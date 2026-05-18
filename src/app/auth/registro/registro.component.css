@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
+.registro-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #0d1f0d;
+  font-family: 'Jersey 10', sans-serif;
+}
+
+.registro-card {
+  background-color: #0f2a0f;
+  border: 2px solid #36ff36;
+  border-radius: 8px;
+  padding: 40px 48px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 0 24px rgba(54, 255, 54, 0.15);
+}
+
+.titulo {
+  text-align: center;
+  font-size: 48px;
+  color: #36ff36;
+  margin: 0 0 4px;
+  letter-spacing: 2px;
+}
+
+.subtitulo {
+  text-align: center;
+  font-size: 22px;
+  color: #aaaaaa;
+  margin: 0 0 28px;
+  font-weight: normal;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+label {
+  color: #36ff36;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+input {
+  background: #0a150a;
+  border: 1px solid #36ff36;
+  border-radius: 4px;
+  color: #ffffff;
+  font-family: 'Jersey 10', sans-serif;
+  font-size: 18px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input::placeholder {
+  color: #446644;
+}
+
+input:focus {
+  border-color: #88ff88;
+}
+
+.error {
+  color: #ff4444;
+  font-size: 15px;
+  margin-top: 4px;
+}
+
+.error-servidor {
+  display: block;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px;
+  background: #36ff36;
+  color: #0d1f0d;
+  border: none;
+  border-radius: 4px;
+  font-family: 'Jersey 10', sans-serif;
+  font-size: 22px;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+button:hover:not(:disabled) {
+  background: #88ff88;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.login-link {
+  text-align: center;
+  color: #aaaaaa;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.login-link a {
+  color: #44aaff;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
