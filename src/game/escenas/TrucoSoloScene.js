@@ -12,10 +12,6 @@ const CARTA    = 0xf5e6c8;
 const REVERSO  = 0x7a1a1a;
 const VACIA    = 0x1a6e1a;
 
-// Zonas del tanteador: Malas (0-15) y Buenas (16-30)
-// Se ubican a la DERECHA de los labels "Vos:" / "Máq:"
-const XZ1 = 1145;   // inicio zona Malas
-const XZ2 = 1200;   // inicio zona Buenas
 
 export default class TrucoSoloScene extends BaseScene {
     constructor() { super('TrucoSoloScene'); }
@@ -60,42 +56,49 @@ export default class TrucoSoloScene extends BaseScene {
     }
 
     _buildRightPanel() {
-        const xL = 1090, xC = 1180;
         const F  = { fontFamily: FONT };
+        const xC = 1180;
+        const xL = 1090;
 
-        // ── TANTEADOR ──
-        this.add.text(xC, 14, 'TANTEADOR', { ...F, fontSize: '16px', fill: '#ddaa55' }).setOrigin(0.5, 0).setDepth(3);
+        this.add.rectangle(xC, 96, 186, 176, 0x0d0804)
+            .setStrokeStyle(1, 0x5a3a10).setDepth(2);
 
-        // Cabeceras de zona — centradas sobre sus respectivas zonas de palitos
-        // Zona 1 (Malas): XZ1=1145, 15 palitos → ~51px → centro ≈ 1170
-        // Zona 2 (Buenas): XZ2=1200, 15 palitos → ~51px → centro ≈ 1225
-        this.add.text(1170, 33, 'Malas',  { ...F, fontSize: '10px', fill: '#888888' }).setOrigin(0.5, 0).setDepth(3);
-        this.add.text(1228, 33, 'Buenas', { ...F, fontSize: '10px', fill: '#888888' }).setOrigin(0.5, 0).setDepth(3);
+        this.add.text(xC, 10, 'T A N T E A D O R', { ...F, fontSize: '13px', fill: '#c89030', letterSpacing: 2 })
+            .setOrigin(0.5, 0).setDepth(3);
 
-        // Labels jugadores a la izquierda; palitos arrancan en XZ1 (a la derecha)
-        this._txtVos = this.add.text(xL, 50, 'Vos: 0', { ...F, fontSize: '13px', fill: '#aaffaa' }).setDepth(3);
-        this._txtMaq = this.add.text(xL, 73, 'Máq: 0', { ...F, fontSize: '13px', fill: '#ffaaaa' }).setDepth(3);
+        this.add.rectangle(xC, 26, 178, 1, 0x7a4a18).setDepth(3);
 
-        // Graphics para los palitos (se limpia y redibuja en cada update)
+        this._txtVos = this.add.text(1134, 29, 'VOS: 0', { ...F, fontSize: '11px', fill: '#66dd44' })
+            .setOrigin(0.5, 0).setDepth(3);
+        this._txtMaq = this.add.text(1226, 29, 'MÁQ: 0', { ...F, fontSize: '11px', fill: '#dd4433' })
+            .setOrigin(0.5, 0).setDepth(3);
+
+        this.add.rectangle(xC, 108, 1, 148, 0x5a3a10).setDepth(3);
+
+        this.add.text(xC, 44, 'MALAS',  { ...F, fontSize: '9px', fill: '#7a6040' }).setOrigin(0.5, 0).setDepth(3);
+        this.add.text(xC, 116, 'BUENAS', { ...F, fontSize: '9px', fill: '#7a6040' }).setOrigin(0.5, 0).setDepth(3);
+
+        this.add.rectangle(xC, 114, 178, 1, 0x3a2a0a).setDepth(3);
+
         this._gTally = this.add.graphics().setDepth(4);
 
-        this.add.rectangle(xC, 100, 165, 1, DIVIDER).setDepth(3);
+        this.add.rectangle(xC, 184, 186, 1, 0x5a3a10).setDepth(3);
 
         // ── ENVIDO ──
-        this.add.text(xL, 106, 'ENVIDO', { ...F, fontSize: '14px', fill: '#55aadd' }).setDepth(3);
-        this._pEnvido = this.add.text(xL, 124, 'Todavía no se cantó envido.',
+        this.add.text(xL, 190, 'ENVIDO', { ...F, fontSize: '14px', fill: '#55aadd' }).setDepth(3);
+        this._pEnvido = this.add.text(xL, 208, 'Todavía no se cantó envido.',
             { ...F, fontSize: '12px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
 
-        this.add.rectangle(xC, 320, 165, 1, DIVIDER).setDepth(3);
+        this.add.rectangle(xC, 400, 178, 1, DIVIDER).setDepth(3);
 
         // ── TRUCO ──
-        this.add.text(xL, 326, 'TRUCO', { ...F, fontSize: '14px', fill: '#ddcc44' }).setDepth(3);
-        this._pTruco = this.add.text(xL, 344, 'Todavía no se cantó truco.',
+        this.add.text(xL, 406, 'TRUCO', { ...F, fontSize: '14px', fill: '#ddcc44' }).setDepth(3);
+        this._pTruco = this.add.text(xL, 424, 'Todavía no se cantó truco.',
             { ...F, fontSize: '12px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
 
-        this.add.rectangle(xC, 665, 165, 1, DIVIDER).setDepth(3);
-        const bk = this.add.rectangle(xC, 692, 165, 34, 0x221810).setStrokeStyle(1, DIVIDER).setDepth(3).setInteractive();
-        this.add.text(xC, 692, 'Volver', { fontFamily: FONT, fontSize: '16px', fill: '#aa6633' }).setOrigin(0.5).setDepth(4);
+        this.add.rectangle(xC, 658, 178, 1, DIVIDER).setDepth(3);
+        const bk = this.add.rectangle(xC, 684, 178, 34, 0x221810).setStrokeStyle(1, DIVIDER).setDepth(3).setInteractive();
+        this.add.text(xC, 684, 'Volver', { fontFamily: FONT, fontSize: '16px', fill: '#aa6633' }).setOrigin(0.5).setDepth(4);
         bk.on('pointerover', () => bk.setFillStyle(0x332818));
         bk.on('pointerout',  () => bk.setFillStyle(0x221810));
         bk.on('pointerdown', () => this.scene.start('GameScene', { playerSprite: this.playerSprite }));
@@ -162,47 +165,76 @@ export default class TrucoSoloScene extends BaseScene {
         });
     }
 
-    // ─── TANTEADOR: palitos ───────────────────────────────────────
+    // ─── TANTEADOR: palitos estilo fósforo ──────────────────────
     _redrawTally(ptsVos, ptsMaq) {
         this._gTally.clear();
-        const yV = 50, yM = 73, H = 13;
 
-        this._drawPalitos(Math.min(ptsVos, 15),     XZ1, yV, H, 0x88ff88);
-        this._drawPalitos(Math.max(0, ptsVos - 15), XZ2, yV, H, 0x44cc44);
-        this._drawPalitos(Math.min(ptsMaq, 15),     XZ1, yM, H, 0xff8888);
-        this._drawPalitos(Math.max(0, ptsMaq - 15), XZ2, yM, H, 0xcc4444);
+        const CX_VOS = 1134, CX_MAQ = 1226;
+        const HALF   = 43;
+        const yMalas = 56, yBuenas = 127;
 
-        // Separador entre zona Malas y zona Buenas
-        const sep = XZ2 - 4;
-        this._gTally.lineStyle(1, 0x5a4020, 1);
-        this._gTally.beginPath();
-        this._gTally.moveTo(sep, yV - 4);
-        this._gTally.lineTo(sep, yM + H + 4);
-        this._gTally.strokePath();
+        this._drawPalitoSection(CX_VOS, HALF, yMalas,  Math.min(ptsVos, 15),     false);
+        this._drawPalitoSection(CX_VOS, HALF, yBuenas, Math.max(0, ptsVos - 15), false);
+        this._drawPalitoSection(CX_MAQ, HALF, yMalas,  Math.min(ptsMaq, 15),     true);
+        this._drawPalitoSection(CX_MAQ, HALF, yBuenas, Math.max(0, ptsMaq - 15), true);
     }
 
-    _drawPalitos(count, xStart, y, h, color) {
-        if (count <= 0) return;
-        this._gTally.lineStyle(2, color, 1);
-        let cx = xStart, gs = xStart;
-        for (let i = 0; i < count; i++) {
-            const p = i % 5;
-            if (p === 0) gs = cx;
-            if (p === 4) {
-                // Diagonal del grupo de 5
-                this._gTally.beginPath();
-                this._gTally.moveTo(gs - 2, y + h + 2);
-                this._gTally.lineTo(cx + 1,  y - 2);
-                this._gTally.strokePath();
-                cx += 7; // espacio entre grupos
-            } else {
-                this._gTally.beginPath();
-                this._gTally.moveTo(cx, y);
-                this._gTally.lineTo(cx, y + h);
-                this._gTally.strokePath();
-                cx += 3;
+    /** Dibuja los palitos de `pts` puntos centrados en `cx` dentro de la sección. */
+    _drawPalitoSection(cx, halfW, yTop, pts, isMaquina) {
+        if (pts <= 0) return;
+
+        const BS   = 20;   // tamaño del cuadrado de fósforos
+        const BGAP = 5;    // separación entre cuadrados
+        const SL   = 14;   // longitud del palito suelto (diagonal)
+        const SGAP = 5;    // separación entre palitos sueltos
+
+        const stickColor = isMaquina ? 0xd46010 : 0xc8a030;
+        const headColor  = 0xcc2208;
+
+        const fullSets = Math.floor(pts / 5);
+        const remainder = pts % 5;
+
+        if (fullSets > 0) {
+            const totalW = fullSets * BS + (fullSets - 1) * BGAP;
+            let bx = cx - totalW / 2;
+            for (let i = 0; i < fullSets; i++) {
+                this._drawMatchstickBox(bx, yTop, BS, stickColor, headColor);
+                bx += BS + BGAP;
             }
         }
+
+        if (remainder > 0) {
+            const totalW = remainder * SL + (remainder - 1) * SGAP;
+            let sx = cx - totalW / 2;
+            const sy = fullSets > 0 ? yTop + BS + 6 : yTop + 3;
+            for (let i = 0; i < remainder; i++) {
+                this._drawMatchstick(sx, sy + SL, sx + SL, sy, stickColor, headColor);
+                sx += SL + SGAP;
+            }
+        }
+    }
+
+    /** Dibuja un cuadrado cerrado de 4 palitos + diagonal (= 5 puntos). */
+    _drawMatchstickBox(bx, by, BS, stickColor, headColor) {
+        this._drawMatchstick(bx,      by + BS, bx,      by,      stickColor, headColor);
+        this._drawMatchstick(bx,      by,      bx + BS, by,      stickColor, headColor);
+        this._drawMatchstick(bx + BS, by,      bx + BS, by + BS, stickColor, headColor);
+        this._drawMatchstick(bx + BS, by + BS, bx,      by + BS, stickColor, headColor);
+        this._drawMatchstick(bx,      by + BS, bx + BS, by,      stickColor, headColor);
+    }
+
+    /** Dibuja un palito de fósforo de (x1,y1) a (x2,y2) con cabeza roja en (x2,y2). */
+    _drawMatchstick(x1, y1, x2, y2, stickColor, headColor) {
+        const g = this._gTally;
+        g.lineStyle(2, stickColor, 1);
+        g.beginPath();
+        g.moveTo(x1, y1);
+        g.lineTo(x2, y2);
+        g.strokePath();
+        g.fillStyle(headColor, 1);
+        g.fillCircle(x2, y2, 3);
+        g.fillStyle(stickColor, 0.7);
+        g.fillCircle(x1, y1, 1.5);
     }
 
     // ─── BUBBLE HELPERS ──────────────────────────────────────────
@@ -360,8 +392,8 @@ export default class TrucoSoloScene extends BaseScene {
     // ─── UI ───────────────────────────────────────────────────────
     _updateUI(m) {
         // Tanteador
-        this._txtVos.setText(`Vos: ${m.puntosHumano}`);
-        this._txtMaq.setText(`Máq: ${m.puntosMaquina}`);
+        this._txtVos.setText(`VOS: ${m.puntosHumano}`);
+        this._txtMaq.setText(`MÁQ: ${m.puntosMaquina}`);
         this._redrawTally(m.puntosHumano, m.puntosMaquina);
 
         // ── Game Over overlay ─────────────────────────────────────
@@ -509,11 +541,14 @@ export default class TrucoSoloScene extends BaseScene {
         } else {
             // ── Estado normal: mostrar botones de canto habilitados/deshabilitados ──
 
-            // ENVIDO — solo válido antes de la primera baza
-            const envOk = !m.envidoCantado && (m.bazas?.length ?? 0) === 0 && esMiTurno && !manoEnd;
-            btns.push(['Envido',       '#4488ff', envOk ? () => this._call('cantar-envido-tipo', { manoId: m.id, tipo: 'Envido'       }) : null]);
-            btns.push(['Real Envido',  '#4488ff', envOk ? () => this._call('cantar-envido-tipo', { manoId: m.id, tipo: 'Real Envido'  }) : null]);
-            btns.push(['Falta Envido', '#4488ff', envOk ? () => this._call('cantar-envido-tipo', { manoId: m.id, tipo: 'Falta Envido' }) : null]);
+            // ENVIDO — solo válido antes de la primera baza y antes de que el truco esté resuelto
+            const envidoPosible = !m.envidoCantado && !m.trucoResuelto
+                && (m.bazas?.length ?? 0) === 0 && !manoEnd;
+            if (envidoPosible) {
+                btns.push(['Envido',       '#4488ff', esMiTurno ? () => this._call('cantar-envido-tipo', { manoId: m.id, tipo: 'Envido'       }) : null]);
+                btns.push(['Real Envido',  '#4488ff', esMiTurno ? () => this._call('cantar-envido-tipo', { manoId: m.id, tipo: 'Real Envido'  }) : null]);
+                btns.push(['Falta Envido', '#4488ff', esMiTurno ? () => this._call('cantar-envido-tipo', { manoId: m.id, tipo: 'Falta Envido' }) : null]);
+            }
 
             // TRUCO / RETRUCO / VALE CUATRO
             if (!trucoCantado) {
