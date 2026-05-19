@@ -1,75 +1,103 @@
-@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&family=Press+Start+2P&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+.barra-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 36px;
+  background-color: #5C3317;
+  z-index: 10;
+}
+
+.barra-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 36px;
+  background-color: #5C3317;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.barra-bottom span {
+  color: #F5EDD0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+}
 
 .login-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #0d1f0d;
-  font-family: 'Jersey 10', sans-serif;
+  font-family: 'Press Start 2P', monospace;
+  background: url('/assets/fondo-auth.png') center center / 100% 100% no-repeat;
 }
 
 .login-card {
-  background-color: #0f2a0f;
-  border: 2px solid #36ff36;
-  border-radius: 8px;
-  padding: 40px 48px;
+  background-color: #C8955A;
+  border: 6px solid #5C3317;
+  border-radius: 4px;
+  padding: 32px 40px;
   width: 100%;
-  max-width: 420px;
-  box-shadow: 0 0 24px rgba(54, 255, 54, 0.15);
+  max-width: 460px;
 }
 
 .titulo {
   text-align: center;
-  font-size: 48px;
-  color: #36ff36;
-  margin: 0 0 4px;
-  letter-spacing: 2px;
-}
-
-.subtitulo {
-  text-align: center;
-  font-size: 22px;
-  color: #aaaaaa;
-  margin: 0 0 28px;
-  font-weight: normal;
+  font-family: 'Jersey 10', monospace;
+  font-size: 42px;
+  color: #2B1500;
+  margin: 0 0 24px;
+  line-height: 1.2;
+  text-shadow: 2px 2px 0px #F5D9A8;
+  white-space: nowrap;
 }
 
 .campo {
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 label {
-  color: #36ff36;
-  font-size: 18px;
-  margin-bottom: 4px;
+  color: #2B1500;
+  font-size: 9px;
+  margin-bottom: 6px;
 }
 
 input {
-  background: #0a150a;
-  border: 1px solid #36ff36;
-  border-radius: 4px;
-  color: #ffffff;
-  font-family: 'Jersey 10', sans-serif;
-  font-size: 18px;
-  padding: 10px 12px;
+  background: #F5EDD0;
+  border: 3px solid #5C3317;
+  border-radius: 2px;
+  color: #2B1500;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 10px 10px;
   outline: none;
-  transition: border-color 0.2s;
-}
-
-input::placeholder {
-  color: #446644;
 }
 
 input:focus {
-  border-color: #88ff88;
+  background: #FFF8E7;
+  border-color: #8B4513;
+}
+
+input::placeholder {
+  color: #A0856A;
+  font-size: 8px;
 }
 
 .error {
-  color: #ff4444;
-  font-size: 15px;
+  color: #CC0000;
+  font-size: 7px;
   margin-top: 4px;
 }
 
@@ -81,39 +109,38 @@ input:focus {
 
 button {
   width: 100%;
-  margin-top: 8px;
+  margin-top: 12px;
   padding: 12px;
-  background: #36ff36;
-  color: #0d1f0d;
-  border: none;
-  border-radius: 4px;
-  font-family: 'Jersey 10', sans-serif;
-  font-size: 22px;
+  background: #8B4513;
+  color: #F5EDD0;
+  border: 3px solid #5C3317;
+  border-radius: 2px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
   cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
+  box-shadow: 3px 3px 0px #5C3317;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
 button:hover:not(:disabled) {
-  background: #88ff88;
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #5C3317;
 }
 
 button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .registro-link {
   text-align: center;
-  color: #aaaaaa;
-  font-size: 16px;
-  margin-top: 20px;
+  color: #2B1500;
+  font-size: 7px;
+  margin-top: 18px;
+  line-height: 1.8;
 }
 
 .registro-link a {
-  color: #44aaff;
-  text-decoration: none;
-}
-
-.registro-link a:hover {
+  color: #1a4fa0;
   text-decoration: underline;
 }
