@@ -49,5 +49,25 @@ export default class MenuScene extends BaseScene {
         salir.on('pointerdown', () => {
             console.log("Saliste");
         });
+
+        const login = this.add.text(640, 570, 'INICIAR SESIÓN', {
+            fontFamily: '"Jersey 10"',
+            fontSize: '28px',
+            fill: '#ffdd44'
+        }).setOrigin(0.5).setInteractive();
+
+        const registro = this.add.text(640, 620, 'REGISTRARSE', {
+            fontFamily: '"Jersey 10"',
+            fontSize: '28px',
+            fill: '#ffdd44'
+        }).setOrigin(0.5).setInteractive();
+
+        [login, registro].forEach(btn => {
+            btn.on('pointerover', () => btn.setAlpha(0.7));
+            btn.on('pointerout',  () => btn.setAlpha(1));
+        });
+
+        login.on('pointerdown', () => { window.location.href = '/login'; });
+        registro.on('pointerdown', () => { window.location.href = '/registro'; });
     }
 }
