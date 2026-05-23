@@ -527,6 +527,14 @@ export default class TrucoSoloScene extends BaseScene {
 
         } else if (pendEnv) {
             btns.push(['QUIERO',    '#44ff44', () => this._call('responder-envido', { manoId: m.id, aceptar: true  })]);
+            // Escalaciones: Real Envido solo si el tipo cantado es Envido; Falta Envido si no es ya Falta Envido
+            const tipoEnv = m.tipoEnvidoCantado; // 'Envido' | 'RealEnvido' | 'FaltaEnvido'
+            if (tipoEnv === 'Envido') {
+                btns.push(['REAL ENVIDO',  '#ffaa00', () => this._call('responder-envido', { manoId: m.id, aceptar: true, escalarA: 'Real Envido'  })]);
+            }
+            if (tipoEnv !== 'FaltaEnvido') {
+                btns.push(['FALTA ENVIDO', '#ff8800', () => this._call('responder-envido', { manoId: m.id, aceptar: true, escalarA: 'Falta Envido' })]);
+            }
             btns.push(['NO QUIERO', '#ff4444', () => this._call('responder-envido', { manoId: m.id, aceptar: false })]);
 
         } else if (pendTru) {
@@ -555,8 +563,8 @@ export default class TrucoSoloScene extends BaseScene {
                 // Truco no cantado aún → mostrar botón Truco (inhabilitado si no es mi turno)
                 const ok = esMiTurno && !manoEnd;
                 btns.push(['Truco', '#cc4444', ok ? () => this._call('cantar-truco', { manoId: m.id }) : null]);
-            } else if (!trucoResuelto && m.nivelTruco < 3) {
-                // Truco aceptado, se puede escalar → mostrar escalación (inhabilitada si no es mi turno)
+            } else if (trucoCantado && m.nivelTruco < 3) {
+                // Truco cantado y aceptado — se puede escalar (inhabilitado si no es mi turno)
                 const lbl = m.nivelTruco === 1 ? 'Retruco' : 'Vale Cuatro';
                 const ok  = esMiTurno && !manoEnd;
                 btns.push([lbl, '#cc4444', ok ? () => this._call('escalar-truco', { manoId: m.id }) : null]);

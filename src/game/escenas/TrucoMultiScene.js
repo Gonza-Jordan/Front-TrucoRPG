@@ -58,36 +58,44 @@ export default class TrucoMultiScene extends BaseScene {
         const xL = 1090, xC = 1180;
         const F  = { fontFamily: FONT };
 
-        // ── TANTEADOR con palitos ──
-        this.add.text(xC, 14, 'TANTEADOR', { ...F, fontSize: '16px', fill: '#ddaa55' }).setOrigin(0.5, 0).setDepth(3);
+        // ── TANTEADOR: mismo estilo que modo Solo ──────────────────
+        this.add.rectangle(xC, 96, 186, 176, 0x0d0804)
+            .setStrokeStyle(1, 0x5a3a10).setDepth(2);
 
-        // Etiquetas "Malas" y "Buenas"
-        const xZ1 = 1105, xZ2 = 1105 + 64;
-        this.add.text((xZ1 + xZ1+56)/2, 33, 'Malas',  { ...F, fontSize: '10px', fill: '#888888' }).setOrigin(0.5, 0).setDepth(3);
-        this.add.text((xZ2 + xZ2+56)/2, 33, 'Buenas', { ...F, fontSize: '10px', fill: '#888888' }).setOrigin(0.5, 0).setDepth(3);
+        this.add.text(xC, 10, 'T A N T E A D O R', { ...F, fontSize: '13px', fill: '#c89030', letterSpacing: 2 })
+            .setOrigin(0.5, 0).setDepth(3);
 
-        // Labels jugadores
-        this._txtJ1 = this.add.text(xL, 50, 'J1: 0', { ...F, fontSize: '13px', fill: '#aaffaa' }).setDepth(3);
-        this._txtJ2 = this.add.text(xL, 73, 'J2: 0', { ...F, fontSize: '13px', fill: '#ffaaaa' }).setDepth(3);
+        this.add.rectangle(xC, 26, 178, 1, 0x7a4a18).setDepth(3);
 
-        // Tally graphics (se redibuja en cada update)
+        this._txtJ1 = this.add.text(1134, 29, 'J1: 0', { ...F, fontSize: '11px', fill: '#66dd44' })
+            .setOrigin(0.5, 0).setDepth(3);
+        this._txtJ2 = this.add.text(1226, 29, 'J2: 0', { ...F, fontSize: '11px', fill: '#dd4433' })
+            .setOrigin(0.5, 0).setDepth(3);
+
+        this.add.rectangle(xC, 108, 1, 148, 0x5a3a10).setDepth(3);
+
+        this.add.text(xC, 44, 'MALAS',  { ...F, fontSize: '9px', fill: '#7a6040' }).setOrigin(0.5, 0).setDepth(3);
+        this.add.text(xC, 116, 'BUENAS', { ...F, fontSize: '9px', fill: '#7a6040' }).setOrigin(0.5, 0).setDepth(3);
+
+        this.add.rectangle(xC, 114, 178, 1, 0x3a2a0a).setDepth(3);
+
         this._gTally = this.add.graphics().setDepth(4);
 
-        this.add.rectangle(xC, 100, 165, 1, DIVIDER).setDepth(3);
+        this.add.rectangle(xC, 184, 186, 1, 0x5a3a10).setDepth(3);
 
         // ── ENVIDO ──
-        this.add.text(xL, 106, 'ENVIDO', { ...F, fontSize: '14px', fill: '#55aadd' }).setDepth(3);
-        this._pEnvido = this.add.text(xL, 124, 'Todavía no se cantó envido.', { ...F, fontSize: '12px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
+        this.add.text(xL, 190, 'ENVIDO', { ...F, fontSize: '14px', fill: '#55aadd' }).setDepth(3);
+        this._pEnvido = this.add.text(xL, 208, 'Todavía no se cantó envido.', { ...F, fontSize: '12px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
 
-        this.add.rectangle(xC, 320, 165, 1, DIVIDER).setDepth(3);
+        this.add.rectangle(xC, 400, 178, 1, DIVIDER).setDepth(3);
 
         // ── TRUCO ──
-        this.add.text(xL, 326, 'TRUCO', { ...F, fontSize: '14px', fill: '#ddcc44' }).setDepth(3);
-        this._pTruco = this.add.text(xL, 344, 'Todavía no se cantó truco.', { ...F, fontSize: '12px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
+        this.add.text(xL, 406, 'TRUCO', { ...F, fontSize: '14px', fill: '#ddcc44' }).setDepth(3);
+        this._pTruco = this.add.text(xL, 424, 'Todavía no se cantó truco.', { ...F, fontSize: '12px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
 
-        this.add.rectangle(xC, 665, 165, 1, DIVIDER).setDepth(3);
-        const bk = this.add.rectangle(xC, 692, 165, 34, 0x221810).setStrokeStyle(1, DIVIDER).setDepth(3).setInteractive();
-        this.add.text(xC, 692, 'Volver', { fontFamily: FONT, fontSize: '16px', fill: '#aa6633' }).setOrigin(0.5).setDepth(4);
+        this.add.rectangle(xC, 658, 178, 1, DIVIDER).setDepth(3);
+        const bk = this.add.rectangle(xC, 684, 178, 34, 0x221810).setStrokeStyle(1, DIVIDER).setDepth(3).setInteractive();
+        this.add.text(xC, 684, 'Volver', { fontFamily: FONT, fontSize: '16px', fill: '#aa6633' }).setOrigin(0.5).setDepth(4);
         bk.on('pointerover', () => bk.setFillStyle(0x332818));
         bk.on('pointerout',  () => bk.setFillStyle(0x221810));
         bk.on('pointerdown', () => {
@@ -149,49 +157,73 @@ export default class TrucoMultiScene extends BaseScene {
         });
     }
 
-    // ─── TANTEADOR: palitos ───────────────────────────────────────
+    // ─── TANTEADOR: palitos estilo fósforo (idéntico al modo Solo) ──
     _redrawTally(ptsJ1, ptsJ2) {
         this._gTally.clear();
-        const xZ1 = 1105, xZ2 = 1105 + 64;
-        const yV = 50, yM = 73, H = 13;
 
-        this._drawPalitos(Math.min(ptsJ1, 15),        xZ1, yV, H, 0x88ff88);
-        this._drawPalitos(Math.max(0, ptsJ1 - 15),    xZ2, yV, H, 0x44cc44);
-        this._drawPalitos(Math.min(ptsJ2, 15),        xZ1, yM, H, 0xff8888);
-        this._drawPalitos(Math.max(0, ptsJ2 - 15),    xZ2, yM, H, 0xcc4444);
+        const CX_J1 = 1134, CX_J2 = 1226;
+        const HALF  = 43;
+        const yMalas = 56, yBuenas = 127;
 
-        // Separador de zonas
-        const sep = xZ2 - 5;
-        this._gTally.lineStyle(1, 0x5a4020, 1);
-        this._gTally.beginPath();
-        this._gTally.moveTo(sep, yV - 4);
-        this._gTally.lineTo(sep, yM + H + 4);
-        this._gTally.strokePath();
+        this._drawPalitoSection(CX_J1, HALF, yMalas,  Math.min(ptsJ1, 15),     false);
+        this._drawPalitoSection(CX_J1, HALF, yBuenas, Math.max(0, ptsJ1 - 15), false);
+        this._drawPalitoSection(CX_J2, HALF, yMalas,  Math.min(ptsJ2, 15),     true);
+        this._drawPalitoSection(CX_J2, HALF, yBuenas, Math.max(0, ptsJ2 - 15), true);
     }
 
-    _drawPalitos(count, xStart, y, h, color) {
-        if (count <= 0) return;
-        this._gTally.lineStyle(2, color, 1);
-        let cx = xStart, gs = xStart;
-        for (let i = 0; i < count; i++) {
-            const p = i % 5;
-            if (p === 0) gs = cx;
-            if (p === 4) {
-                // Palito diagonal (5to del grupo)
-                this._gTally.beginPath();
-                this._gTally.moveTo(gs - 2, y + h + 2);
-                this._gTally.lineTo(cx + 1, y - 2);
-                this._gTally.strokePath();
-                cx += 7; // espacio tras grupo
-            } else {
-                // Palito vertical
-                this._gTally.beginPath();
-                this._gTally.moveTo(cx, y);
-                this._gTally.lineTo(cx, y + h);
-                this._gTally.strokePath();
-                cx += 3;
+    _drawPalitoSection(cx, halfW, yTop, pts, isJ2) {
+        if (pts <= 0) return;
+
+        const BS   = 20;
+        const BGAP = 5;
+        const SL   = 14;
+        const SGAP = 5;
+
+        const stickColor = isJ2 ? 0xd46010 : 0xc8a030;
+        const headColor  = 0xcc2208;
+
+        const fullSets  = Math.floor(pts / 5);
+        const remainder = pts % 5;
+
+        if (fullSets > 0) {
+            const totalW = fullSets * BS + (fullSets - 1) * BGAP;
+            let bx = cx - totalW / 2;
+            for (let i = 0; i < fullSets; i++) {
+                this._drawMatchstickBox(bx, yTop, BS, stickColor, headColor);
+                bx += BS + BGAP;
             }
         }
+
+        if (remainder > 0) {
+            const totalW = remainder * SL + (remainder - 1) * SGAP;
+            let sx = cx - totalW / 2;
+            const sy = fullSets > 0 ? yTop + BS + 6 : yTop + 3;
+            for (let i = 0; i < remainder; i++) {
+                this._drawMatchstick(sx, sy + SL, sx + SL, sy, stickColor, headColor);
+                sx += SL + SGAP;
+            }
+        }
+    }
+
+    _drawMatchstickBox(bx, by, BS, stickColor, headColor) {
+        this._drawMatchstick(bx,      by + BS, bx,      by,      stickColor, headColor);
+        this._drawMatchstick(bx,      by,      bx + BS, by,      stickColor, headColor);
+        this._drawMatchstick(bx + BS, by,      bx + BS, by + BS, stickColor, headColor);
+        this._drawMatchstick(bx + BS, by + BS, bx,      by + BS, stickColor, headColor);
+        this._drawMatchstick(bx,      by + BS, bx + BS, by,      stickColor, headColor);
+    }
+
+    _drawMatchstick(x1, y1, x2, y2, stickColor, headColor) {
+        const g = this._gTally;
+        g.lineStyle(2, stickColor, 1);
+        g.beginPath();
+        g.moveTo(x1, y1);
+        g.lineTo(x2, y2);
+        g.strokePath();
+        g.fillStyle(headColor, 1);
+        g.fillCircle(x2, y2, 3);
+        g.fillStyle(stickColor, 0.7);
+        g.fillCircle(x1, y1, 1.5);
     }
 
     // ─── SignalR ──────────────────────────────────────────────────
@@ -324,7 +356,7 @@ export default class TrucoMultiScene extends BaseScene {
             }
             if (!e.trucoCantado && esMiTurno) {
                 btns.push(['Truco', '#cc4444', () => multiplayerManager.solicitarTruco()]);
-            } else if (e.trucoCantado && !e.trucoResuelto && e.nivelTruco < 3 && esMiTurno) {
+            } else if (e.trucoCantado && e.nivelTruco < 3 && esMiTurno) {
                 const lbl = e.nivelTruco === 1 ? 'Retruco' : 'Vale Cuatro';
                 btns.push([lbl, '#cc4444', () => multiplayerManager.escalarTruco()]);
             }
