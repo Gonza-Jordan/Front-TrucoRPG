@@ -563,13 +563,13 @@ export default class TrucoSoloScene extends BaseScene {
                 // Truco no cantado aún → mostrar botón Truco (inhabilitado si no es mi turno)
                 const ok = esMiTurno && !manoEnd;
                 btns.push(['Truco', '#cc4444', ok ? () => this._call('cantar-truco', { manoId: m.id }) : null]);
-            } else if (trucoCantado && m.nivelTruco < 3) {
-                // Truco cantado y aceptado — se puede escalar (inhabilitado si no es mi turno)
+            } else if (trucoCantado && !trucoResuelto && m.nivelTruco < 3) {
+                // Truco activo pero aún no resuelto — el oponente del cantor puede escalar
                 const lbl = m.nivelTruco === 1 ? 'Retruco' : 'Vale Cuatro';
                 const ok  = esMiTurno && !manoEnd;
                 btns.push([lbl, '#cc4444', ok ? () => this._call('escalar-truco', { manoId: m.id }) : null]);
             }
-            // Si trucoCantado && trucoResuelto: la mano debería haber terminado (no mostrar nada de truco)
+            // Si trucoCantado && trucoResuelto: truco aceptado/rechazado → no se puede escalar más
 
             // IR AL MAZO — solo visible cuando es mi turno
             if (esMiTurno && !manoEnd) {

@@ -356,7 +356,7 @@ export default class TrucoMultiScene extends BaseScene {
             }
             if (!e.trucoCantado && esMiTurno) {
                 btns.push(['Truco', '#cc4444', () => multiplayerManager.solicitarTruco()]);
-            } else if (e.trucoCantado && e.nivelTruco < 3 && esMiTurno) {
+            } else if (e.trucoCantado && !e.trucoResuelto && e.nivelTruco < 3 && esMiTurno) {
                 const lbl = e.nivelTruco === 1 ? 'Retruco' : 'Vale Cuatro';
                 btns.push([lbl, '#cc4444', () => multiplayerManager.escalarTruco()]);
             }
