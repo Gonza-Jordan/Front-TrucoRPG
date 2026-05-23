@@ -429,16 +429,36 @@ export default class TrucoSoloScene extends BaseScene {
         );
 
         // ── Burbuja de diálogo ──────────────────────────────────
+        const envidoChanged = m.estadoEnvido !== this._prevEstadoEnvido;
+        const trucoChanged  = m.estadoTruco  !== this._prevEstadoTruco;
+
         if (pendTru || pendEnv) {
-            // La máquina cantó → burbuja persistente hasta que el humano responda
-            if (this._bubbleTimer) { this._bubbleTimer.remove(); this._bubbleTimer = null; }
-            const txt = this._cantoBubbleText(m, pendTru, pendEnv);
-            if (txt) this._showBubble(txt);
+            // La máquina tiene un canto pendiente de respuesta.
+            // Pero si el envido acaba de resolverse (la máquina respondió al canto del humano),
+            // mostramos brevemente esa respuesta antes de volver al canto pendiente.
+            if (pendTru && envidoChanged && m.envidoCantado && !this._prevPendEnv) {
+                const e = (m.estadoEnvido || '').toLowerCase();
+                let rsp = null;
+                if      (e.includes('no quiso') || e.includes('no quiere')) rsp = '¡No quiero!';
+                else if (e.includes('quiso')    || e.includes('quiere'))    rsp = '¡Quiero!';
+                if (rsp) {
+                    // Muestra la respuesta al envido y luego vuelve al canto del truco
+                    this._showTempBubble(rsp, 2000);
+                    this.time.delayedCall(2100, () => {
+                        const trucotxt = this._cantoBubbleText(m, pendTru, false);
+                        if (trucotxt) this._showBubble(trucotxt);
+                    }, [], this);
+                } else {
+                    const txt = this._cantoBubbleText(m, pendTru, pendEnv);
+                    if (txt) { if (this._bubbleTimer) { this._bubbleTimer.remove(); this._bubbleTimer = null; } this._showBubble(txt); }
+                }
+            } else {
+                if (this._bubbleTimer) { this._bubbleTimer.remove(); this._bubbleTimer = null; }
+                const txt = this._cantoBubbleText(m, pendTru, pendEnv);
+                if (txt) this._showBubble(txt);
+            }
         } else {
             // Detectar si la máquina acaba de RESPONDER a un canto del humano
-            const trucoChanged  = m.estadoTruco  !== this._prevEstadoTruco;
-            const envidoChanged = m.estadoEnvido !== this._prevEstadoEnvido;
-
             let responseText = null;
 
             if (trucoChanged && m.trucoCantado && !this._prevPendTru) {
@@ -546,6 +566,13 @@ export default class TrucoSoloScene extends BaseScene {
             }
             btns.push(['NO QUIERO', '#ff4444', () => this._call('responder-truco', { manoId: m.id, aceptar: false })]);
 
+            // Envido cantable mientras se decide el truco (sin bazas jugadas)
+            if (!m.envidoCantado && (m.bazas?.length ?? 0) === 0) {
+                btns.push(['Envido',       '#4488ff', () => this._call('cantar-envido-tipo', { manoId: m.id, tipo: 'Envido'       })]);
+                btns.push(['Real Envido',  '#4488ff', () => this._call('cantar-envido-tipo', { manoId: m.id, tipo: 'Real Envido'  })]);
+                btns.push(['Falta Envido', '#4488ff', () => this._call('cantar-envido-tipo', { manoId: m.id, tipo: 'Falta Envido' })]);
+            }
+
         } else {
             // ── Estado normal: mostrar botones de canto habilitados/deshabilitados ──
 
@@ -563,13 +590,13 @@ export default class TrucoSoloScene extends BaseScene {
                 // Truco no cantado aún → mostrar botón Truco (inhabilitado si no es mi turno)
                 const ok = esMiTurno && !manoEnd;
                 btns.push(['Truco', '#cc4444', ok ? () => this._call('cantar-truco', { manoId: m.id }) : null]);
-            } else if (trucoCantado && !trucoResuelto && m.nivelTruco < 3) {
-                // Truco activo pero aún no resuelto — el oponente del cantor puede escalar
+            } else if (trucoCantado && !trucoResuelto && m.nivelTruco < 3 && m.cantorTruco !== 'Humano') {
+                // Truco activo, no resuelto, y fue la máquina quien cantó el nivel actual → humano puede escalar
                 const lbl = m.nivelTruco === 1 ? 'Retruco' : 'Vale Cuatro';
                 const ok  = esMiTurno && !manoEnd;
                 btns.push([lbl, '#cc4444', ok ? () => this._call('escalar-truco', { manoId: m.id }) : null]);
             }
-            // Si trucoCantado && trucoResuelto: truco aceptado/rechazado → no se puede escalar más
+            // Si trucoResuelto o cantorTruco === 'Humano': no se puede escalar más
 
             // IR AL MAZO — solo visible cuando es mi turno
             if (esMiTurno && !manoEnd) {
