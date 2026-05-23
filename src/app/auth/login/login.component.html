@@ -1,0 +1,36 @@
+<div class="barra-top"></div>
+<div class="login-wrapper">
+  <div class="login-card">
+    <h1 class="titulo">INICIAR SESIÓN</h1>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+      <div class="campo">
+        <label for="email">Ingresar Email:</label>
+        <input id="email" type="email" formControlName="email" placeholder="tu@email.com" />
+        <span class="error" *ngIf="email.touched && email.errors?.['required']">Campo obligatorio</span>
+        <span class="error" *ngIf="email.touched && email.errors?.['email']">Email inválido</span>
+      </div>
+
+      <div class="campo">
+        <label for="password">Ingresar Contraseña:</label>
+        <input id="password" type="password" formControlName="password" placeholder="Tu contraseña" />
+        <span class="error" *ngIf="password.touched && password.errors?.['required']">Campo obligatorio</span>
+      </div>
+
+      <span class="error error-servidor" *ngIf="errorServidor">{{ errorServidor }}</span>
+
+      <button type="submit" [disabled]="cargando">
+        {{ cargando ? 'Ingresando...' : 'Ingresar' }}
+      </button>
+
+    </form>
+
+    <p class="registro-link">
+      ¿No tenés cuenta? <a routerLink="/registro">Registrate</a>
+    </p>
+  </div>
+</div>
+<div class="barra-bottom">
+  <span>Copyright © 2026 Truco y mafia. All rights reserved.</span>
+</div>
