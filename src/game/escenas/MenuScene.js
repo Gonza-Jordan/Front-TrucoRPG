@@ -5,7 +5,13 @@ export default class MenuScene extends BaseScene {
         super('MenuScene');
     }
 
+    preload() {
+        this.load.image('fondo-menu', './assets/home.png');
+    }
+
     create() {
+        this.add.image(640, 360, 'fondo-menu').setDisplaySize(1280, 720);
+
         this.botonPantallaCompleta();
 
         this.add.text(640, 200, 'TRUCO RPG', {

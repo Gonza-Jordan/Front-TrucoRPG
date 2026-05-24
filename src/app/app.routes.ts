@@ -4,7 +4,7 @@ import { RegistroComponent } from './auth/registro/registro.component';
 import { LoginComponent } from './auth/login/login.component';
 import { Home } from './pages/home/home';
 import { LandingPage } from './pages/landing-page/landing-page';
-import { ConfiguracionComponent } from './configuracion/configuracion.component';
+import { ConfiguracionComponent } from './pages/configuracion/configuracion';
 
 export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
@@ -12,6 +12,6 @@ export const routes: Routes = [
   { path: 'registro', component: RegistroComponent, data: { header: 'registro' } },
   { path: 'login', component: LoginComponent, data: { header: 'login' } },
   { path: 'home', component: Home, data: { header: 'home' } },
-  { path: 'configuracion', component: ConfiguracionComponent },
+  { path: 'configuracion', component: ConfiguracionComponent, data: { header: 'configuracion' } },
   { path: '**', redirectTo: '' },
 ];

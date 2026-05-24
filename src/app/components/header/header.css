@@ -2,13 +2,14 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1.5rem;
-    padding: 1.5rem 2rem;
+    gap: 1rem;
+    padding: 0.6rem 2rem;
     background: #7a421d;
     border-bottom: 4px solid #4d2913;
     box-shadow: 0 4px 0 #4d2913;
     flex-wrap: wrap;
     font-family: 'Jersey 20';
+    flex-shrink: 0;
 }
 
 header .logo {

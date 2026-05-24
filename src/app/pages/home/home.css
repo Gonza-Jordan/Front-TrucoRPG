@@ -1,12 +1,20 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
 main {
-    min-height: 100vh;
     flex: 1;
+    min-height: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 2rem;
     overflow: hidden;
     font-family: 'Jersey 20';
+    background: url('/assets/home.png') center center / cover no-repeat;
 }
 
 .contenedor-menu {
