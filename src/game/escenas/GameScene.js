@@ -14,6 +14,8 @@ export default class GameScene extends BaseScene {
         this.startX       = data.x || 100;
         this.startY       = data.y || 100;
         this.esMultijugador = data.multijugador || false;
+        this.modoJuego = data.modoJuego ?? 0;
+        this.claseHeroe = data.claseHeroe ?? null;
     }
 
     create() {
@@ -96,7 +98,9 @@ export default class GameScene extends BaseScene {
                 });
             } else {
                 this.scene.start('TrucoSoloScene', {
-                    playerSprite: this.playerKey
+                    playerSprite: this.playerKey,
+                    modoJuego: this.modoJuego,
+                    claseHeroe: this.claseHeroe,
                 });
             }
         }

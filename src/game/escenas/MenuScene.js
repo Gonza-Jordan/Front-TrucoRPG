@@ -50,23 +50,30 @@ export default class MenuScene extends BaseScene {
             console.log("Saliste");
         });
 
-        const login = this.add.text(640, 570, 'INICIAR SESIÓN', {
+        const config = this.add.text(640, 545, 'CONFIGURACIÓN', {
+            fontFamily: '"Jersey 10"',
+            fontSize: '28px',
+            fill: '#aaaaaa'
+        }).setOrigin(0.5).setInteractive();
+
+        const login = this.add.text(640, 605, 'INICIAR SESIÓN', {
             fontFamily: '"Jersey 10"',
             fontSize: '28px',
             fill: '#ffdd44'
         }).setOrigin(0.5).setInteractive();
 
-        const registro = this.add.text(640, 620, 'REGISTRARSE', {
+        const registro = this.add.text(640, 655, 'REGISTRARSE', {
             fontFamily: '"Jersey 10"',
             fontSize: '28px',
             fill: '#ffdd44'
         }).setOrigin(0.5).setInteractive();
 
-        [login, registro].forEach(btn => {
+        [config, login, registro].forEach(btn => {
             btn.on('pointerover', () => btn.setAlpha(0.7));
             btn.on('pointerout',  () => btn.setAlpha(1));
         });
 
+        config.on('pointerdown', () => { window.location.href = '/configuracion'; });
         login.on('pointerdown', () => { window.location.href = '/login'; });
         registro.on('pointerdown', () => { window.location.href = '/registro'; });
 
