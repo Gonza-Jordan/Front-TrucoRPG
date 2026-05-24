@@ -30,6 +30,7 @@ export default class TrucoSoloScene extends BaseScene {
         this._bubbleTimer  = null;
         this._loading       = false;
         this._gameOverShown = false;
+        this._habilidadCartaIdx = null;
     }
 
     async create() {
@@ -183,7 +184,15 @@ export default class TrucoSoloScene extends BaseScene {
             const idx = this._misCarts.length;
             r.on('pointerover', () => { if (r.visible) { r.setFillStyle(0xffe8a0); r.y=552; n.y=522; p.y=554; v.y=571; }});
             r.on('pointerout',  () => { if (r.visible) { r.setFillStyle(CARTA);    r.y=560; n.y=530; p.y=562; v.y=579; }});
-            r.on('pointerdown', () => this._jugarCarta(idx));
+            r.on('pointerdown', () => {
+                const v = this.mano?.vistaHabilidadesHumano;
+                if (v?.activaDisponible && v?.claseHeroe === 0) {
+                    this._habilidadCartaIdx = idx;
+                    this._showToast('Carta elegida. Tocá "Usar habilidad".');
+                    return;
+                }
+                this._jugarCarta(idx);
+            });
             this._misCarts.push({ r, n, p, v, carta: null });
         });
     }
@@ -348,6 +357,21 @@ export default class TrucoSoloScene extends BaseScene {
         }
     }
 
+    async _activarHabilidad() {
+        if (!this.mano) return;
+        const body = { manoId: this.mano.id };
+        const v = this.mano.vistaHabilidadesHumano;
+        if (v?.claseHeroe === 0 && this._habilidadCartaIdx != null) {
+            const c = this.mano.humano?.mano?.[this._habilidadCartaIdx];
+            if (c) {
+                body.numeroCarta = c.numero;
+                body.paloCarta = c.palo;
+            }
+        }
+        await this._call('activar-habilidad', body);
+        this._habilidadCartaIdx = null;
+    }
+
     async _jugarCarta(i) {
         const s = this._misCarts[i];
         if (!s.carta || !this.mano) return;
@@ -445,9 +469,12 @@ export default class TrucoSoloScene extends BaseScene {
         } else {
             this._pHeroe.setText(`${v.nombreHeroe ?? 'Héroe'} · mano ${m.numeroDeMano}`);
             const suma = v.sumaValorTrucoMano != null ? v.sumaValorTrucoMano : '?';
-            this._pHabilidad.setText(
-                `${v.ultimoMensajeHabilidad || ''}\n\nSuma ValorTruco: ${suma}`
-            );
+            let txt = `${v.ultimoMensajeHabilidad || ''}\n\nSuma ValorTruco: ${suma}`;
+            if (v.activaDisponible)
+                txt += '\n\n⚡ Activa disponible';
+            if (v.cartaReveladaRival)
+                txt += `\n\nRival revelado: ${v.cartaReveladaRival.numero} ${v.cartaReveladaRival.palo} (T:${v.cartaReveladaRival.valorTruco})`;
+            this._pHabilidad.setText(txt);
         }
 
         // Retrato label
@@ -566,6 +593,10 @@ export default class TrucoSoloScene extends BaseScene {
                 sl.n.setText(String(carta.numero));
                 sl.p.setText(`${PALO[carta.palo]||''} ${carta.palo}`);
                 sl.v.setText(`Truco: ${carta.valorTruco}`);
+                if (this._habilidadCartaIdx === i)
+                    sl.r.setStrokeStyle(3, 0xaa44ff);
+                else
+                    sl.r.setStrokeStyle(1, 0x333333);
             }
         });
 
@@ -580,6 +611,9 @@ export default class TrucoSoloScene extends BaseScene {
         const trucoCantado  = !!m.trucoCantado;
         const trucoResuelto = !!m.trucoResuelto;
         const btns = []; // [label, activeColor, callback | null]
+
+        const v = m.vistaHabilidadesHumano;
+        const habilidadLista = v?.activaDisponible && !manoEnd && !pendEnv && !pendTru;
 
         if (m.partidaTerminada) {
             btns.push(['Nueva partida', '#226622', () => this._call('nueva-partida', this._partidaBody())]);
@@ -616,6 +650,10 @@ export default class TrucoSoloScene extends BaseScene {
             }
 
         } else {
+            if (habilidadLista) {
+                btns.push(['Usar habilidad', '#aa44ff', () => this._activarHabilidad()]);
+            }
+
             // ── Estado normal: mostrar botones de canto habilitados/deshabilitados ──
 
             // ENVIDO — solo válido antes de la primera baza y antes de que el truco esté resuelto
