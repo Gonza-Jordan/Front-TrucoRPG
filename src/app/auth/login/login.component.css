@@ -39,7 +39,7 @@
   align-items: center;
   min-height: 100vh;
   font-family: 'Press Start 2P', monospace;
-  background: url('/assets/fondo-auth.png') center center / 100% 100% no-repeat;
+  background: url('/assets/home.png') center center / cover no-repeat;
 }
 
 .login-card {
