@@ -1,0 +1,29 @@
+<header>
+  @if (headerType() === 'landing') {
+    <a routerLink="home">
+      <img src="/Logo.png" alt="Truco y maña - Logo" class="logo" />
+    </a>
+  }
+  @if (headerType() === 'home') {
+    <a routerLink="home">
+      <img src="/Logo.png" alt="Truco y maña - Logo" class="logo" />
+    </a>
+  }
+  @if (headerType() === 'registro' || headerType() === 'login') {
+    <a routerLink="home">
+      <img src="/Logo.png" alt="Truco y maña - Logo" class="logo" />
+    </a>
+  }
+
+  <nav>
+    <ul>
+      @if (headerType() === 'landing') {
+        <li><a routerLink="login">Iniciar Sesión</a></li>
+        <li><a routerLink="registro">Registrarse</a></li>
+      }
+      @if (headerType() === 'home') {
+        <li><a routerLink="">Cerrar Sesión</a></li>
+      }
+    </ul>
+  </nav>
+</header>

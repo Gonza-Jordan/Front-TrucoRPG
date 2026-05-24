@@ -69,5 +69,13 @@ export default class MenuScene extends BaseScene {
 
         login.on('pointerdown', () => { window.location.href = '/login'; });
         registro.on('pointerdown', () => { window.location.href = '/registro'; });
+
+        const home = this.add.text(640,670, 'HOME',{
+            fontFamily: '"Jersey 10"',
+            fontSize: '28px',
+            fill: '#ffdd44'
+        }).setOrigin(0.5).setInteractive();
+
+        home.on('pointerdown', () => {window.location.href = '/home'});
     }
 }
