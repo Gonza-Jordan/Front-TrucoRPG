@@ -1,0 +1,36 @@
+<app-header></app-header>
+
+<div class="wrapper">
+  <div class="card">
+
+    <h1 class="titulo">Configuración</h1>
+
+    <div class="fila">
+      <span class="label">Volumen</span>
+      <input type="range" [(ngModel)]="volumen" min="0" max="100" />
+    </div>
+
+    <div class="fila">
+      <span class="label">Música</span>
+      <select [(ngModel)]="musica">
+        <option [ngValue]="true">Activada</option>
+        <option [ngValue]="false">Desactivada</option>
+      </select>
+    </div>
+
+    <div class="fila">
+      <span class="label">Pantalla completa</span>
+      <button class="toggle" (click)="pantallaCompleta = !pantallaCompleta">
+        {{ pantallaCompleta ? 'SI' : 'NO' }}
+      </button>
+    </div>
+
+    <div class="acciones">
+      <button class="btn-guardar" (click)="guardar()">Guardar</button>
+      <button class="btn-cancelar" (click)="cancelar()">Cancelar</button>
+    </div>
+
+  </div>
+</div>
+
+<app-footer></app-footer>
