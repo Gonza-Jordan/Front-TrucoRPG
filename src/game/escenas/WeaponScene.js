@@ -28,11 +28,9 @@ export default class WeaponScene extends BaseScene {
 
     irASiguiente(finalSprite) {
         if (this.modo === 'multijugador') {
-            // Ir al lobby para crear/unirse a una sala
             this.scene.start('LobbyScene', { playerSprite: finalSprite });
         } else {
-            // Modo vs máquina: flujo original
-            this.scene.start('GameScene', { playerSprite: finalSprite, multijugador: false });
+            this.scene.start('HeroSelectScene', { playerSprite: finalSprite });
         }
     }
 }

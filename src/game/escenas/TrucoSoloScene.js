@@ -18,6 +18,8 @@ export default class TrucoSoloScene extends BaseScene {
 
     init(data) {
         this.playerSprite = data.playerSprite || 'nene-hacha';
+        this.modoJuego = data.modoJuego ?? 0;
+        this.claseHeroe = data.claseHeroe ?? null;
         this.mano = null;
         this._btnObjs = [];
         // Estado previo para detectar respuesta de la máquina
@@ -35,7 +37,14 @@ export default class TrucoSoloScene extends BaseScene {
         this._buildLayout();
         this._buildErrorToast();
         this._buildGameOverOverlay();
-        await this._call('nueva-mano', {});
+        await this._call('nueva-partida', this._partidaBody());
+    }
+
+    _partidaBody() {
+        const body = { modo: this.modoJuego };
+        if (this.modoJuego === 1 && this.claseHeroe !== null)
+            body.claseHeroe = this.claseHeroe;
+        return body;
     }
 
     // ─── LAYOUT ──────────────────────────────────────────────────
@@ -96,12 +105,26 @@ export default class TrucoSoloScene extends BaseScene {
         this._pTruco = this.add.text(xL, 424, 'Todavía no se cantó truco.',
             { ...F, fontSize: '12px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
 
+        this.add.rectangle(xC, 498, 178, 1, DIVIDER).setDepth(3);
+
+        // ── HABILIDADES ──
+        this.add.text(xL, 504, 'HÉROE', { ...F, fontSize: '14px', fill: '#cc88ff' }).setDepth(3);
+        this._pHeroe = this.add.text(xL, 522, 'Modo tradicional',
+            { ...F, fontSize: '11px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
+        this._pHabilidad = this.add.text(xL, 558, '',
+            { ...F, fontSize: '11px', fill: '#88ccaa', wordWrap: { width: 178 } }).setDepth(3);
+
         this.add.rectangle(xC, 658, 178, 1, DIVIDER).setDepth(3);
         const bk = this.add.rectangle(xC, 684, 178, 34, 0x221810).setStrokeStyle(1, DIVIDER).setDepth(3).setInteractive();
         this.add.text(xC, 684, 'Volver', { fontFamily: FONT, fontSize: '16px', fill: '#aa6633' }).setOrigin(0.5).setDepth(4);
         bk.on('pointerover', () => bk.setFillStyle(0x332818));
         bk.on('pointerout',  () => bk.setFillStyle(0x221810));
-        bk.on('pointerdown', () => this.scene.start('GameScene', { playerSprite: this.playerSprite }));
+        bk.on('pointerdown', () => this.scene.start('GameScene', {
+            playerSprite: this.playerSprite,
+            multijugador: false,
+            modoJuego: this.modoJuego,
+            claseHeroe: this.claseHeroe,
+        }));
     }
 
     _buildCenter() {
@@ -303,16 +326,23 @@ export default class TrucoSoloScene extends BaseScene {
         try {
             const res = await fetch(`${API}/${endpoint}`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body ?? {})
             });
             if (!res.ok) {
                 const errMsg = await res.text();
-                console.warn('[TrucoSolo]', endpoint, errMsg);
-                this._showToast(`Error en ${endpoint}: ${errMsg}`);
+                console.warn('[TrucoSolo]', endpoint, res.status, errMsg);
+                this._showToast(
+                    `Error en ${endpoint} (${res.status}): ${errMsg || 'sin detalle. ¿Backend en http://localhost:5000?'}`
+                );
                 return;
             }
             this.mano = await res.json();
             this._updateUI(this.mano);
+        } catch (e) {
+            console.error('[TrucoSolo]', endpoint, e);
+            this._showToast(
+                `Sin conexión al backend en ${endpoint}. Verificá que la API esté en http://localhost:5000 y reiniciá npm start.`
+            );
         } finally {
             this._loading = false;
         }
@@ -356,7 +386,7 @@ export default class TrucoSoloScene extends BaseScene {
         this._goBtn1Bg.on('pointerout',  () => this._goBtn1Bg.setFillStyle(0x1a4a1a));
         this._goBtn1Bg.on('pointerdown', () => {
             this._hideGameOver();
-            this._call('nueva-partida', {});
+            this._call('nueva-partida', this._partidaBody());
         });
 
         // Botón 2: Salir
@@ -407,6 +437,18 @@ export default class TrucoSoloScene extends BaseScene {
         // Paneles de estado
         this._pEnvido.setText(m.estadoEnvido || 'Todavía no se cantó envido.');
         this._pTruco.setText(m.estadoTruco   || 'Todavía no se cantó truco.');
+
+        const v = m.vistaHabilidadesHumano;
+        if (m.configuracion?.modo === 0 || !v?.habilidadesActivasEnPartida) {
+            this._pHeroe.setText('Modo tradicional');
+            this._pHabilidad.setText('Sin habilidades de héroe.');
+        } else {
+            this._pHeroe.setText(`${v.nombreHeroe ?? 'Héroe'} · mano ${m.numeroDeMano}`);
+            const suma = v.sumaValorTrucoMano != null ? v.sumaValorTrucoMano : '?';
+            this._pHabilidad.setText(
+                `${v.ultimoMensajeHabilidad || ''}\n\nSuma ValorTruco: ${suma}`
+            );
+        }
 
         // Retrato label
         if (m.ganadorPartida)
@@ -540,7 +582,7 @@ export default class TrucoSoloScene extends BaseScene {
         const btns = []; // [label, activeColor, callback | null]
 
         if (m.partidaTerminada) {
-            btns.push(['Nueva partida', '#226622', () => this._call('nueva-partida', {})]);
+            btns.push(['Nueva partida', '#226622', () => this._call('nueva-partida', this._partidaBody())]);
 
         } else if (m.ganadorMano) {
             btns.push(['Nueva mano', '#cc8800', () => this._call('nueva-mano', { manoAnteriorId: m.id })]);
