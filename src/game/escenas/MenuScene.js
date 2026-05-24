@@ -5,7 +5,13 @@ export default class MenuScene extends BaseScene {
         super('MenuScene');
     }
 
+    preload() {
+        this.load.image('fondo-menu', './assets/home.png');
+    }
+
     create() {
+        this.add.image(640, 360, 'fondo-menu').setDisplaySize(1280, 720);
+
         this.botonPantallaCompleta();
 
         this.add.text(640, 200, 'TRUCO RPG', {
@@ -76,5 +82,13 @@ export default class MenuScene extends BaseScene {
         config.on('pointerdown', () => { window.location.href = '/configuracion'; });
         login.on('pointerdown', () => { window.location.href = '/login'; });
         registro.on('pointerdown', () => { window.location.href = '/registro'; });
+
+        const home = this.add.text(640,670, 'HOME',{
+            fontFamily: '"Jersey 10"',
+            fontSize: '28px',
+            fill: '#ffdd44'
+        }).setOrigin(0.5).setInteractive();
+
+        home.on('pointerdown', () => {window.location.href = '/home'});
     }
 }

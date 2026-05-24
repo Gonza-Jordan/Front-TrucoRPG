@@ -2,13 +2,15 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Header } from '../../components/header/header';
+import { Footer } from '../../components/footer/footer';
 
 @Component({
   selector: 'app-configuracion',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './configuracion.component.html',
-  styleUrl: './configuracion.component.css'
+  imports: [CommonModule, FormsModule, Header, Footer],
+  templateUrl: './configuracion.html',
+  styleUrl: './configuracion.css'
 })
 export class ConfiguracionComponent {
   volumen = Number(localStorage.getItem('cfg_volumen') ?? 70);

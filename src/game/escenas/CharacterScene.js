@@ -5,8 +5,8 @@ export default class CharacterScene extends BaseScene {
         super('CharacterScene');
     }
 
-    init(data) {
-        this.modo = data.modo || 'maquina';
+    init() {
+    this.modo = this.registry.get('modo') || 'maquina';
     }
 
     create() {

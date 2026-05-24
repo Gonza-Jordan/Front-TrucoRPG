@@ -33,13 +33,22 @@
   font-size: 7px;
 }
 
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
 .login-wrapper {
+  flex: 1;
+  min-height: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   font-family: 'Press Start 2P', monospace;
   background: url('/assets/home.png') center center / cover no-repeat;
+  overflow: auto;
 }
 
 .login-card {
