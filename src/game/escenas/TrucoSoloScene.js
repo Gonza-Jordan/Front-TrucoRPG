@@ -18,6 +18,8 @@ export default class TrucoSoloScene extends BaseScene {
 
     init(data) {
         this.playerSprite = data.playerSprite || 'nene-hacha';
+        this.modoJuego = data.modoJuego ?? 0;
+        this.claseHeroe = data.claseHeroe ?? null;
         this.mano = null;
         this._btnObjs = [];
         // Estado previo para detectar respuesta de la máquina
@@ -28,6 +30,7 @@ export default class TrucoSoloScene extends BaseScene {
         this._bubbleTimer  = null;
         this._loading       = false;
         this._gameOverShown = false;
+        this._habilidadCartaIdx = null;
     }
 
     async create() {
@@ -35,7 +38,14 @@ export default class TrucoSoloScene extends BaseScene {
         this._buildLayout();
         this._buildErrorToast();
         this._buildGameOverOverlay();
-        await this._call('nueva-mano', {});
+        await this._call('nueva-partida', this._partidaBody());
+    }
+
+    _partidaBody() {
+        const body = { modo: this.modoJuego };
+        if (this.modoJuego === 1 && this.claseHeroe !== null)
+            body.claseHeroe = this.claseHeroe;
+        return body;
     }
 
     // ─── LAYOUT ──────────────────────────────────────────────────
@@ -96,12 +106,26 @@ export default class TrucoSoloScene extends BaseScene {
         this._pTruco = this.add.text(xL, 424, 'Todavía no se cantó truco.',
             { ...F, fontSize: '12px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
 
+        this.add.rectangle(xC, 498, 178, 1, DIVIDER).setDepth(3);
+
+        // ── HABILIDADES ──
+        this.add.text(xL, 504, 'HÉROE', { ...F, fontSize: '14px', fill: '#cc88ff' }).setDepth(3);
+        this._pHeroe = this.add.text(xL, 522, 'Modo tradicional',
+            { ...F, fontSize: '11px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
+        this._pHabilidad = this.add.text(xL, 558, '',
+            { ...F, fontSize: '11px', fill: '#88ccaa', wordWrap: { width: 178 } }).setDepth(3);
+
         this.add.rectangle(xC, 658, 178, 1, DIVIDER).setDepth(3);
         const bk = this.add.rectangle(xC, 684, 178, 34, 0x221810).setStrokeStyle(1, DIVIDER).setDepth(3).setInteractive();
         this.add.text(xC, 684, 'Volver', { fontFamily: FONT, fontSize: '16px', fill: '#aa6633' }).setOrigin(0.5).setDepth(4);
         bk.on('pointerover', () => bk.setFillStyle(0x332818));
         bk.on('pointerout',  () => bk.setFillStyle(0x221810));
-        bk.on('pointerdown', () => this.scene.start('GameScene', { playerSprite: this.playerSprite }));
+        bk.on('pointerdown', () => this.scene.start('GameScene', {
+            playerSprite: this.playerSprite,
+            multijugador: false,
+            modoJuego: this.modoJuego,
+            claseHeroe: this.claseHeroe,
+        }));
     }
 
     _buildCenter() {
@@ -160,7 +184,15 @@ export default class TrucoSoloScene extends BaseScene {
             const idx = this._misCarts.length;
             r.on('pointerover', () => { if (r.visible) { r.setFillStyle(0xffe8a0); r.y=552; n.y=522; p.y=554; v.y=571; }});
             r.on('pointerout',  () => { if (r.visible) { r.setFillStyle(CARTA);    r.y=560; n.y=530; p.y=562; v.y=579; }});
-            r.on('pointerdown', () => this._jugarCarta(idx));
+            r.on('pointerdown', () => {
+                const v = this.mano?.vistaHabilidadesHumano;
+                if (v?.activaDisponible && v?.claseHeroe === 0) {
+                    this._habilidadCartaIdx = idx;
+                    this._showToast('Carta elegida. Tocá "Usar habilidad".');
+                    return;
+                }
+                this._jugarCarta(idx);
+            });
             this._misCarts.push({ r, n, p, v, carta: null });
         });
     }
@@ -303,19 +335,41 @@ export default class TrucoSoloScene extends BaseScene {
         try {
             const res = await fetch(`${API}/${endpoint}`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body ?? {})
             });
             if (!res.ok) {
                 const errMsg = await res.text();
-                console.warn('[TrucoSolo]', endpoint, errMsg);
-                this._showToast(`Error en ${endpoint}: ${errMsg}`);
+                console.warn('[TrucoSolo]', endpoint, res.status, errMsg);
+                this._showToast(
+                    `Error en ${endpoint} (${res.status}): ${errMsg || 'sin detalle. ¿Backend en http://localhost:5000?'}`
+                );
                 return;
             }
             this.mano = await res.json();
             this._updateUI(this.mano);
+        } catch (e) {
+            console.error('[TrucoSolo]', endpoint, e);
+            this._showToast(
+                `Sin conexión al backend en ${endpoint}. Verificá que la API esté en http://localhost:5000 y reiniciá npm start.`
+            );
         } finally {
             this._loading = false;
         }
+    }
+
+    async _activarHabilidad() {
+        if (!this.mano) return;
+        const body = { manoId: this.mano.id };
+        const v = this.mano.vistaHabilidadesHumano;
+        if (v?.claseHeroe === 0 && this._habilidadCartaIdx != null) {
+            const c = this.mano.humano?.mano?.[this._habilidadCartaIdx];
+            if (c) {
+                body.numeroCarta = c.numero;
+                body.paloCarta = c.palo;
+            }
+        }
+        await this._call('activar-habilidad', body);
+        this._habilidadCartaIdx = null;
     }
 
     async _jugarCarta(i) {
@@ -356,7 +410,7 @@ export default class TrucoSoloScene extends BaseScene {
         this._goBtn1Bg.on('pointerout',  () => this._goBtn1Bg.setFillStyle(0x1a4a1a));
         this._goBtn1Bg.on('pointerdown', () => {
             this._hideGameOver();
-            this._call('nueva-partida', {});
+            this._call('nueva-partida', this._partidaBody());
         });
 
         // Botón 2: Salir
@@ -407,6 +461,21 @@ export default class TrucoSoloScene extends BaseScene {
         // Paneles de estado
         this._pEnvido.setText(m.estadoEnvido || 'Todavía no se cantó envido.');
         this._pTruco.setText(m.estadoTruco   || 'Todavía no se cantó truco.');
+
+        const v = m.vistaHabilidadesHumano;
+        if (m.configuracion?.modo === 0 || !v?.habilidadesActivasEnPartida) {
+            this._pHeroe.setText('Modo tradicional');
+            this._pHabilidad.setText('Sin habilidades de héroe.');
+        } else {
+            this._pHeroe.setText(`${v.nombreHeroe ?? 'Héroe'} · mano ${m.numeroDeMano}`);
+            const suma = v.sumaValorTrucoMano != null ? v.sumaValorTrucoMano : '?';
+            let txt = `${v.ultimoMensajeHabilidad || ''}\n\nSuma ValorTruco: ${suma}`;
+            if (v.activaDisponible)
+                txt += '\n\n⚡ Activa disponible';
+            if (v.cartaReveladaRival)
+                txt += `\n\nRival revelado: ${v.cartaReveladaRival.numero} ${v.cartaReveladaRival.palo} (T:${v.cartaReveladaRival.valorTruco})`;
+            this._pHabilidad.setText(txt);
+        }
 
         // Retrato label
         if (m.ganadorPartida)
@@ -524,6 +593,10 @@ export default class TrucoSoloScene extends BaseScene {
                 sl.n.setText(String(carta.numero));
                 sl.p.setText(`${PALO[carta.palo]||''} ${carta.palo}`);
                 sl.v.setText(`Truco: ${carta.valorTruco}`);
+                if (this._habilidadCartaIdx === i)
+                    sl.r.setStrokeStyle(3, 0xaa44ff);
+                else
+                    sl.r.setStrokeStyle(1, 0x333333);
             }
         });
 
@@ -539,8 +612,11 @@ export default class TrucoSoloScene extends BaseScene {
         const trucoResuelto = !!m.trucoResuelto;
         const btns = []; // [label, activeColor, callback | null]
 
+        const v = m.vistaHabilidadesHumano;
+        const habilidadLista = v?.activaDisponible && !manoEnd && !pendEnv && !pendTru;
+
         if (m.partidaTerminada) {
-            btns.push(['Nueva partida', '#226622', () => this._call('nueva-partida', {})]);
+            btns.push(['Nueva partida', '#226622', () => this._call('nueva-partida', this._partidaBody())]);
 
         } else if (m.ganadorMano) {
             btns.push(['Nueva mano', '#cc8800', () => this._call('nueva-mano', { manoAnteriorId: m.id })]);
@@ -574,6 +650,10 @@ export default class TrucoSoloScene extends BaseScene {
             }
 
         } else {
+            if (habilidadLista) {
+                btns.push(['Usar habilidad', '#aa44ff', () => this._activarHabilidad()]);
+            }
+
             // ── Estado normal: mostrar botones de canto habilitados/deshabilitados ──
 
             // ENVIDO — solo válido antes de la primera baza y antes de que el truco esté resuelto

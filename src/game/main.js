@@ -7,6 +7,7 @@ import LobbyScene from './escenas/LobbyScene.js';
 import GameScene from './escenas/GameScene.js';
 import GameScene2 from './escenas/GameScene2.js';
 import BaseScene from './escenas/BaseScene.js';
+import HeroSelectScene from './escenas/HeroSelectScene.js';
 import TrucoMultiScene from './escenas/TrucoMultiScene.js';
 import TrucoSoloScene from './escenas/TrucoSoloScene.js';
 
@@ -26,7 +27,7 @@ export function initGame(parent = 'contenedor-juego') {
             arcade: { debug: false },
         },
         scene: [
-            BootScene, MenuScene, CharacterScene, WeaponScene,
+            BootScene, MenuScene, CharacterScene, WeaponScene, HeroSelectScene,
             LobbyScene, GameScene, GameScene2, BaseScene,
             TrucoMultiScene, TrucoSoloScene,
         ],
