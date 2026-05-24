@@ -1,4 +1,5 @@
 import BaseScene from "./BaseScene.js";
+import { heroePorId, textoPanelPartida } from "../data/heroes.js";
 
 const PALO  = { Oro: '★', Espada: '†', Copa: '♦', Basto: '♣' };
 const API   = '/api/truco';
@@ -94,30 +95,51 @@ export default class TrucoSoloScene extends BaseScene {
 
         this.add.rectangle(xC, 184, 186, 1, 0x5a3a10).setDepth(3);
 
-        // ── ENVIDO ──
-        this.add.text(xL, 190, 'ENVIDO', { ...F, fontSize: '14px', fill: '#55aadd' }).setDepth(3);
-        this._pEnvido = this.add.text(xL, 208, 'Todavía no se cantó envido.',
-            { ...F, fontSize: '12px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
+        // ── ENVIDO (mitad superior del bloque envido/truco) ──
+        const yEnvidoTit = 188;
+        const yEnvidoTxt = 204;
+        const yDivTruco  = 296;
 
-        this.add.rectangle(xC, 400, 178, 1, DIVIDER).setDepth(3);
+        this.add.text(xL, yEnvidoTit, 'ENVIDO', { ...F, fontSize: '14px', fill: '#55aadd' }).setDepth(3);
+        this._pEnvido = this.add.text(xL, yEnvidoTxt, 'Todavía no se cantó envido.',
+            { ...F, fontSize: '11px', fill: '#bbbbbb', wordWrap: { width: 178 }, lineSpacing: 2 }).setDepth(3);
 
-        // ── TRUCO ──
-        this.add.text(xL, 406, 'TRUCO', { ...F, fontSize: '14px', fill: '#ddcc44' }).setDepth(3);
-        this._pTruco = this.add.text(xL, 424, 'Todavía no se cantó truco.',
-            { ...F, fontSize: '12px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
+        this.add.rectangle(xC, yDivTruco, 178, 1, DIVIDER).setDepth(3);
 
-        this.add.rectangle(xC, 498, 178, 1, DIVIDER).setDepth(3);
+        // ── TRUCO (mitad inferior, mismo alto que envido) ──
+        const yTrucoTit = 300;
+        const yTrucoTxt = 316;
+        const yDivHeroe = 408;
 
-        // ── HABILIDADES ──
-        this.add.text(xL, 504, 'HÉROE', { ...F, fontSize: '14px', fill: '#cc88ff' }).setDepth(3);
-        this._pHeroe = this.add.text(xL, 522, 'Modo tradicional',
-            { ...F, fontSize: '11px', fill: '#bbbbbb', wordWrap: { width: 178 } }).setDepth(3);
-        this._pHabilidad = this.add.text(xL, 558, '',
-            { ...F, fontSize: '11px', fill: '#88ccaa', wordWrap: { width: 178 } }).setDepth(3);
+        this.add.text(xL, yTrucoTit, 'TRUCO', { ...F, fontSize: '14px', fill: '#ddcc44' }).setDepth(3);
+        this._pTruco = this.add.text(xL, yTrucoTxt, 'Todavía no se cantó truco.',
+            { ...F, fontSize: '11px', fill: '#bbbbbb', wordWrap: { width: 178 }, lineSpacing: 2 }).setDepth(3);
 
-        this.add.rectangle(xC, 658, 178, 1, DIVIDER).setDepth(3);
-        const bk = this.add.rectangle(xC, 684, 178, 34, 0x221810).setStrokeStyle(1, DIVIDER).setDepth(3).setInteractive();
-        this.add.text(xC, 684, 'Volver', { fontFamily: FONT, fontSize: '16px', fill: '#aa6633' }).setOrigin(0.5).setDepth(4);
+        this.add.rectangle(xC, yDivHeroe, 178, 1, DIVIDER).setDepth(3);
+
+        // ── HÉROE (pasiva + activa fijas) ──
+        const yHeroeTit = 412;
+        const yHeroeTxt = 428;
+        const yDivEvento = 538;
+
+        this.add.text(xL, yHeroeTit, 'HÉROE', { ...F, fontSize: '14px', fill: '#cc88ff' }).setDepth(3);
+        this._pHeroe = this.add.text(xL, yHeroeTxt, 'Modo tradicional',
+            { ...F, fontSize: '9px', fill: '#cccccc', wordWrap: { width: 178 }, lineSpacing: 2 }).setDepth(3);
+
+        this.add.rectangle(xC, yDivEvento, 178, 1, DIVIDER).setDepth(3);
+
+        // ── Eventos de habilidad (mensajes dinámicos, debajo del héroe) ──
+        this._pEventoHeroe = this.add.text(xL, 544, '',
+            { ...F, fontSize: '10px', fill: '#ffdd88', wordWrap: { width: 178 }, lineSpacing: 3 }).setDepth(3);
+
+        this._maskPanelTexto(xL, yEnvidoTxt, 178, yDivTruco - yEnvidoTxt - 4, this._pEnvido);
+        this._maskPanelTexto(xL, yTrucoTxt, 178, yDivHeroe - yTrucoTxt - 4, this._pTruco);
+        this._maskPanelTexto(xL, yHeroeTxt, 178, yDivEvento - yHeroeTxt - 4, this._pHeroe);
+        this._maskPanelTexto(xL, 544, 178, 648 - 544 - 10, this._pEventoHeroe);
+
+        this.add.rectangle(xC, 648, 178, 1, DIVIDER).setDepth(3);
+        const bk = this.add.rectangle(xC, 674, 178, 34, 0x221810).setStrokeStyle(1, DIVIDER).setDepth(3).setInteractive();
+        this.add.text(xC, 674, 'Volver', { fontFamily: FONT, fontSize: '16px', fill: '#aa6633' }).setOrigin(0.5).setDepth(4);
         bk.on('pointerover', () => bk.setFillStyle(0x332818));
         bk.on('pointerout',  () => bk.setFillStyle(0x221810));
         bk.on('pointerdown', () => this.scene.start('GameScene', {
@@ -126,6 +148,14 @@ export default class TrucoSoloScene extends BaseScene {
             modoJuego: this.modoJuego,
             claseHeroe: this.claseHeroe,
         }));
+    }
+
+    /** Recorta texto del panel derecho para que no invada otras secciones. */
+    _maskPanelTexto(x, y, w, h, target) {
+        const g = this.make.graphics({});
+        g.fillStyle(0xffffff);
+        g.fillRect(x, y, w, h);
+        target.setMask(g.createGeometryMask());
     }
 
     _buildCenter() {
@@ -463,18 +493,26 @@ export default class TrucoSoloScene extends BaseScene {
         this._pTruco.setText(m.estadoTruco   || 'Todavía no se cantó truco.');
 
         const v = m.vistaHabilidadesHumano;
+        const claseHeroe = v?.claseHeroe ?? m.configuracion?.heroeDelHumano ?? this.claseHeroe;
+        const heroe = heroePorId(claseHeroe);
+
         if (m.configuracion?.modo === 0 || !v?.habilidadesActivasEnPartida) {
-            this._pHeroe.setText('Modo tradicional');
-            this._pHabilidad.setText('Sin habilidades de héroe.');
-        } else {
-            this._pHeroe.setText(`${v.nombreHeroe ?? 'Héroe'} · mano ${m.numeroDeMano}`);
-            const suma = v.sumaValorTrucoMano != null ? v.sumaValorTrucoMano : '?';
-            let txt = `${v.ultimoMensajeHabilidad || ''}\n\nSuma ValorTruco: ${suma}`;
+            this._pHeroe.setText('Modo tradicional\n\nSin habilidades de héroe.');
+            this._pEventoHeroe.setText('');
+        } else if (heroe) {
+            this._pHeroe.setText(textoPanelPartida(heroe, m.numeroDeMano));
+
+            const extras = [];
             if (v.activaDisponible)
-                txt += '\n\n⚡ Activa disponible';
+                extras.push('⚡ Activa disponible');
             if (v.cartaReveladaRival)
-                txt += `\n\nRival revelado: ${v.cartaReveladaRival.numero} ${v.cartaReveladaRival.palo} (T:${v.cartaReveladaRival.valorTruco})`;
-            this._pHabilidad.setText(txt);
+                extras.push(`Rival revelado: ${v.cartaReveladaRival.numero} ${v.cartaReveladaRival.palo}`);
+            if (v.ultimoMensajeHabilidad)
+                extras.push(v.ultimoMensajeHabilidad);
+            this._pEventoHeroe.setText(extras.join('\n\n'));
+        } else {
+            this._pHeroe.setText(`${v?.nombreHeroe ?? 'Héroe'} · mano ${m.numeroDeMano}`);
+            this._pEventoHeroe.setText(v?.ultimoMensajeHabilidad ?? '');
         }
 
         // Retrato label
