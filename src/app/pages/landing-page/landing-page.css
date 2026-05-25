@@ -12,3 +12,91 @@ main {
     justify-content: center;
     align-items: center;
 }
+
+.seccion-1 {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem;
+    text-align: center;
+
+    background-image: url('/assets/pasto-pixel.png');
+    background-repeat: repeat;
+    background-size: 12rem;
+
+}
+
+.imagen-landing {
+    width: 30rem;
+    height: auto;
+}
+
+.texto-landing {
+    text-align: center;
+    max-width: 35rem;
+    font-family: 'Jersey 20';
+    font-size: 2rem;
+    color: #333;
+}
+
+.texto-landing a {
+    position: relative;
+    margin: 0 auto;
+    width: min(280px, 100%);
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    background-image: url('/UI/boton.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    image-rendering: pixelated;
+    transition: transform 0.08s ease,
+        filter 0.08s ease;
+    user-select: none;
+    border: none;
+    padding-inline: 1rem;
+    padding-bottom: 6px;
+    text-shadow:
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        2px 2px 0 #000;
+}
+
+.texto-landing a span {
+    transform: translateY(-1px);
+}
+
+.texto-landing a:hover {
+    transform: scale(1.03);
+    filter:
+        brightness(1.08) drop-shadow(0 0 6px rgba(255, 255, 255, 0.25));
+    cursor: pointer;
+}
+
+.texto-landing a:active {
+    background-image: url("/UI/boton-apretar.png");
+    transform: translateY(3px);
+    filter: brightness(0.95);
+}
+
+.texto-landing a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.18),
+            transparent 40%);
+    opacity: 0.5;
+    pointer-events: none;
+}
