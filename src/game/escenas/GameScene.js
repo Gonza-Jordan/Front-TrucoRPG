@@ -14,6 +14,8 @@ export default class GameScene extends BaseScene {
         this.startX         = data.x || 100;
         this.startY         = data.y || 100;
         this.esMultijugador = data.multijugador || false;
+        this.modoJuego = data.modoJuego ?? 0;
+        this.claseHeroe = data.claseHeroe ?? null;
     }
 
     create() {
@@ -92,11 +94,11 @@ export default class GameScene extends BaseScene {
                     miRol: multiplayerManager.esHost ? 'J1' : 'J2'
                 });
             } else {
-                // ── Delegar la navegación al Router de Angular ──────────────
-                // GameComponent escucha este evento y llama router.navigate(['/truco-solo'])
-                window.dispatchEvent(new CustomEvent('truco-solo:start', {
-                    detail: { playerSprite: this.playerKey }
-                }));
+                this.scene.start('TrucoSoloScene', {
+                    playerSprite: this.playerKey,
+                    modoJuego: this.modoJuego,
+                    claseHeroe: this.claseHeroe,
+                });
             }
         }
 

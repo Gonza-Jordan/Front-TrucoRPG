@@ -1,12 +1,12 @@
 {
   "/api": {
-    "target": "http://localhost:5068",
+    "target": "http://localhost:5000",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"
   },
   "/gamehub": {
-    "target": "http://localhost:5068",
+    "target": "http://localhost:5000",
     "secure": false,
     "changeOrigin": true,
     "ws": true,
