@@ -5,31 +5,67 @@
     overflow: hidden;
 }
 
+body {
+    margin: 0;
+}
+
 main {
     flex: 1;
-    min-height: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
 }
 
 .seccion-1 {
     width: 100%;
-    min-height: 100vh;
+    height: auto;
+
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 2rem;
-    padding: 2rem;
-    text-align: center;
+    gap: 4rem;
+
+    padding: 4rem 2rem;
+    box-sizing: border-box;
 
     background-image: url('/assets/pasto-pixel.png');
     background-repeat: repeat;
     background-size: 12rem;
 
+    text-align: center;
+
+    flex-wrap: wrap;
+}
+
+.seccion-2 {
+    width: 100%;
+    height: auto;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 4rem 2rem;
+    box-sizing: border-box;
+
+    background-image: url('/assets/tablones-fondo.jpg');
+    background-repeat: repeat;
+    background-size: 25rem;
+
+    text-align: center;
+}
+
+.seccion-2 .texto-landing {
+    color: #fff;
+}
+
+.titulo-landing {
+    font-family: 'Jersey 20';
+    font-size: 3rem;
+    color: white
 }
 
 .imagen-landing {
-    width: 30rem;
+    width: min(30rem, 90vw);
     height: auto;
 }
 
