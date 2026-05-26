@@ -10,9 +10,9 @@ export default class GameScene extends BaseScene {
     constructor() { super('GameScene'); }
 
     init(data) {
-        this.playerKey      = data.playerSprite || 'player';
-        this.startX         = data.x || 100;
-        this.startY         = data.y || 100;
+        this.playerKey = data.playerSprite || 'player';
+        this.startX = data.x || 100;
+        this.startY = data.y || 100;
         this.esMultijugador = data.multijugador || false;
         this.modoJuego = data.modoJuego ?? 0;
         this.claseHeroe = data.claseHeroe ?? null;
@@ -29,8 +29,8 @@ export default class GameScene extends BaseScene {
         ).setDepth(1);
         this.JugadorPrincipal.setCollideWorldBounds(true);
 
-        this.npc    = new Npc(this, 490, 180, 'troll').setDepth(0);
-        this.keys   = this.input.keyboard.createCursorKeys();
+        this.npc = new Npc(this, 490, 180, 'troll').setDepth(0);
+        this.keys = this.input.keyboard.createCursorKeys();
         this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         this.portal = new Portal(this, 600, 150, 'GameScene2', 'casa');
         this.physics.add.collider(this.JugadorPrincipal, this.portal.zone);
@@ -54,7 +54,7 @@ export default class GameScene extends BaseScene {
         // ── MODO MULTIJUGADOR ────────────────────────────────────
         if (this.esMultijugador) {
             this.jugadorRemoto = null;
-            this.timerEnvio    = 0;
+            this.timerEnvio = 0;
             multiplayerManager.limpiarCallbacks();
 
             multiplayerManager.onPosicionActualizada = (x, y, animacion, sprite, escena) => {
@@ -89,16 +89,23 @@ export default class GameScene extends BaseScene {
 
         // Interacción con el troll: E para jugar Truco
         if (this.estaEnZonaNpc && Phaser.Input.Keyboard.JustDown(this.teclaE)) {
+
             if (this.esMultijugador) {
+
                 this.scene.start('TrucoMultiScene', {
                     miRol: multiplayerManager.esHost ? 'J1' : 'J2'
                 });
+
             } else {
-                this.scene.start('TrucoSoloScene', {
-                    playerSprite: this.playerKey,
-                    modoJuego: this.modoJuego,
-                    claseHeroe: this.claseHeroe,
-                });
+
+                window.dispatchEvent(new CustomEvent('truco-solo:start', {
+                    detail: {
+                        playerSprite: this.playerKey,
+                        modoJuego: this.modoJuego,
+                        claseHeroe: this.claseHeroe,
+                    }
+                }));
+
             }
         }
 

@@ -11,7 +11,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
-// ── Tipos ────────────────────────────────────────────────────────────────────
+//palos
 
 export type Palo = 'Oro' | 'Espada' | 'Copa' | 'Basto';
 export type TipoEnvido = 'Envido' | 'Real Envido' | 'Falta Envido';
@@ -31,26 +31,30 @@ export interface Baza {
 
 export interface ManoState {
   id: string;
-  humano:   { mano: Carta[] };
-  maquina:  { mano: Carta[] };
-  bazas:    Baza[];
+  humano: { mano: Carta[] };
+  maquina: { mano: Carta[] };
+  bazas: Baza[];
   turnoActual: 'Humano' | 'Maquina';
   puntosHumano: number;
   puntosMaquina: number;
   estadoEnvido?: string;
-  estadoTruco?:  string;
+  estadoTruco?: string;
   envidoCantado?: boolean;
-  trucoCantado?:  boolean;
+  trucoCantado?: boolean;
   trucoResuelto?: boolean;
   nivelTruco?: number;
   cantorTruco?: 'Humano' | 'Maquina';
   tipoEnvidoCantado?: TipoEnvido;
-  ganadorMano?:    'Humano' | 'Maquina' | 'Parda';
+  ganadorMano?: 'Humano' | 'Maquina' | 'Parda';
   ganadorPartida?: 'Humano' | 'Maquina';
   partidaTerminada?: boolean;
   envidoPendienteRespuestaHumano?: boolean;
-  trucoPendienteRespuestaHumano?:  boolean;
+  trucoPendienteRespuestaHumano?: boolean;
   cartaMaquinaEnMesa?: Carta;
+  // heroe-clase
+  habilidadDisponible?: boolean;
+  habilidadUsada?: boolean;
+  resultadoHabilidad?: string;   // texto que devuelve el backend tras usar la habilidad
 }
 
 export interface Btn {
@@ -67,6 +71,42 @@ export interface Slot {
   winner?: 'Humano' | 'Maquina' | 'Parda';
 }
 
+//heroe
+
+export interface Heroe {
+  id: number;
+  nombre: string;
+  color: string;
+  descripcion: string;  // descripción de la habilidad activa
+}
+
+const HEROES: Heroe[] = [
+  {
+    id: 0,
+    nombre: 'Manipulador',
+    color: '#aa66ff',
+    descripcion: 'Cada 3 manos: reemplazá 1 carta por otra del mazo (nunca de menor valor).',
+  },
+  {
+    id: 1,
+    nombre: 'Timbero',
+    color: '#ffaa44',
+    descripcion: 'Antes de jugar: apostá. Si ganás la mano, duplicás puntos; si perdés, rival +2.',
+  },
+  {
+    id: 2,
+    nombre: 'Fanfarrón',
+    color: '#44aaff',
+    descripcion: 'Tu próximo envido o truco aceptado vale +1 punto extra.',
+  },
+  {
+    id: 3,
+    nombre: 'Mentiroso',
+    color: '#66dd88',
+    descripcion: 'Cada 2 manos: al inicio, revelás 1 carta aleatoria del rival.',
+  },
+];
+
 // ── Constantes ───────────────────────────────────────────────────────────────
 
 const PALO_SYM: Record<Palo, string> = {
@@ -76,7 +116,7 @@ const PALO_SYM: Record<Palo, string> = {
 const API = '/api/truco';
 
 const FAN_ANGLES = [-16, 0, 16];
-const FAN_X      = [-84, 0, 84];
+const FAN_X = [-84, 0, 84];
 
 // ── Componente ───────────────────────────────────────────────────────────────
 
@@ -90,12 +130,20 @@ const FAN_X      = [-84, 0, 84];
 })
 export class TrucoSoloComponent implements OnInit, OnDestroy {
 
-  private http   = inject(HttpClient);
+  private http = inject(HttpClient);
   private router = inject(Router);
-  private cdr    = inject(ChangeDetectorRef);
+  private cdr = inject(ChangeDetectorRef);
 
   // ── Estado del juego ─────────────────────────────────────────────────────
   mano: ManoState | null = null;
+
+  // ── Héroe ─────────────────────────────────────────────────────────────────
+  heroe: Heroe | null = null;
+  resultadoHabilidad = '';   // texto que se muestra debajo del botón tras usarla
+
+  get habilidadDisponible(): boolean {
+    return !!this.heroe && !!this.mano?.habilidadDisponible && !this.mano?.habilidadUsada;
+  }
 
   // ── UI ───────────────────────────────────────────────────────────────────
   btns: Btn[] = [];
@@ -109,66 +157,56 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
     { carta: null, visible: false },
   ];
 
-  rivalLabel  = 'Esperando mano...';
-  turnoBadge  = '';
-  bubbleText  = '';
-  gameOver    = false;
+  rivalLabel = 'Esperando mano...';
+  turnoBadge = '';
+  bubbleText = '';
+  gameOver = false;
   gameOverWon = false;
-  toastMsg    = '';
+  toastMsg = '';
 
   readonly fanAngles = FAN_ANGLES;
-  readonly fanXOff   = FAN_X;
+  readonly fanXOff = FAN_X;
 
   tallySticks: { x1: number; y1: number; x2: number; y2: number; color: string }[] = [];
 
   // ── Estado interno ────────────────────────────────────────────────────────
-  private loading          = false;
-  private prevEstadoTruco  = '';
+  private loading = false;
+  private prevEstadoTruco = '';
   private prevEstadoEnvido = '';
-  private prevPendTru      = false;
-  private prevPendEnv      = false;
+  private prevPendTru = false;
+  private prevPendEnv = false;
   private bubbleTimer: ReturnType<typeof setTimeout> | null = null;
-  private toastTimer:  ReturnType<typeof setTimeout> | null = null;
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
-  ngOnInit(): void { this.call('nueva-mano', {}); }
+  ngOnInit(): void {
+    const heroeIdStr = localStorage.getItem('heroeId');
+    if (heroeIdStr !== null) {
+      const id = parseInt(heroeIdStr, 10);
+      this.heroe = HEROES.find(h => h.id === id) ?? null;
+    }
+    this.call('nueva-mano', {});
+  }
 
   ngOnDestroy(): void {
     if (this.bubbleTimer) clearTimeout(this.bubbleTimer);
-    if (this.toastTimer)  clearTimeout(this.toastTimer);
+    if (this.toastTimer) clearTimeout(this.toastTimer);
   }
 
   // ── Template helpers ──────────────────────────────────────────────────────
   sym(palo: Palo): string { return PALO_SYM[palo] ?? ''; }
 
-
-//metodo assets cartas (acomodar)
+  //metodo assets cartas (acomodar)
   cardImg(carta: Carta): string {
-
-  const mapaNumeros: Record<number, number> = {
-    1: 1,
-    2: 2,
-    3: 3,
-    4: 4,
-    5: 5,
-    6: 6,
-    7: 7,
-    10: 8,
-    11: 9,
-    12: 10
-  };
-
-  const offsetPalo: Record<Palo, number> = {
-    Oro: 0,
-    Copa: 10,
-    Espada: 20,
-    Basto: 30
-  };
-
-  const numeroArchivo = offsetPalo[carta.palo] + mapaNumeros[carta.numero];
-
-  return `assets/cards/${numeroArchivo}.PNG`;
-}
+    const mapaNumeros: Record<number, number> = {
+      1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 10: 8, 11: 9, 12: 10
+    };
+    const offsetPalo: Record<Palo, number> = {
+      Oro: 0, Copa: 10, Espada: 20, Basto: 30
+    };
+    const numeroArchivo = offsetPalo[carta.palo] + mapaNumeros[carta.numero];
+    return `assets/cards/${numeroArchivo}.PNG`;
+  }
 
   // ── API ───────────────────────────────────────────────────────────────────
   async call(endpoint: string, body: object): Promise<void> {
@@ -179,6 +217,10 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
         this.http.post<ManoState>(`${API}/${endpoint}`, body)
       );
       this.mano = data;
+      // Si el backend devuelve el resultado de la habilidad, lo mostramos
+      if (data.resultadoHabilidad) {
+        this.resultadoHabilidad = data.resultadoHabilidad;
+      }
       this.updateUI(data);
     } catch (err: any) {
       const msg = err?.error?.message ?? err?.message ?? String(err);
@@ -195,15 +237,36 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
     this.call('jugar-carta', { manoId: this.mano.id, numero: c.numero, palo: c.palo });
   }
 
-  nuevaPartida(): void { this.gameOver = false; this.call('nueva-partida', {}); }
-  goBack(): void { this.router.navigate(['/']); }
+  usarHabilidad(): void {
+    if (!this.mano || !this.habilidadDisponible) return;
+    this.resultadoHabilidad = '';   // limpiar resultado anterior antes de la llamada
+    this.call('usar-habilidad', { manoId: this.mano.id });
+  }
+
+  nuevaPartida(): void {
+    this.gameOver = false;
+    this.resultadoHabilidad = '';
+    this.call('nueva-partida', {});
+  }
+  //vuelve a menu principal 
+  goBack(): void {
+    this.router.navigate(['/']);
+  }
+
+  //vuelve a phaser
+  salirPartida(): void {
+    console.log('evento salir');
+    window.dispatchEvent(
+      new CustomEvent('truco-solo:end')
+    );
+  }
 
   // ── UI update ─────────────────────────────────────────────────────────────
   private updateUI(m: ManoState): void {
     this.redrawTally(m.puntosHumano, m.puntosMaquina);
 
     if (m.ganadorPartida) {
-      this.gameOver    = true;
+      this.gameOver = true;
       this.gameOverWon = m.ganadorPartida === 'Humano';
       this.cdr.markForCheck();
       return;
@@ -217,18 +280,18 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
       this.rivalLabel = m.turnoActual === 'Maquina' ? 'Pensando...' : '...';
     }
 
-    const pendEnv   = !!m.envidoPendienteRespuestaHumano;
-    const pendTru   = !!m.trucoPendienteRespuestaHumano;
+    const pendEnv = !!m.envidoPendienteRespuestaHumano;
+    const pendTru = !!m.trucoPendienteRespuestaHumano;
     const esMiTurno = (m.turnoActual === 'Humano' || !!m.cartaMaquinaEnMesa)
-                      && !m.ganadorMano && !m.ganadorPartida && !pendEnv && !pendTru;
+      && !m.ganadorMano && !m.ganadorPartida && !pendEnv && !pendTru;
 
     this.turnoBadge = esMiTurno
-      ? '⭐ Tu turno — jugá una carta o cantá'
-      : (pendEnv || pendTru) ? '⚡ Respondé el canto de la máquina' : '';
+      ? 'Tu turno — jugá una carta o cantá'
+      : (pendEnv || pendTru) ? 'Respondé el canto de la máquina' : '';
 
     // Burbuja
     this.updateBubble(m, pendTru, pendEnv);
-    this.prevEstadoTruco  = m.estadoTruco  ?? '';
+    this.prevEstadoTruco = m.estadoTruco ?? '';
     this.prevEstadoEnvido = m.estadoEnvido ?? '';
     this.prevPendTru = pendTru;
     this.prevPendEnv = pendEnv;
@@ -245,7 +308,7 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
         jugador: b?.cartaJugador,
         maquina: b?.cartaMaquina ?? (pendingMaq ? m.cartaMaquinaEnMesa : undefined),
         pending: pendingMaq,
-        winner:  b?.ganador,
+        winner: b?.ganador,
       };
     });
 
@@ -260,17 +323,15 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
 
   // ── Burbuja ───────────────────────────────────────────────────────────────
   private updateBubble(m: ManoState, pendTru: boolean, pendEnv: boolean): void {
-    const trucoChanged  = (m.estadoTruco  ?? '') !== this.prevEstadoTruco;
+    const trucoChanged = (m.estadoTruco ?? '') !== this.prevEstadoTruco;
     const envidoChanged = (m.estadoEnvido ?? '') !== this.prevEstadoEnvido;
 
     if (pendTru || pendEnv) {
-      // Caso especial: la máquina acaba de responder al envido del humano
-      // Y además tiene un truco pendiente → mostrar respuesta brevemente, luego el canto
       if (pendTru && envidoChanged && m.envidoCantado && !this.prevPendEnv) {
         const e = (m.estadoEnvido ?? '').toLowerCase();
         let rsp = '';
-        if      (e.includes('no quiso') || e.includes('no quiere')) rsp = '¡No quiero!';
-        else if (e.includes('quiso')    || e.includes('quiere'))    rsp = '¡Quiero!';
+        if (e.includes('no quiso') || e.includes('no quiere')) rsp = '¡No quiero!';
+        else if (e.includes('quiso') || e.includes('quiere')) rsp = '¡Quiero!';
         if (rsp) {
           this.showTempBubble(rsp, 2000);
           setTimeout(() => {
@@ -280,13 +341,11 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
           return;
         }
       }
-      // Normal: mostrar canto pendiente de forma persistente
       if (this.bubbleTimer) { clearTimeout(this.bubbleTimer); this.bubbleTimer = null; }
       const txt = this.cantoBubbleText(m, pendTru, pendEnv);
       if (txt) this.showBubble(txt);
 
     } else {
-      // Detectar respuesta de la máquina a un canto del humano
       let resp = '';
       if (trucoChanged && m.trucoCantado && !this.prevPendTru) {
         const t = (m.estadoTruco ?? '').toLowerCase();
@@ -318,7 +377,7 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
     if (pendEnv) {
       const s = (m.estadoEnvido ?? '').toLowerCase();
       if (s.includes('falta')) return '¡Falta Envido!';
-      if (s.includes('real'))  return '¡Real Envido!';
+      if (s.includes('real')) return '¡Real Envido!';
       return '¡Envido!';
     }
     return '';
@@ -356,8 +415,8 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
   private buildBtns(
     m: ManoState, esMiTurno: boolean, pendEnv: boolean, pendTru: boolean
   ): void {
-    const manoEnd       = !!m.ganadorMano || !!m.ganadorPartida;
-    const trucoCantado  = !!m.trucoCantado;
+    const manoEnd = !!m.ganadorMano || !!m.ganadorPartida;
+    const trucoCantado = !!m.trucoCantado;
     const trucoResuelto = !!m.trucoResuelto;
     const raw: [string, string, (() => void) | null][] = [];
 
@@ -369,7 +428,6 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
         () => this.call('nueva-mano', { manoAnteriorId: m.id })]);
 
     } else if (pendEnv) {
-      // Responder envido — con posibles escalaciones según el tipo cantado
       raw.push(['QUIERO', '#44ff44',
         () => this.call('responder-envido', { manoId: m.id, aceptar: true })]);
       const tipoEnv = m.tipoEnvidoCantado;
@@ -385,7 +443,6 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
         () => this.call('responder-envido', { manoId: m.id, aceptar: false })]);
 
     } else if (pendTru) {
-      // Responder truco
       raw.push(['QUIERO', '#44ff44',
         () => this.call('responder-truco', { manoId: m.id, aceptar: true })]);
       if ((m.nivelTruco ?? 0) < 3) {
@@ -397,7 +454,6 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
       raw.push(['NO QUIERO', '#ff4444',
         () => this.call('responder-truco', { manoId: m.id, aceptar: false })]);
 
-      // Envido cantable mientras se decide el truco (sin bazas jugadas aún)
       if (!m.envidoCantado && (m.bazas?.length ?? 0) === 0) {
         raw.push(['Envido', '#4488ff',
           () => this.call('cantar-envido-tipo', { manoId: m.id, tipo: 'Envido' })]);
@@ -408,9 +464,6 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
       }
 
     } else {
-      // ── Turno normal ─────────────────────────────────────────────────────
-
-      // Envido — solo antes de la primera baza y sin truco resuelto
       const envidoPosible = !m.envidoCantado && !m.trucoResuelto
         && (m.bazas?.length ?? 0) === 0 && !manoEnd;
       if (envidoPosible) {
@@ -422,20 +475,17 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
           esMiTurno ? () => this.call('cantar-envido-tipo', { manoId: m.id, tipo: 'Falta Envido' }) : null]);
       }
 
-      // Truco / escalación
       if (!trucoCantado) {
         const ok = esMiTurno && !manoEnd;
         raw.push(['Truco', '#cc4444',
           ok ? () => this.call('cantar-truco', { manoId: m.id }) : null]);
       } else if (trucoCantado && !trucoResuelto && (m.nivelTruco ?? 0) < 3 && m.cantorTruco !== 'Humano') {
-        // Solo puede escalar si fue la máquina quien cantó el nivel actual
         const lbl = m.nivelTruco === 1 ? 'Retruco' : 'Vale Cuatro';
-        const ok  = esMiTurno && !manoEnd;
+        const ok = esMiTurno && !manoEnd;
         raw.push([lbl, '#cc4444',
           ok ? () => this.call('escalar-truco', { manoId: m.id }) : null]);
       }
 
-      // Ir al mazo
       if (esMiTurno && !manoEnd) {
         raw.push(['Ir al mazo', '#556677',
           () => this.call('irse-al-mazo', { manoId: m.id })]);
@@ -450,7 +500,7 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
   // ── Tanteador SVG ─────────────────────────────────────────────────────────
   private redrawTally(ptsVos: number, ptsMaq: number): void {
     const sticks: typeof this.tallySticks = [];
-    this.drawPalitos(sticks, 36,  Math.min(ptsVos, 15), false);
+    this.drawPalitos(sticks, 36, Math.min(ptsVos, 15), false);
     this.drawPalitos(sticks, 124, Math.min(ptsMaq, 15), true);
     this.tallySticks = sticks;
   }
@@ -467,11 +517,11 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
       let bx = cx - totalW / 2;
       for (let i = 0; i < full; i++) {
         const by = 6;
-        this.stick(out, bx,      by + BS, bx,      by,      color);
-        this.stick(out, bx,      by,      bx + BS, by,      color);
-        this.stick(out, bx + BS, by,      bx + BS, by + BS, color);
-        this.stick(out, bx + BS, by + BS, bx,      by + BS, color);
-        this.stick(out, bx,      by + BS, bx + BS, by,      color);
+        this.stick(out, bx, by + BS, bx, by, color);
+        this.stick(out, bx, by, bx + BS, by, color);
+        this.stick(out, bx + BS, by, bx + BS, by + BS, color);
+        this.stick(out, bx + BS, by + BS, bx, by + BS, color);
+        this.stick(out, bx, by + BS, bx + BS, by, color);
         bx += BS + BGAP;
       }
     }

@@ -719,3 +719,114 @@
   object-fit: cover;
   border-radius: 4px;
 }
+
+
+/* eeee cambios descripcion habilidad, falta */
+
+.character-section {
+  margin-top: 14px;
+}
+
+.character-title {
+  color: #b987ff;
+}
+
+.character-name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 6px;
+  color: #f5e6ff;
+}
+
+.character-desc {
+  margin-top: 6px;
+  font-size: .9rem;
+  line-height: 1.3;
+  color: #d8d8d8;
+}
+
+.character-status {
+  margin-top: 10px;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.character-status.ready {
+  color: #7dff7d;
+}
+
+.character-status.used {
+  color: #ff8d8d;
+}
+
+
+/* testeo habilidades heroe*/
+
+.heroe-section {
+  border-left: 2px solid #444;
+  /* el color real lo pone Angular inline */
+  padding-left: 6px;
+}
+
+/* Nombre / clase del héroe */
+.heroe-nombre {
+  font-family: "Jersey 10", monospace;
+  font-size: 14px;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+/* Descripción de la habilidad activa */
+.heroe-desc {
+  font-family: "Jersey 10", monospace;
+  font-size: 11px;
+  color: #999;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+/* Botón usar habilidad */
+.habilidad-btn {
+  font-family: "Jersey 10", monospace;
+  font-size: 13px;
+  width: 100%;
+  padding: 6px 4px;
+  border-radius: 3px;
+  border: 1px solid #333;
+  background: #161616;
+  color: #444;
+  cursor: not-allowed;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.habilidad-btn.disponible {
+  background: #162210;
+  border-color: #55aa33;
+  color: #88ff44;
+  cursor: pointer;
+}
+
+.habilidad-btn.disponible:hover {
+  background: #1e3318;
+}
+
+.habilidad-btn.usada {
+  background: #111;
+  border-color: #2a3a2a;
+  color: #3a5a3a;
+  cursor: not-allowed;
+}
+
+/* Resultado que devuelve el backend tras usar la habilidad */
+.heroe-resultado {
+  font-family: "Jersey 10", monospace;
+  font-size: 12px;
+  color: #ffdd88;
+  background: #1a1400;
+  border: 1px solid #5a4400;
+  border-radius: 3px;
+  padding: 5px 7px;
+  margin-top: 6px;
+  line-height: 1.4;
+  word-break: break-word;
+}

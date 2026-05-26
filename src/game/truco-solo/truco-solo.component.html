@@ -16,7 +16,6 @@
   <!-- ── ÁREA DE JUEGO CENTRAL ─────────────────────────────────────────────── -->
   <main class="arena">
 
-    <!-- Sprite rival + burbuja — sobre el borde lejano de la mesa -->
     <div class="rival-zone">
       <div class="rival-portrait">
         <img src="assets/rival.png" alt="rival" class="rival-img" />
@@ -30,59 +29,47 @@
       }
     </div>
 
-    <!-- Mesa en perspectiva CSS -->
     <div class="table-wrap">
       <div class="table-surface">
 
-        <!-- Cartas del rival (reverso) -->
         <div class="rival-hand">
           @for (c of opCards; track $index) {
           <img class="card-back-img" [class.hidden]="!c.visible" src="assets/cards/back.PNG" alt="reverso" />
           }
         </div>
 
-        <!-- Bazas: 3 columnas -->
         <div class="bazas">
           @for (s of slots; track $index) {
           <div class="baza-col">
-
-            <!-- Carta máquina (zona lejana) -->
             <div class="baza-slot far-slot" [class.pending]="s.pending">
               @if (s.maquina) {
               <img class="baza-card-img far-card-img" [src]="cardImg(s.maquina)"
                 [alt]="s.maquina.numero + ' ' + s.maquina.palo" />
               }
             </div>
-
-            <!-- Ganador de baza -->
             @if (s.winner) {
             <div class="baza-winner" [class.winner-human]="s.winner === 'Humano'"
               [class.winner-maq]="s.winner === 'Maquina'" [class.winner-parda]="s.winner === 'Parda'">
               {{ s.winner === 'Humano' ? '★ Vos' : s.winner === 'Maquina' ? '★ Máq' : '— Parda' }}
             </div>
             }
-
-            <!-- Carta jugador (zona cercana) -->
             <div class="baza-slot near-slot">
               @if (s.jugador) {
               <img class="baza-card-img near-card-img" [src]="cardImg(s.jugador)"
                 [alt]="s.jugador.numero + ' ' + s.jugador.palo" />
               }
             </div>
-
           </div>
           }
         </div>
 
-        <!-- Badge de turno -->
         @if (turnoBadge) {
         <div class="turno-badge">{{ turnoBadge }}</div>
         }
 
-      </div><!-- /table-surface -->
-    </div><!-- /table-wrap -->
+      </div>
+    </div>
 
-    <!-- ── ABANICO ─────────────────────────────────────────────────────────── -->
     <div class="fan-wrap">
       @for (c of misCarts; track $index) {
       <div class="fan-card" [class.hidden]="!c.visible" [class.played-out]="!c.carta"
@@ -97,9 +84,10 @@
 
   </main>
 
-  <!-- ── PANEL DERECHO: tanteador + estado ─────────────────────────────────── -->
+  <!-- ── PANEL DERECHO ─────────────────────────────────────────────────────── -->
   <aside class="side-panel right-panel">
 
+    <!-- Tanteador -->
     <div class="scoreboard">
       <div class="score-title">TANTEADOR</div>
       <div class="score-row">
@@ -116,17 +104,57 @@
       </svg>
     </div>
 
+    <!-- Envido -->
     <div class="state-section">
       <div class="state-title envido-title">ENVIDO</div>
       <div class="state-text">{{ mano?.estadoEnvido || 'No se cantó.' }}</div>
     </div>
 
+
+    <!-- Truco -->
     <div class="state-section">
       <div class="state-title truco-title">TRUCO</div>
       <div class="state-text">{{ mano?.estadoTruco || 'No se cantó.' }}</div>
     </div>
 
-    <button class="back-btn" (click)="goBack()">← Volver</button>
+
+
+    <!-- ── HÉROE ─────────────────────────────────────────────────────────── -->
+    @if (heroe) {
+    <div class="state-section heroe-section" [style.border-color]="heroe.color + '55'">
+
+      <!-- Clase del héroe -->
+      <div class="heroe-nombre" [style.color]="heroe.color">
+        ⚔ {{ heroe.nombre }}
+      </div>
+
+      <!-- Descripción de la habilidad activa -->
+      <div class="heroe-desc">{{ heroe.descripcion }}</div>
+
+      <!-- Botón usar habilidad -->
+      <button class="habilidad-btn" [class.disponible]="habilidadDisponible" [class.usada]="mano?.habilidadUsada"
+        [disabled]="!habilidadDisponible" (click)="usarHabilidad()">
+        @if (mano?.habilidadUsada) {
+        ✓ Habilidad usada
+        } @else if (habilidadDisponible) {
+        ⚡ Usar habilidad
+        } @else {
+        Habilidad no disponible
+        }
+      </button>
+
+      <!-- Resultado de la habilidad (lo que devuelve el backend) -->
+      @if (resultadoHabilidad) {
+      <div class="heroe-resultado">
+        {{ resultadoHabilidad }}
+      </div>
+      }
+    </div>
+    }
+
+
+    <button class="back-btn" (click)="salirPartida()">← Volver</button>
+
 
   </aside>
 
@@ -144,13 +172,14 @@
       </div>
       <div class="go-btn-row">
         <button class="go-btn go-btn-play" (click)="nuevaPartida()">Volver a jugar</button>
-        <button class="go-btn go-btn-exit" (click)="goBack()">Salir al mapa</button>
+        <button class="go-btn go-btn-exit" (click)="salirPartida()">Salir al mapa</button>
       </div>
     </div>
   </div>
   }
 
   <!-- ── TOAST DE ERROR ────────────────────────────────────────────────────── -->
+
   @if (toastMsg) {
   <div class="toast">{{ toastMsg }}</div>
   }
