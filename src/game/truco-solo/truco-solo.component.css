@@ -762,13 +762,12 @@
 
 /* testeo habilidades heroe*/
 
+/* Sección del héroe */
 .heroe-section {
   border-left: 2px solid #444;
-  /* el color real lo pone Angular inline */
   padding-left: 6px;
 }
 
-/* Nombre / clase del héroe */
 .heroe-nombre {
   font-family: "Jersey 10", monospace;
   font-size: 14px;
@@ -776,7 +775,6 @@
   margin-bottom: 4px;
 }
 
-/* Descripción de la habilidad activa */
 .heroe-desc {
   font-family: "Jersey 10", monospace;
   font-size: 11px;
@@ -788,7 +786,7 @@
 /* Botón usar habilidad */
 .habilidad-btn {
   font-family: "Jersey 10", monospace;
-  font-size: 13px;
+  font-size: 12px;
   width: 100%;
   padding: 6px 4px;
   border-radius: 3px;
@@ -817,16 +815,50 @@
   cursor: not-allowed;
 }
 
-/* Resultado que devuelve el backend tras usar la habilidad */
-.heroe-resultado {
+.habilidad-btn.esperando-carta {
+  border-color: #aa66ff;
+  color: #aa66ff;
+  cursor: not-allowed;
+}
+
+/* Log de eventos */
+.heroe-log {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.heroe-log-linea {
   font-family: "Jersey 10", monospace;
-  font-size: 12px;
+  font-size: 11px;
   color: #ffdd88;
   background: #1a1400;
   border: 1px solid #5a4400;
   border-radius: 3px;
-  padding: 5px 7px;
-  margin-top: 6px;
+  padding: 4px 6px;
   line-height: 1.4;
   word-break: break-word;
+}
+
+/* Carta seleccionada (Manipulador) */
+.carta-seleccionada {
+  filter: drop-shadow(0 0 8px #aa44ff) drop-shadow(0 0 3px #aa44ff);
+}
+
+/* Hint del Manipulador sobre el abanico */
+.manipulador-hint {
+  position: absolute;
+  bottom: 170px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Jersey 10", monospace;
+  font-size: 14px;
+  color: #cc88ff;
+  background: #1a0a2a;
+  border: 1px solid #aa44ff;
+  border-radius: 4px;
+  padding: 5px 12px;
+  pointer-events: none;
+  z-index: 10;
 }

@@ -1,7 +1,6 @@
-<!-- ── ROOT ──────────────────────────────────────────────────────────────────── -->
 <div class="root">
 
-  <!-- ── PANEL IZQUIERDO: botones de acción ────────────────────────────────── -->
+  <!-- ── PANEL IZQUIERDO: botones de acción ──────────────────────────────── -->
   <aside class="side-panel left-panel">
     <div class="btn-list">
       @for (b of btns; track b.label) {
@@ -13,7 +12,7 @@
     </div>
   </aside>
 
-  <!-- ── ÁREA DE JUEGO CENTRAL ─────────────────────────────────────────────── -->
+  <!-- ── ÁREA DE JUEGO CENTRAL ───────────────────────────────────────────── -->
   <main class="arena">
 
     <div class="rival-zone">
@@ -70,11 +69,12 @@
       </div>
     </div>
 
+    <!-- ── ABANICO ──────────────────────────────────────────────────────── -->
     <div class="fan-wrap">
       @for (c of misCarts; track $index) {
       <div class="fan-card" [class.hidden]="!c.visible" [class.played-out]="!c.carta"
-        [style.--angle]="fanAngles[$index] + 'deg'" [style.--xoff]="fanXOff[$index] + 'px'"
-        (click)="jugarCarta($index)">
+        [class.carta-seleccionada]="c.seleccionada" [style.--angle]="fanAngles[$index] + 'deg'"
+        [style.--xoff]="fanXOff[$index] + 'px'" (click)="jugarCarta($index)">
         @if (c.carta) {
         <img class="fan-card-img" [src]="cardImg(c.carta)" [alt]="c.carta.numero + ' ' + c.carta.palo" />
         }
@@ -82,9 +82,16 @@
       }
     </div>
 
+    <!-- Instrucción del Manipulador cuando espera que elijas carta -->
+    @if (manipuladorEsperandoCarta) {
+    <div class="manipulador-hint">
+      ⚡ Tocá la carta que querés cambiar
+    </div>
+    }
+
   </main>
 
-  <!-- ── PANEL DERECHO ─────────────────────────────────────────────────────── -->
+  <!-- ── PANEL DERECHO ───────────────────────────────────────────────────── -->
   <aside class="side-panel right-panel">
 
     <!-- Tanteador -->
@@ -110,32 +117,30 @@
       <div class="state-text">{{ mano?.estadoEnvido || 'No se cantó.' }}</div>
     </div>
 
-
     <!-- Truco -->
     <div class="state-section">
       <div class="state-title truco-title">TRUCO</div>
       <div class="state-text">{{ mano?.estadoTruco || 'No se cantó.' }}</div>
     </div>
 
-
-
-    <!-- ── HÉROE ─────────────────────────────────────────────────────────── -->
-    @if (heroe) {
+    <!-- ── HÉROE ──────────────────────────────────────────────────────────── -->
+    @if (heroe && vista?.habilidadesActivasEnPartida) {
     <div class="state-section heroe-section" [style.border-color]="heroe.color + '55'">
 
-      <!-- Clase del héroe -->
-      <div class="heroe-nombre" [style.color]="heroe.color">
-        ⚔ {{ heroe.nombre }}
-      </div>
+      <!-- Nombre -->
+      <div class="heroe-nombre" [style.color]="heroe.color">⚔ {{ heroe.nombre }}</div>
 
-      <!-- Descripción de la habilidad activa -->
+      <!-- descripcion habilidad -->
       <div class="heroe-desc">{{ heroe.descripcion }}</div>
 
-      <!-- Botón usar habilidad -->
-      <button class="habilidad-btn" [class.disponible]="habilidadDisponible" [class.usada]="mano?.vistaHabilidadesHumano?.activaUsadaEnEstaMano"
+      <!-- usar habilidad -->
+      <button class="habilidad-btn" [class.disponible]="habilidadDisponible && !manipuladorEsperandoCarta"
+        [class.usada]="vista?.activaUsadaEnEstaMano" [class.esperando-carta]="manipuladorEsperandoCarta"
         [disabled]="!habilidadDisponible" (click)="usarHabilidad()">
-        @if (mano?.vistaHabilidadesHumano?.activaUsadaEnEstaMano) {
+        @if (vista?.activaUsadaEnEstaMano) {
         ✓ Habilidad usada
+        } @else if (manipuladorEsperandoCarta) {
+        ← Tocá la carta a cambiar
         } @else if (habilidadDisponible) {
         ⚡ Usar habilidad
         } @else {
@@ -143,22 +148,23 @@
         }
       </button>
 
-      <!-- Resultado de la habilidad (lo que devuelve el backend) -->
-      @if (resultadoHabilidad) {
-      <div class="heroe-resultado">
-        {{ resultadoHabilidad }}
+      <!-- Log de eventos de habilidad -->
+      @if (eventosHabilidad.length > 0) {
+      <div class="heroe-log">
+        @for (linea of eventosHabilidad; track $index) {
+        <div class="heroe-log-linea">{{ linea }}</div>
+        }
       </div>
       }
+
     </div>
     }
 
-
     <button class="back-btn" (click)="salirPartida()">← Volver</button>
-
 
   </aside>
 
-  <!-- ── GAME OVER OVERLAY ──────────────────────────────────────────────────── -->
+  <!-- ── GAME OVER OVERLAY ───────────────────────────────────────────────── -->
   @if (gameOver) {
   <div class="game-over-overlay" (click)="$event.stopPropagation()">
     <div class="game-over-box">
@@ -178,8 +184,8 @@
   </div>
   }
 
-  <!-- ── TOAST DE ERROR ────────────────────────────────────────────────────── -->
 
+  <!-- se puede comentar -->
   @if (toastMsg) {
   <div class="toast">{{ toastMsg }}</div>
   }
