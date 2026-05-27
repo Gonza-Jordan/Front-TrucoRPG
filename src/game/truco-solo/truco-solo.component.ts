@@ -55,6 +55,13 @@ export interface ManoState {
   habilidadDisponible?: boolean;
   habilidadUsada?: boolean;
   resultadoHabilidad?: string;   // texto que devuelve el backend tras usar la habilidad
+  vistaHabilidadesHumano?: {
+    activaDisponible: boolean;
+    activaUsadaEnEstaMano: boolean;
+    habilidadesActivasEnPartida: boolean;
+    ultimoMensajeHabilidad?: string;
+    cartaReveladaRival?: { numero: number; palo: string; valorTruco: number };
+  };
 }
 
 export interface Btn {
@@ -142,7 +149,8 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
   resultadoHabilidad = '';   // texto que se muestra debajo del botón tras usarla
 
   get habilidadDisponible(): boolean {
-    return !!this.heroe && !!this.mano?.habilidadDisponible && !this.mano?.habilidadUsada;
+    const vista = this.mano?.vistaHabilidadesHumano;
+    return !!this.heroe && !!vista?.activaDisponible && !vista?.activaUsadaEnEstaMano;
   }
 
   // ── UI ───────────────────────────────────────────────────────────────────
@@ -185,7 +193,11 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
       const id = parseInt(heroeIdStr, 10);
       this.heroe = HEROES.find(h => h.id === id) ?? null;
     }
-    this.call('nueva-mano', {});
+    // Iniciar con modo Historia (1) y el héroe elegido para que las habilidades estén activas.
+    // Si no hay héroe guardado se usa modo Tradicional (0).
+    const body: Record<string, unknown> = { modo: this.heroe ? 1 : 0 };
+    if (this.heroe) body['claseHeroe'] = this.heroe.id;
+    this.call('nueva-partida', body);
   }
 
   ngOnDestroy(): void {
@@ -240,13 +252,15 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
   usarHabilidad(): void {
     if (!this.mano || !this.habilidadDisponible) return;
     this.resultadoHabilidad = '';   // limpiar resultado anterior antes de la llamada
-    this.call('usar-habilidad', { manoId: this.mano.id });
+    this.call('activar-habilidad', { manoId: this.mano.id });
   }
 
   nuevaPartida(): void {
     this.gameOver = false;
     this.resultadoHabilidad = '';
-    this.call('nueva-partida', {});
+    const body: Record<string, unknown> = { modo: this.heroe ? 1 : 0 };
+    if (this.heroe) body['claseHeroe'] = this.heroe.id;
+    this.call('nueva-partida', body);
   }
   //vuelve a menu principal 
   goBack(): void {

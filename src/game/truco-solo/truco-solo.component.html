@@ -132,9 +132,9 @@
       <div class="heroe-desc">{{ heroe.descripcion }}</div>
 
       <!-- Botón usar habilidad -->
-      <button class="habilidad-btn" [class.disponible]="habilidadDisponible" [class.usada]="mano?.habilidadUsada"
+      <button class="habilidad-btn" [class.disponible]="habilidadDisponible" [class.usada]="mano?.vistaHabilidadesHumano?.activaUsadaEnEstaMano"
         [disabled]="!habilidadDisponible" (click)="usarHabilidad()">
-        @if (mano?.habilidadUsada) {
+        @if (mano?.vistaHabilidadesHumano?.activaUsadaEnEstaMano) {
         ✓ Habilidad usada
         } @else if (habilidadDisponible) {
         ⚡ Usar habilidad
