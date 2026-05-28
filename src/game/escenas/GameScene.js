@@ -10,9 +10,9 @@ export default class GameScene extends BaseScene {
     constructor() { super('GameScene'); }
 
     init(data) {
-        this.playerKey    = data.playerSprite || 'player';
-        this.startX       = data.x || 100;
-        this.startY       = data.y || 100;
+        this.playerKey = data.playerSprite || 'player';
+        this.startX = data.x || 100;
+        this.startY = data.y || 100;
         this.esMultijugador = data.multijugador || false;
         this.modoJuego = data.modoJuego ?? 0;
         this.claseHeroe = data.claseHeroe ?? null;
@@ -30,7 +30,7 @@ export default class GameScene extends BaseScene {
         this.JugadorPrincipal.setCollideWorldBounds(true);
 
         this.npc = new Npc(this, 490, 180, 'troll').setDepth(0);
-        this.keys   = this.input.keyboard.createCursorKeys();
+        this.keys = this.input.keyboard.createCursorKeys();
         this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         this.portal = new Portal(this, 600, 150, 'GameScene2', 'casa');
         this.physics.add.collider(this.JugadorPrincipal, this.portal.zone);
@@ -40,14 +40,12 @@ export default class GameScene extends BaseScene {
         this.zonaInteraccion.body.setAllowGravity(false);
         this.zonaInteraccion.body.moves = false;
 
-        const mensajeNpcTexto = this.esMultijugador
-            ? '¡Presioná E para jugar al TRUCO!'
-            : '¡Presioná E para jugar al TRUCO!';
         this.mensajeNpc = this.add.text(
             this.npc.x, this.npc.y - this.npc.height / 2 - 20,
-            mensajeNpcTexto,
+            '¡Presioná E para jugar al TRUCO!',
             { fontFamily: '"Jersey 10"', fontSize: '18px', color: '#000', backgroundColor: '#fff', padding: { x: 10, y: 5 } }
         ).setOrigin(0.5).setVisible(false).setDepth(10);
+
         this.estaEnZonaNpc = false;
         this.physics.add.overlap(this.JugadorPrincipal, this.zonaInteraccion, () => {
             this.estaEnZonaNpc = true;
@@ -59,7 +57,6 @@ export default class GameScene extends BaseScene {
             this.timerEnvio = 0;
             multiplayerManager.limpiarCallbacks();
 
-            // Posición del otro jugador
             multiplayerManager.onPosicionActualizada = (x, y, animacion, sprite, escena) => {
                 if (escena !== 'GameScene') {
                     if (this.jugadorRemoto) { this.jugadorRemoto.destruir(); this.jugadorRemoto = null; }
@@ -90,18 +87,25 @@ export default class GameScene extends BaseScene {
         this.portal.update(this.JugadorPrincipal, this.teclaE);
         this.mensajeNpc.setVisible(this.estaEnZonaNpc);
 
-        // Interacción con el orco: E para jugar Truco
+        // Interacción con el troll: E para jugar Truco
         if (this.estaEnZonaNpc && Phaser.Input.Keyboard.JustDown(this.teclaE)) {
+
             if (this.esMultijugador) {
+
                 this.scene.start('TrucoMultiScene', {
                     miRol: multiplayerManager.esHost ? 'J1' : 'J2'
                 });
+
             } else {
-                this.scene.start('TrucoSoloScene', {
-                    playerSprite: this.playerKey,
-                    modoJuego: this.modoJuego,
-                    claseHeroe: this.claseHeroe,
-                });
+
+                window.dispatchEvent(new CustomEvent('truco-solo:start', {
+                    detail: {
+                        playerSprite: this.playerKey,
+                        modoJuego: this.modoJuego,
+                        claseHeroe: this.claseHeroe,
+                    }
+                }));
+
             }
         }
 
