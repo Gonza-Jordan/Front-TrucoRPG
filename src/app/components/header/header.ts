@@ -1,10 +1,11 @@
 import { Component,inject,signal } from '@angular/core';
-import { RouterModule,ActivatedRoute,NavigationEnd,Router,RouterLink } from '@angular/router';
+import { RouterModule,ActivatedRoute,NavigationEnd,Router } from '@angular/router';
 import { filter } from 'rxjs';
+import { Boton } from '../boton/boton';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterModule],
+  imports: [RouterModule, Boton],
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
