@@ -1,0 +1,17 @@
+<app-header></app-header>
+<main>
+    <div class="contenedor-menu">
+        <div class="codigo-sala-box sala">
+            <p class="codigo-sala-title">Código de sala</p>
+            <div class="codigo-sala-value">{{ codigoSala || 'Generando código...' }}</div>
+            <button type="button" class="boton-copiar" (click)="copiarCodigo()" [disabled]="!codigoSala">Copiar código</button>
+        </div>
+
+        <div class="sala" routerLink="/">Vos</div>
+        <div class="sala" routerLink="/">Osorio</div>
+        <div class="sala" routerLink="/">Carmela</div>
+        <div class="sala" routerLink="/">Esperando Jugadores...</div>
+        <a class="sala" routerLink="/menu-multijugador"><span>Abandonar Sala</span></a>
+    </div>
+</main>
+<app-footer></app-footer>
