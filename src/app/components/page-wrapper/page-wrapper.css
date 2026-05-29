@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  overflow: auto;
+  background: url('/assets/home.png') center center / cover no-repeat;
+  font-family: 'Jersey 10', monospace;
+}

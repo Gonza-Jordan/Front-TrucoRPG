@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
+:host {
+  display: inline-block;
+}
+
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Jersey 10', monospace;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #e8aa40;
+  background: #2e1e08;
+  border: 2px solid #6a4a20;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) {
+  background: #2e1f0e;
+  color: #f0b050;
+  border-color: #8a6030;
+  box-shadow: 0 0 10px rgba(200, 144, 48, 0.25);
+}
+
+.btn:active:not(:disabled) {
+  background: #140e04;
+  color: #a07020;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
