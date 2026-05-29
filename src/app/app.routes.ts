@@ -18,8 +18,8 @@ export const routes: Routes = [
   { path: 'configuracion', component: ConfiguracionComponent, data: { header: 'configuracion' } },
   { path: 'juego/maquina', component: TrucoSoloComponent },
   { path: 'juego/:modo', component: GameComponent },
-  { path: 'menu-multijugador', component: MenuMultijugador, data: { header: 'menu-multijugador' } },
-  { path: 'menu-multijugador-tradicional', component: MenuMultijugadorTradicional, data: { header: 'menu-multijugador-tradicional' } },
-  { path: 'menu-multijugador-tradicional-sala', component: MenuMultijugadorTradicionalSala, data: { header: 'menu-multijugador-tradicional-sala' } },
+  { path: 'menu-multijugador', component: MenuMultijugador, data: { header: 'home' } },
+  { path: 'menu-multijugador-tradicional', component: MenuMultijugadorTradicional, data: { header: 'home' } },
+  { path: 'menu-multijugador-tradicional-sala', component: MenuMultijugadorTradicionalSala, data: { header: 'home' } },
   { path: '**', redirectTo: '' },
 ];
