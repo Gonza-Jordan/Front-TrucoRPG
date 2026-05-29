@@ -19,20 +19,67 @@ export default class TrucoMultiScene extends BaseScene {
     init(data) {
         this.miRol = data.miRol || 'J1';
         this._btnObjs = [];
+        this._juegoIniciado = false;
     }
 
     create() {
         this.cameras.main.setBackgroundColor('#0a0805');
         this._buildLayout();
+        this._buildWaitingOverlay();
 
-        multiplayerManager.onTrucoEstado = (data) => this._updateUI(data);
+        multiplayerManager.onTrucoEstado = (data) => {
+            if (!this._juegoIniciado) {
+                this._juegoIniciado = true;
+                this._hideWaitingOverlay();
+            }
+            this._updateUI(data);
+        };
         multiplayerManager.onJugadorDesconectado = () => {
             this._pTruco.setText('El otro jugador se desconectó.');
         };
 
-        if (multiplayerManager.esHost) multiplayerManager.iniciarTruco();
+        // Ambos jugadores avisan que están listos; el servidor inicia cuando los dos lleguen
+        multiplayerManager.listoParaJugar();
 
         this.events.on('shutdown', () => { multiplayerManager.onTrucoEstado = null; });
+    }
+
+    _buildWaitingOverlay() {
+        const W = 1280, H = 720;
+        const F = { fontFamily: '"Jersey 10"' };
+
+        const waitBg    = this.add.rectangle(W / 2, H / 2, W, H, 0x050302, 0.95).setDepth(200);
+        const waitTitle = this.add.text(W / 2, H / 2 - 80, 'MULTIJUGADOR', {
+            ...F, fontSize: '52px', fill: '#44aaff'
+        }).setOrigin(0.5).setDepth(201);
+
+        this._waitTxt = this.add.text(W / 2, H / 2 + 10, 'Esperando al otro jugador...', {
+            ...F, fontSize: '28px', fill: '#ffffff',
+            backgroundColor: '#00000088', padding: { x: 16, y: 8 }
+        }).setOrigin(0.5).setDepth(201);
+
+        const waitRol = this.add.text(W / 2, H / 2 + 80, `Tu rol: ${this.miRol}`, {
+            ...F, fontSize: '20px', fill: '#aaaaaa'
+        }).setOrigin(0.5).setDepth(201);
+
+        // Puntitos animados
+        let dots = 0;
+        this._waitTimer = this.time.addEvent({
+            delay: 600, loop: true,
+            callback: () => {
+                dots = (dots + 1) % 4;
+                this._waitTxt?.setText('Esperando al otro jugador' + '.'.repeat(dots));
+            }
+        });
+
+        // Todos los objetos del overlay juntos para ocultarlos de una
+        this._waitObjs = [waitBg, waitTitle, this._waitTxt, waitRol];
+    }
+
+    _hideWaitingOverlay() {
+        if (this._waitTimer) { this._waitTimer.remove(); this._waitTimer = null; }
+        this._waitObjs?.forEach(o => o.setVisible(false));
+        this._waitObjs = [];
     }
 
     // ─── LAYOUT ──────────────────────────────────────────────────
@@ -331,16 +378,40 @@ export default class TrucoMultiScene extends BaseScene {
         this._btnObjs.forEach(o => o.destroy());
         this._btnObjs = [];
 
-        const btns = [];
+        // miRol es 'J1'/'J2'; el backend usa 'Humano'/'Maquina' para los roles
+        const miTurnoRol  = miRol === 'J1' ? 'Humano' : 'Maquina';
+        const manoEnd     = !!e.ganadorMano || !!e.ganadorPartida;
+        const btns = []; // [label, color, callback | null]  — null = deshabilitado
 
         if (e.partidaTerminada) {
             btns.push(['Nueva partida', '#226622', () => multiplayerManager.nuevaPartida()]);
+
         } else if (e.ganadorMano) {
             btns.push(['Nueva mano', '#cc8800', () => multiplayerManager.nuevaMano()]);
+
         } else if (pendEnv) {
-            btns.push(['QUIERO',    '#44ff44', () => multiplayerManager.responderEnvido(true)]);
+            // Escalación al responder envido (como en TrucoSolo)
+            btns.push(['QUIERO', '#44ff44', () => multiplayerManager.responderEnvido(true)]);
+            const tipoEnv = e.tipoEnvidoCantado;
+            if (tipoEnv === 'Envido') {
+                btns.push(['ENVIDO',       '#4488ff', () => multiplayerManager.escalarEnvido('Envido Envido')]);
+                btns.push(['REAL ENVIDO',  '#ffaa00', () => multiplayerManager.escalarEnvido('Real Envido')]);
+                btns.push(['FALTA ENVIDO', '#ff8800', () => multiplayerManager.escalarEnvido('Falta Envido')]);
+            } else if (tipoEnv === 'EnvidoEnvido') {
+                btns.push(['REAL ENVIDO',  '#ffaa00', () => multiplayerManager.escalarEnvido('Real Envido')]);
+                btns.push(['FALTA ENVIDO', '#ff8800', () => multiplayerManager.escalarEnvido('Falta Envido')]);
+            } else if (tipoEnv === 'RealEnvido') {
+                btns.push(['FALTA ENVIDO', '#ff8800', () => multiplayerManager.escalarEnvido('Falta Envido')]);
+            }
             btns.push(['NO QUIERO', '#ff4444', () => multiplayerManager.responderEnvido(false)]);
+
         } else if (pendTru) {
+            // Envido cantable mientras se decide el truco (sin bazas jugadas)
+            if (!e.envidoCantado && (e.bazas?.length ?? 0) === 0) {
+                btns.push(['Envido',       '#4488ff', () => multiplayerManager.solicitarEnvido('Envido')]);
+                btns.push(['Real Envido',  '#4488ff', () => multiplayerManager.solicitarEnvido('Real Envido')]);
+                btns.push(['Falta Envido', '#4488ff', () => multiplayerManager.solicitarEnvido('Falta Envido')]);
+            }
             btns.push(['QUIERO', '#44ff44', () => multiplayerManager.responderTruco(true)]);
             if (e.nivelTruco < 3) {
                 const lbl = e.nivelTruco === 1 ? 'RETRUCO' : 'VALE 4';
@@ -348,29 +419,47 @@ export default class TrucoMultiScene extends BaseScene {
                 btns.push([lbl, '#ffaa00', () => multiplayerManager.responderTruco(true, esc)]);
             }
             btns.push(['NO QUIERO', '#ff4444', () => multiplayerManager.responderTruco(false)]);
+            btns.push(['Ir al mazo', '#556677', () => multiplayerManager.irseAlMazo()]);
+
         } else {
-            if (!e.envidoCantado && (e.bazas?.length ?? 0) === 0 && esMiTurno) {
-                btns.push(['Envido',       '#4488ff', () => multiplayerManager.solicitarEnvido('Envido')]);
-                btns.push(['Real Envido',  '#4488ff', () => multiplayerManager.solicitarEnvido('Real Envido')]);
-                btns.push(['Falta Envido', '#4488ff', () => multiplayerManager.solicitarEnvido('Falta Envido')]);
+            // ── Envido — válido antes de la primera baza (deshabilitado si no es mi turno) ──
+            const envidoPosible = !e.envidoCantado && (e.bazas?.length ?? 0) === 0 && !manoEnd;
+            if (envidoPosible) {
+                btns.push(['Envido',       '#4488ff', esMiTurno ? () => multiplayerManager.solicitarEnvido('Envido')       : null]);
+                btns.push(['Real Envido',  '#4488ff', esMiTurno ? () => multiplayerManager.solicitarEnvido('Real Envido')  : null]);
+                btns.push(['Falta Envido', '#4488ff', esMiTurno ? () => multiplayerManager.solicitarEnvido('Falta Envido') : null]);
             }
-            if (!e.trucoCantado && esMiTurno) {
-                btns.push(['Truco', '#cc4444', () => multiplayerManager.solicitarTruco()]);
-            } else if (e.trucoCantado && !e.trucoResuelto && e.nivelTruco < 3 && e.cantorTruco !== miRol && esMiTurno) {
+
+            // ── Truco / Retruco / Vale Cuatro ──
+            if (!e.trucoCantado) {
+                const ok = esMiTurno && !manoEnd;
+                btns.push(['Truco', '#cc4444', ok ? () => multiplayerManager.solicitarTruco() : null]);
+            } else if (e.trucoCantado && !e.trucoResuelto && e.nivelTruco < 3 && e.cantorTruco !== miTurnoRol && esMiTurno) {
+                // La máquina cantó el nivel actual → puedo escalar
                 const lbl = e.nivelTruco === 1 ? 'Retruco' : 'Vale Cuatro';
                 btns.push([lbl, '#cc4444', () => multiplayerManager.escalarTruco()]);
             }
-            if (esMiTurno)
+
+            if (esMiTurno && !manoEnd)
                 btns.push(['Ir al mazo', '#556677', () => multiplayerManager.irseAlMazo()]);
         }
 
         let y = this._yBtns;
         btns.forEach(([label, color, cb]) => {
-            const bg  = this.add.rectangle(100, y+17, 172, 34, 0x222222).setStrokeStyle(1, 0x444444).setDepth(3).setInteractive();
-            const txt = this.add.text(100, y+17, label, { fontFamily: FONT, fontSize: '15px', fill: color }).setOrigin(0.5).setDepth(4);
-            bg.on('pointerover', () => bg.setFillStyle(0x333333));
-            bg.on('pointerout',  () => bg.setFillStyle(0x222222));
-            bg.on('pointerdown', cb);
+            const enabled = !!cb;
+            const bg = this.add.rectangle(100, y + 17, 172, 34,
+                enabled ? 0x222222 : 0x161616)
+                .setStrokeStyle(1, enabled ? 0x444444 : 0x252525)
+                .setDepth(3);
+            const txt = this.add.text(100, y + 17, label,
+                { fontFamily: FONT, fontSize: '15px', fill: enabled ? color : '#444444' })
+                .setOrigin(0.5).setDepth(4);
+            if (enabled) {
+                bg.setInteractive();
+                bg.on('pointerover', () => bg.setFillStyle(0x333333));
+                bg.on('pointerout',  () => bg.setFillStyle(0x222222));
+                bg.on('pointerdown', cb);
+            }
             this._btnObjs.push(bg, txt);
             y += 40;
         });

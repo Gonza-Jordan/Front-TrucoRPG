@@ -86,7 +86,7 @@ export class GameComponent implements AfterViewInit, OnDestroy {
       modo
     );
 
-    // Listener para abrir y cewrrar la mesa de angular
+    // Listener para abrir y cerrar la mesa de angular
     window.addEventListener(
       'truco-solo:start',
       this.abrirMesaTruco
@@ -96,6 +96,33 @@ export class GameComponent implements AfterViewInit, OnDestroy {
       'truco-solo:end',
       this.cerrarMesaTruco
     );
+
+    // Auto-fullscreen al rotar a landscape en mobile
+    const esTactil = navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
+    if (esTactil) {
+      screen.orientation?.addEventListener('change', this._onOrientationChange);
+      // Si ya está en landscape al cargar, intentar fullscreen
+      if (screen.orientation?.type?.includes('landscape')) {
+        this._solicitarFullscreen();
+      }
+    }
+  }
+
+  private _onOrientationChange = () => {
+    if (screen.orientation?.type?.includes('landscape')) {
+      this._solicitarFullscreen();
+    }
+  };
+
+  private _solicitarFullscreen() {
+    const el = document.documentElement;
+    if (!document.fullscreenElement && el.requestFullscreen) {
+      el.requestFullscreen().catch(() => {});
+    }
+    const orientation = screen.orientation as any;
+    if (orientation?.lock) {
+      orientation.lock('landscape').catch(() => {});
+    }
   }
 
   abrirMesaTruco = () => {
@@ -127,6 +154,8 @@ export class GameComponent implements AfterViewInit, OnDestroy {
       'truco-solo:end',
       this.cerrarMesaTruco
     );
+
+    screen.orientation?.removeEventListener('change', this._onOrientationChange);
 
     if (this.game) {
       this.game.destroy(true);
