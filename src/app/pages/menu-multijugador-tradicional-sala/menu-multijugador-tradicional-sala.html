@@ -1,0 +1,38 @@
+<app-header></app-header>
+<main>
+      <div class="connection-container">
+        <app-connection-status></app-connection-status>
+    </div>
+    <div class="menu-wrapper">
+      <div class="contenedor-menu">
+            <div class="codigo-sala-box">
+            <h1 class="codigo-sala-title">Código de sala</h1>
+            <div class="codigo-sala-value">{{ codigoSala || 'Generando código...' }}</div>
+            <button type="button" class="boton-copiar" (click)="copiarCodigo()" [disabled]="!codigoSala">Copiar código</button>
+        </div>
+        <div class="menu-sep"></div>
+        <div class="sala-grid">
+          <div class="sala" routerLink="/">
+            <span class="sala-avatar"></span>
+            <span class="sala-label">Vos</span>
+          </div>
+          <div class="sala" routerLink="/">
+            <span class="sala-avatar"></span>
+            <span class="sala-label">Osorio</span>
+          </div>
+          <div class="sala" routerLink="/">
+            <span class="sala-avatar"></span>
+            <span class="sala-label">Carmela</span>
+          </div>
+          <div class="sala" routerLink="/">
+            <span class="sala-avatar"></span>
+            <span class="sala-label">Esperando Jugadores...</span>
+          </div>
+        </div>
+        <div class="menu-sep"></div>
+        <a routerLink="/menu-multijugador"><span>Abandonar Sala</span></a>
+      </div>
+    </div>
+</main>
+<app-footer></app-footer>
+

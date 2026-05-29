@@ -18,11 +18,11 @@
   <nav>
     <ul>
       @if (headerType() === 'landing') {
-        <li><a routerLink="login">Iniciar Sesión</a></li>
-        <li><a routerLink="registro">Registrarse</a></li>
+        <li><app-boton enlace="login">Iniciar Sesión</app-boton></li>
+        <li><app-boton enlace="registro">Registrarse</app-boton></li>
       }
       @if (headerType() === 'home') {
-        <li><a routerLink="">Cerrar Sesión</a></li>
+        <li><app-boton enlace="">Cerrar Sesión</app-boton></li>
       }
     </ul>
   </nav>

@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Header } from '../../components/header/header';
 import { Footer } from '../../components/footer/footer';
+import { Card } from '../../components/card/card';
+import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 
 @Component({
   selector: 'app-configuracion',
   standalone: true,
-  imports: [CommonModule, FormsModule, Header, Footer],
+  imports: [CommonModule, FormsModule, Header, Footer, Card, PageWrapper],
   templateUrl: './configuracion.html',
   styleUrl: './configuracion.css'
 })
