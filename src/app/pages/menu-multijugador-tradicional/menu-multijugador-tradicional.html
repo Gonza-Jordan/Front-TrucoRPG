@@ -1,10 +1,17 @@
 <app-header></app-header>
 <main>
-    <div class="contenedor-menu">
+    <div class="connection-container">
+        <app-connection-status></app-connection-status>
+    </div>
+    <div class="menu-wrapper">
+      <div class="contenedor-menu">
+        <div class="menu-sep"></div>
         <a routerLink="/menu-multijugador-tradicional-sala"><span>CREAR SALA</span></a>
         <a routerLink="/juego/multijugador"><span>UNIRSE A SALA</span></a>
         <a routerLink="/juego/multijugador"><span>BUSCAR PARTIDA</span></a>
+        <div class="menu-sep"></div>
         <a routerLink="/menu-multijugador"><span>VOLVER</span></a>
       </div>
+    </div>
 </main>
 <app-footer></app-footer>

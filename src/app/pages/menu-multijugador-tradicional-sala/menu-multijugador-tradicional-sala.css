@@ -1,7 +1,10 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
 :host {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 110vh;
     overflow: hidden;
 }
 
@@ -13,20 +16,127 @@ main {
     align-items: center;
     padding: 2rem;
     overflow: hidden;
-    font-family: 'Jersey 20';
+    font-family: 'Jersey 10', monospace;
     background: url('/assets/home.png') center center / cover no-repeat;
 }
 
-.contenedor-menu {
-    position: relative;
-    width: min(400px, 100%);
-    padding: 75px 60px;
+.connection-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    max-width: 300px;
+}
+
+/* ── Wrapper logo + panel ────────────────────────────────────── */
+.menu-wrapper {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    width: min(500px, 90vw);
+    animation: flotar 2.5s infinite ease-in-out;
+}
+
+/* ── Panel ───────────────────────────────────────────────────── */
+.contenedor-menu {
+    width: 100%;
+    padding: 72px 24px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    background: rgba(14, 12, 8, 0.94);
+    border: 2px solid #5a4020;
+    outline: 1px solid rgba(200, 144, 48, 0.18);
+    outline-offset: 4px;
+    box-shadow:
+        0 0 40px rgba(0, 0, 0, 0.8),
+        inset 0 0 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Separador ───────────────────────────────────────────────── */
+.menu-sep {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #5a4020, transparent);
+    margin: 2px 0;
+}
+
+/* ── Botones ─────────────────────────────────────────────────── */
+.contenedor-menu a {
+    width: 100%;
+    height: 60px;
+    font-size: 1.2rem;
+    display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.8em;
-    animation: flotar 2s infinite ease-in-out;
+    text-decoration: none;
+    font-family: 'Jersey 10', monospace;
+    font-size: 1.05rem;
+    letter-spacing: 2px;
+    color: #c89030;
+    background: #1e1508;
+    border: 2px solid #5a4020;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s, border-color 0.1s, box-shadow 0.1s;
+}
+
+.contenedor-menu a:hover:not(.inactivo) {
+    background: #2e1f0e;
+    color: #f0b050;
+    border-color: #8a6030;
+    box-shadow: 0 0 10px rgba(200, 144, 48, 0.25);
+}
+
+.contenedor-menu a:active:not(.inactivo) {
+    background: #140e04;
+    color: #a07020;
+}
+
+/* Multijugador — acento azul */
+.contenedor-menu a.btn-multi {
+    color: #55aadd;
+    border-color: #2a5a7a;
+    background: #0e1820;
+}
+
+.contenedor-menu a.btn-multi:hover {
+    background: #162030;
+    color: #88ccff;
+    border-color: #4a8aaa;
+    box-shadow: 0 0 10px rgba(85, 170, 221, 0.25);
+}
+
+/* Configuración — acento gris */
+.contenedor-menu a.btn-config {
+    color: #8a8070;
+    border-color: #3a3020;
+    background: #181410;
+}
+
+.contenedor-menu a.btn-config:hover {
+    background: #221c14;
+    color: #aaa090;
+    border-color: #5a5040;
+    box-shadow: 0 0 10px rgba(138, 128, 112, 0.2);
+}
+
+/* Inactivos */
+.contenedor-menu a.inactivo {
+    opacity: 0.3;
+    cursor: default;
+}
+
+@media (max-width: 480px) {
+    main { padding: 1rem; }
+    .contenedor-menu { padding: 20px 20px 24px; }
+    .sala-grid { grid-template-columns: 1fr; }
+}
+
+@keyframes flotar {
+    0%   { transform: translateY(0px); }
+    50%  { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
 }
 
 .codigo-sala-box {
@@ -37,10 +147,20 @@ main {
     align-items: center;
     gap: 0.5rem;
     padding: 1rem;
-    border: 2px solid rgba(255,255,255,0.35);
     border-radius: 16px;
-    background: rgba(0,0,0,0.35);
     text-align: center;
+    justify-content: flex-start;
+    text-decoration: none;
+    font-family: 'Jersey 10', monospace;
+    color: white;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    background-color: rgba(105, 100, 100, 0.205);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    user-select: none;
+    padding: 1rem;
 }
 
 .codigo-sala-box.sala {
@@ -48,6 +168,13 @@ main {
     min-height: auto;
     align-items: center;
     padding: 1.2rem 1rem;
+}
+
+.sala-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
 }
 
 .codigo-sala-title {
@@ -76,12 +203,13 @@ main {
     border: none;
     border-radius: 12px;
     background: #681816;
-    color: #fff;
+    color: white;
     font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 1px;
+    font-weight: 600;
+    letter-spacing: 2px;
     cursor: pointer;
     transition: transform 0.1s ease, filter 0.1s ease;
+    font-family: 'Jersey 10', monospace;
 }
 
 .boton-copiar:hover:not(:disabled) {
@@ -94,68 +222,15 @@ main {
     cursor: not-allowed;
 }
 
-.contenedor-menu::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: url('/UI/marco.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    image-rendering: pixelated;
-    pointer-events: none;
-
-}
-
-.contenedor-menu a {
-    position: relative;
-    width: min(280px, 100%);
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    text-decoration: none;
-    color: white;
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-    background-image: url('/UI/boton.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    image-rendering: pixelated;
-    transition: transform 0.08s ease,
-        filter 0.08s ease;
-    user-select: none;
-    border: none;
-    padding-inline: 1rem;
-    padding-bottom: 6px;
-    text-shadow:
-        -2px -2px 0 #000,
-        2px -2px 0 #000,
-        -2px 2px 0 #000,
-        2px 2px 0 #000;
-}
-
-.contenedor-menu a span {
-    transform: translateY(-1px);
-}
-
-.contenedor-menu a:hover {
-    transform: scale(1.03);
-    filter:
-        brightness(1.08) drop-shadow(0 0 6px rgba(255, 255, 255, 0.25));
-    cursor: pointer;
-}
-
 .sala{
     position: relative;
-    width: min(280px, 100%);
+    width: 100%;
+    max-width: 280px;
     height: 60px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    text-align: center;
+    text-align: left;
     text-decoration: none;
     color: white;
     font-size: 1.2rem;
@@ -169,76 +244,58 @@ main {
         filter 0.08s ease;
     user-select: none;
     border: none;
-    padding-inline: 1rem;
-    padding-bottom: 6px;
-    text-shadow:
+    padding: 0 1rem 0 0.8rem;
+    gap: 0.85rem;
+    overflow: hidden;
+    white-space: normal;
+    /*
+        text-shadow:
         -2px -2px 0 #000,
         2px -2px 0 #000,
         -2px 2px 0 #000,
         2px 2px 0 #000;
+    */
 }
 
-
-.contenedor-menu a:active {
-    background-image: url("/UI/boton-apretar.png");
-    transform: translateY(3px);
-    filter: brightness(0.95);
+.sala-label {
+    flex: 1;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
-.contenedor-menu a::after {
-    content: "";
+.sala-avatar {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #5c4325 0%, #3f2c18 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    position: relative;
+}
+
+.sala-avatar::before {
+    content: '';
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 35%, #f4e1a4 35%, transparent 36%);
+    box-shadow:
+        0 8px 0 -4px rgba(255,255,255,0.12) inset,
+        0 0 0 2px rgba(0,0,0,0.12);
+}
+
+.sala-avatar::after {
+    content: '';
+    width: 36%;
+    height: 24%;
+    border-radius: 999px;
+    background: rgba(244, 225, 164, 0.95);
     position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(to bottom,
-            rgba(255, 255, 255, 0.18),
-            transparent 40%);
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-@media (max-width: 768px) {
-
-    .contenedor-menu {
-        padding: 60px 40px;
-    }
-
-    .contenedor-menu a {
-        width: 80%;
-    }
-}
-
-@media (max-width: 480px) {
-
-    main {
-        padding: 1rem;
-    }
-
-    .contenedor-menu {
-        width: 100%;
-        padding:
-            55px 25px;
-    }
-
-    .contenedor-menu a {
-        width: 70%;
-        height: 52px;
-        font-size: 0.95rem;
-        letter-spacing: 1px;
-    }
-
-}
-
-@keyframes flotar {
-    0% {
-        transform: translateY(0px);
-    }
-
-    50% {
-        transform: translateY(-4px);
-    }
-
-    100% {
-        transform: translateY(0px);
-    }
+    bottom: 12%;
+    left: 50%;
+    transform: translateX(-50%);
 }
