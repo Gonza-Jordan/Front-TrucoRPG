@@ -3,7 +3,7 @@
 :host {
     display: flex;
     flex-direction: column;
-    height: 110vh;
+    height: 100dvh;
     overflow: hidden;
 }
 
@@ -14,8 +14,8 @@ main {
     justify-content: center;
     align-items: center;
     padding: 2rem;
-    overflow: hidden;
-    font-family: 'Jersey 10', monospace;
+    overflow: auto;
+    font-family: 'Jersey 20';
     background: url('/assets/home.png') center center / cover no-repeat;
 }
 
@@ -130,6 +130,33 @@ main {
 @media (max-width: 480px) {
     main { padding: 1rem; }
     .contenedor-menu { padding: 20px 20px 24px; }
+}
+
+/* ── Landscape mobile: todo entra sin scroll ─────────────────────────────── */
+@media (max-height: 500px) and (orientation: landscape) {
+
+    :host {
+        height: 100dvh;
+    }
+
+    main {
+        padding: 0.4rem;
+        align-items: flex-start;
+    }
+
+    .contenedor-menu {
+        padding: 32px 24px;
+        gap: 0.35em;
+        animation: none;
+        width: min(360px, 96%);
+    }
+
+    .contenedor-menu a {
+        height: 42px;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        width: 80%;
+    }
 }
 
 @keyframes flotar {

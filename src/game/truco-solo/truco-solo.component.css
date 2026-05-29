@@ -862,3 +862,156 @@
   pointer-events: none;
   z-index: 10;
 }
+
+/* ── Overlay: rotá el dispositivo (solo portrait en mobile) ───────────────── */
+.rotate-overlay {
+  display: none;
+}
+
+@media (max-width: 900px) and (orientation: portrait) {
+  .rotate-overlay {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    background: #080604ee;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+}
+
+.rotate-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: rotateHint 1.6s ease-in-out infinite;
+}
+
+.rotate-icon {
+  font-size: 64px;
+  transform-origin: center;
+}
+
+.rotate-text {
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: #ffdd44;
+  text-align: center;
+}
+
+.rotate-sub {
+  font-family: var(--font-data);
+  font-size: 18px;
+  color: #aaa;
+  text-align: center;
+}
+
+@keyframes rotateHint {
+  0%, 100% { transform: rotate(0deg); }
+  40%       { transform: rotate(90deg); }
+  60%       { transform: rotate(90deg); }
+}
+
+/* ── Responsive mobile landscape ─────────────────────────────────────────── */
+@media (max-width: 900px) and (orientation: landscape) {
+  /* Paneles laterales más angostos */
+  .side-panel {
+    width: 130px;
+    padding: 8px 6px;
+  }
+
+  .action-btn {
+    font-size: 15px;
+    padding: 6px 4px;
+  }
+
+  /* Abanico más compacto */
+  .fan-wrap {
+    height: 110px;
+    width: 240px;
+    margin-top: 4px;
+  }
+
+  .fan-card {
+    width: 60px;
+    height: 86px;
+    margin-left: -30px;
+  }
+
+  .fan-card-img {
+    width: 120%;
+    height: 120%;
+  }
+
+  /* Arena con menos padding superior */
+  .arena {
+    padding-top: 52px;
+  }
+
+  /* Mesa más pequeña */
+  .table-wrap {
+    perspective: 600px;
+    margin-top: 4px;
+  }
+
+  .table-surface {
+    width: 420px;
+    height: 300px;
+  }
+
+  /* Imágenes de bazas más chicas */
+  .far-card-img {
+    height: 44px;
+  }
+
+  .near-card-img {
+    height: 64px;
+  }
+
+  /* Botones táctiles más grandes (área de toque) */
+  .action-btn {
+    min-height: 44px;
+  }
+
+  .back-btn {
+    min-height: 44px;
+    font-size: 15px;
+  }
+
+  .habilidad-btn {
+    min-height: 44px;
+    font-size: 13px;
+  }
+
+  /* Score más compacto */
+  .score-title {
+    font-size: 6px;
+  }
+
+  .score-row {
+    font-size: 14px;
+  }
+
+  .state-text {
+    font-size: 13px;
+  }
+}
+
+/* Touch: estados activos explícitos para dispositivos táctiles */
+@media (pointer: coarse) {
+  .fan-card:active:not(.hidden):not(.played-out) {
+    transform: translateX(var(--xoff)) rotate(var(--angle)) translateY(-16px) scale(0.97);
+    filter: brightness(1.15);
+  }
+
+  .action-btn:not(.disabled):active {
+    background: #3a3020;
+    transform: scale(0.95);
+  }
+
+  .go-btn:active {
+    transform: scale(0.93);
+  }
+}

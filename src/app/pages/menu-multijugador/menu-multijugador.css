@@ -4,7 +4,7 @@
 :host {
     display: flex;
     flex-direction: column;
-    height: 110vh;
+    height: 100dvh;
     overflow: hidden;
 }
 
@@ -22,7 +22,7 @@ main {
 
 .connection-container {
     position: absolute;
-    top: 20px;
+    top: 70px;
     right: 20px;
     z-index: 10;
     max-width: 300px;

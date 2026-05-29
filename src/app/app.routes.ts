@@ -8,6 +8,7 @@ import { ConfiguracionComponent } from './pages/configuracion/configuracion';
 import { MenuMultijugador } from './pages/menu-multijugador/menu-multijugador';
 import { MenuMultijugadorTradicional } from './pages/menu-multijugador-tradicional/menu-multijugador-tradicional';
 import { MenuMultijugadorTradicionalSala } from './pages/menu-multijugador-tradicional-sala/menu-multijugador-tradicional-sala';
+import { TrucoSoloComponent } from '../game/truco-solo/truco-solo.component';
 
 export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
@@ -15,6 +16,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent, data: { header: 'login' } },
   { path: 'home', component: Home, data: { header: 'home' } },
   { path: 'configuracion', component: ConfiguracionComponent, data: { header: 'configuracion' } },
+  { path: 'juego/maquina', component: TrucoSoloComponent },
   { path: 'juego/:modo', component: GameComponent },
   { path: 'menu-multijugador', component: MenuMultijugador, data: { header: 'menu-multijugador' } },
   { path: 'menu-multijugador-tradicional', component: MenuMultijugadorTradicional, data: { header: 'menu-multijugador-tradicional' } },

@@ -47,8 +47,8 @@ export default class GameScene extends BaseScene {
     this.zonaInteraccion.body.setAllowGravity(false);
     this.zonaInteraccion.body.moves = false;
 
-    const mensajeNpcTexto = this.esMultijugador
-      ? '¡Presioná E para jugar al TRUCO!'
+    const mensajeNpcTexto = this.esTactil
+      ? '¡Tocá "Interactuar" para jugar al TRUCO!'
       : '¡Presioná E para jugar al TRUCO!';
     this.mensajeNpc = this.add
       .text(this.npc.x, this.npc.y - this.npc.height / 2 - 20, mensajeNpcTexto, {
@@ -123,8 +123,10 @@ export default class GameScene extends BaseScene {
     this.portal.update(this.JugadorPrincipal, this.teclaE);
     this.mensajeNpc.setVisible(this.estaEnZonaNpc);
 
-    // Interacción con el orco: E para jugar Truco
-    if (this.estaEnZonaNpc && Phaser.Input.Keyboard.JustDown(this.teclaE)) {
+    // Interacción con el orco: E (teclado) o botón tactil para jugar Truco
+    const interactuar = Phaser.Input.Keyboard.JustDown(this.teclaE) || this.botonInteractuarPresionado;
+    this.botonInteractuarPresionado = false;
+    if (this.estaEnZonaNpc && interactuar) {
       if (this.esMultijugador) {
         this.scene.start('TrucoMultiScene', {
           miRol: multiplayerManager.esHost ? 'J1' : 'J2',
