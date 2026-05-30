@@ -19,9 +19,6 @@
 }
 
 @if (vistaActual === 'seleccion-heroe') {
-  <div class="volver-wrap">
-    <a class="btn-volver" (click)="vistaActual = 'menu-principal'">← VOLVER</a>
-  </div>
   <app-seleccion-personaje [standalone]="false" (heroeConfirmado)="alConfirmarHeroe($event)"></app-seleccion-personaje>
 }
 
