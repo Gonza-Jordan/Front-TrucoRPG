@@ -115,7 +115,7 @@ export default class LobbyScene extends BaseScene {
 
         btnVolver.on('pointerdown', async () => {
             await multiplayerManager.desconectar();
-            window.location.href = '/home';
+            this.scene.start('MenuScene');
         });
     }
 
@@ -126,8 +126,7 @@ export default class LobbyScene extends BaseScene {
             overlay.style.cssText = [
                 'position:fixed', 'top:0', 'left:0', 'width:100%', 'height:100%',
                 'background:rgba(0,0,0,0.85)', 'display:flex', 'align-items:center',
-                'justify-content:center', 'z-index:9999', 'flex-direction:column', 'gap:18px',
-                'touch-action:manipulation'
+                'justify-content:center', 'z-index:9999', 'flex-direction:column', 'gap:18px'
             ].join(';');
 
             const titulo = document.createElement('div');
@@ -171,34 +170,21 @@ export default class LobbyScene extends BaseScene {
                 input.setSelectionRange(pos, pos);
             });
 
-            let _resuelto = false;
-            const confirmar = (e) => {
-                if (_resuelto) return;
-                _resuelto = true;
-                e?.preventDefault();
-                e?.stopPropagation();
+            const confirmar = () => {
                 const codigo = input.value.trim().toUpperCase();
                 document.body.removeChild(overlay);
                 resolve(codigo || null);
             };
-            const cancelar = (e) => {
-                if (_resuelto) return;
-                _resuelto = true;
-                e?.preventDefault();
-                e?.stopPropagation();
+            const cancelar = () => {
                 document.body.removeChild(overlay);
                 resolve(null);
             };
 
-            // pointerdown en vez de click: sin delay de 300ms en mobile
-            btnOk.addEventListener('pointerdown', confirmar);
-            btnCancelar.addEventListener('pointerdown', cancelar);
-            // fallback click por si acaso
             btnOk.addEventListener('click', confirmar);
             btnCancelar.addEventListener('click', cancelar);
             input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') confirmar(e);
-                if (e.key === 'Escape') cancelar(e);
+                if (e.key === 'Enter') confirmar();
+                if (e.key === 'Escape') cancelar();
             });
 
             setTimeout(() => input.focus(), 50);
