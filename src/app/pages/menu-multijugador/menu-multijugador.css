@@ -152,10 +152,25 @@ main {
     .contenedor-menu a { height: 46px; font-size: 0.9rem; letter-spacing: 1.5px; }
 }
 
-@media (max-height: 500px) and (orientation: landscape) {
-    .menu-logo { width: 80px; margin-bottom: -28px; }
-    .menu-wrapper { width: min(320px, 55vw); }
-    .contenedor-menu { padding: 36px 16px 28px; gap: 6px; }
+/* Pantalla baja: 2 columnas (3 botones → 2+1 centrado) */
+@media (max-height: 620px) {
+    .menu-logo { width: 100px; margin-bottom: -34px; }
+    .menu-wrapper { width: min(480px, 92vw); animation: none; }
+    .contenedor-menu {
+        padding: 42px 20px 32px;
+        gap: 8px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .menu-sep { grid-column: 1 / -1; margin: 0; }
+    .contenedor-menu a { height: 48px; font-size: 0.9rem; width: 100%; }
+}
+
+@media (max-height: 500px) {
+    :host { height: 100dvh; }
+    main { padding: 0.5rem; }
+    .menu-logo { width: 80px; margin-bottom: -26px; }
+    .contenedor-menu { padding: 34px 16px 22px; gap: 6px; }
     .contenedor-menu a { height: 40px; font-size: 0.85rem; }
 }
 

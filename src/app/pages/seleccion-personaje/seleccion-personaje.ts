@@ -16,8 +16,8 @@ export class SeleccionPersonaje {
   @Input() standalone = true; // false cuando se embebe dentro de otro componente
 
   heroes = HEROES;
-
   selectedHeroId: number | null = null;
+  readonly esTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
   @Output() heroeConfirmado = new EventEmitter<number>();
 
