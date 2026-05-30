@@ -4,7 +4,8 @@
 :host {
     display: flex;
     flex-direction: column;
-    height: 100dvh;
+    flex: 1;
+    min-height: 0;
     overflow: hidden;
 }
 
@@ -156,7 +157,6 @@ main {
 }
 
 @media (max-height: 500px) {
-    :host { height: 100dvh; }
     main { padding: 0.5rem; }
     .contenedor-menu { padding: 34px 14px 22px; gap: 6px; }
     .contenedor-menu a { height: 40px; font-size: 0.85rem; }

@@ -2,7 +2,8 @@
 :host {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   /* Fondo en el host para que main y botones compartan el mismo fondo */
   background: url('/assets/home.png') center center / cover no-repeat;
@@ -26,7 +27,6 @@ main {
   overflow: hidden;
   font-family: 'Jersey 20';
   background: transparent; /* hereda del :host */
-  row-gap: 2.5em;
 }
 
 /* ── Grid de cartas ───────────────────────────────────────────────────────── */
@@ -299,10 +299,8 @@ main {
   justify-content: center;
   flex-shrink: 0;
   width: 100%;
-  max-width: 700px;
-  align-self: center;
   padding: 0.6rem 1rem;
-  background: transparent; /* hereda el fondo del :host */
+  background: transparent;
 }
 
 .acciones-confirmar button {
