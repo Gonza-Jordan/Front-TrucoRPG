@@ -305,7 +305,11 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
   }
 
   salirPartida(): void {
-    window.dispatchEvent(new CustomEvent('truco-solo:end'));
+    const confirmar = window.confirm('¿Querés salir de la partida?');
+    if (confirmar) {
+      window.dispatchEvent(new CustomEvent('truco-solo:end'));
+      this.router.navigate(['/home']);
+    }
   }
 
   // ── UI update ─────────────────────────────────────────────────────────────
