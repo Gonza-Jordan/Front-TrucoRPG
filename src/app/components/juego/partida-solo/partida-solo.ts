@@ -1,14 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { Header } from "../../header/header";
-import { Footer } from "../../footer/footer";
 import { SeleccionPersonaje } from '../../../pages/seleccion-personaje/seleccion-personaje';
 
 @Component({
   selector: 'app-partida-solo',
   standalone: true,
-  imports: [CommonModule, Header, Footer, SeleccionPersonaje,RouterLink],
+  imports: [CommonModule, SeleccionPersonaje,RouterLink],
   templateUrl: './partida-solo.html',
   styleUrl: './partida-solo.css'
 })
