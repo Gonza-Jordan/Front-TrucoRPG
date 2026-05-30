@@ -2,13 +2,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Location } from '@angular/common';
 import { HEROES } from '../../../game/data/heroes';
-import { Header } from '../../components/header/header';
-import { Footer } from '../../components/footer/footer';
 
 @Component({
   selector: 'app-seleccion-personaje',
   standalone: true,
-  imports: [CommonModule, Header, Footer],
+  imports: [CommonModule],
   templateUrl: './seleccion-personaje.html',
   styleUrl: './seleccion-personaje.css',
 })
