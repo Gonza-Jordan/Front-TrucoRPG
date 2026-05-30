@@ -9,6 +9,7 @@ import { MenuMultijugador } from './pages/menu-multijugador/menu-multijugador';
 import { MenuMultijugadorTradicional } from './pages/menu-multijugador-tradicional/menu-multijugador-tradicional';
 import { MenuMultijugadorTradicionalSala } from './pages/menu-multijugador-tradicional-sala/menu-multijugador-tradicional-sala';
 import { TrucoSoloComponent } from '../game/truco-solo/truco-solo.component';
+import { SeleccionPersonaje } from './pages/seleccion-personaje/seleccion-personaje';
 
 export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
@@ -21,5 +22,6 @@ export const routes: Routes = [
   { path: 'menu-multijugador', component: MenuMultijugador, data: { header: 'home' } },
   { path: 'menu-multijugador-tradicional', component: MenuMultijugadorTradicional, data: { header: 'home' } },
   { path: 'menu-multijugador-tradicional-sala', component: MenuMultijugadorTradicionalSala, data: { header: 'home' } },
+  { path: 'seleccion-personaje', component: SeleccionPersonaje, data: { header: 'home' } },
   { path: '**', redirectTo: '' },
 ];

@@ -3,7 +3,7 @@
 :host {
     display: flex;
     flex-direction: column;
-    height: 100dvh;
+    height: 110dvh;
     overflow: hidden;
 }
 
@@ -14,7 +14,7 @@ main {
     justify-content: center;
     align-items: center;
     padding: 2rem;
-    overflow: auto;
+    overflow:hidden;
     font-family: 'Jersey 20';
     background: url('/assets/home.png') center center / cover no-repeat;
 }
