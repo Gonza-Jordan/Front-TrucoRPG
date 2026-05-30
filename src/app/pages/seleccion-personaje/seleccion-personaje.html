@@ -1,3 +1,4 @@
+@if (standalone) { <app-header></app-header> }
 <main>
 <section class="contenedor-cartas">
   @for (heroe of heroes; track heroe.id) {
@@ -39,11 +40,16 @@
 </section>
 
 <div class="acciones-confirmar">
-  <button 
-    class="confirmar-heroe" 
-    [disabled]="selectedHeroId === null" 
+  <button class="btn-volver" (click)="volver()">← VOLVER</button>
+  @if (selectedHeroId !== null) {
+    <button class="btn-elegir-otro" (click)="elegirOtro()">↺ ELEGIR OTRO</button>
+  }
+  <button
+    class="confirmar-heroe"
+    [disabled]="selectedHeroId === null"
     (click)="enviarConfirmacion()">
     Confirmar Personaje y Jugar
   </button>
 </div>
 </main>
+@if (standalone) { <app-footer></app-footer> }

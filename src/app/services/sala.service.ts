@@ -16,9 +16,11 @@ export class SalaService {
   error$ = new BehaviorSubject<string>('');
 
   constructor(private auth: AuthService) {
+    // hubUrl es relativo ('/gamehub') — el proxy de Vite lo redirige al backend
     this.hub = new signalR.HubConnectionBuilder()
       .withUrl(environment.hubUrl, {
         accessTokenFactory: () => this.auth.obtenerToken() ?? '',
+        skipNegotiation: false,
       })
       .withAutomaticReconnect()
       .build();
