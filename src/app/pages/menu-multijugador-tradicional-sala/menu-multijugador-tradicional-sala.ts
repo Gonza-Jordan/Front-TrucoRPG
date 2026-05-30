@@ -1,12 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Header } from '../../components/header/header';
-import { Footer } from '../../components/footer/footer';
 import { RouterLink } from '@angular/router';
 import { ConnectionStatusComponent } from '../../components/connection-status/connection-status';
 
 @Component({
   selector: 'app-menu-multijugador-tradicional-sala',
-  imports: [Header,Footer,RouterLink,ConnectionStatusComponent],
+  imports: [RouterLink,ConnectionStatusComponent],
   templateUrl: './menu-multijugador-tradicional-sala.html',
   styleUrl: './menu-multijugador-tradicional-sala.css',
 })

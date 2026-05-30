@@ -3,7 +3,7 @@
 :host {
     display: flex;
     flex-direction: column;
-    height: 110dvh;
+    height: 100%;
     overflow: hidden;
 }
 
