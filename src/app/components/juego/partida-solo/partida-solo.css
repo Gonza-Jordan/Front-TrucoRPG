@@ -1,7 +1,7 @@
 :host {
     display: flex;
     flex-direction: column;
-    height: 110dvh;
+    height: 100dvh;
     overflow: hidden;
 }
 
@@ -16,6 +16,15 @@ main {
     font-family: 'Jersey 20';
     background: url('/assets/home.png') center center / cover no-repeat;
     color:#ffffff;
+}
+
+.menu-logo {
+    width: 160px;
+    image-rendering: pixelated;
+    margin-bottom: -55px;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.9));
 }
 
 .menu-wrapper {
@@ -85,6 +94,36 @@ main {
 @media (max-width: 480px) {
     main { padding: 1rem; }
     .contenedor-menu { padding: 20px 20px 24px; }
+}
+
+.volver-wrap {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.btn-volver {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 2rem;
+    font-family: 'Jersey 10', monospace;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    color: #c89030;
+    background: rgba(14, 12, 8, 0.92);
+    border: 2px solid #5a4020;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.1s, color 0.1s, border-color 0.1s, box-shadow 0.1s;
+}
+
+.btn-volver:hover {
+    background: #2e1f0e;
+    color: #f0b050;
+    border-color: #8a6030;
+    box-shadow: 0 0 10px rgba(200, 144, 48, 0.25);
 }
 
 @keyframes flotar {
