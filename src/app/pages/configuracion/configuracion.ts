@@ -25,10 +25,10 @@ export class ConfiguracionComponent {
     localStorage.setItem('cfg_volumen', String(this.volumen));
     localStorage.setItem('cfg_musica',  String(this.musica));
     localStorage.setItem('cfg_pantalla', String(this.pantallaCompleta));
-    this.router.navigate(['/']);
+    this.router.navigate(['/home']);
   }
 
   cancelar() {
-    this.router.navigate(['/']);
+    this.router.navigate(['/home']);
   }
 }
