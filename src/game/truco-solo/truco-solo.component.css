@@ -863,6 +863,46 @@
   z-index: 10;
 }
 
+/* ── Responsive: desktop mediano (1100–1400px) ───────────────────────────── */
+@media (max-width: 1400px) {
+  .side-panel { width: 155px; }
+  .table-surface { width: 540px; height: 400px; }
+}
+
+@media (max-width: 1200px) {
+  .side-panel { width: 140px; padding: 10px 8px; }
+  .action-btn { font-size: 16px; padding: 7px 5px; }
+  .table-surface { width: 480px; height: 360px; }
+  .fan-wrap { width: 260px; height: 126px; }
+  .fan-card { width: 68px; height: 98px; margin-left: -34px; }
+  .scoreboard { padding: 8px 6px; }
+  .score-title { font-size: 8px; }
+  .score-row { font-size: 16px; }
+  .state-section { padding: 6px 8px; }
+  .state-title { font-size: 10px; }
+  .state-text { font-size: 15px; }
+  .heroe-nombre { font-size: 14px; }
+  .heroe-desc { font-size: 13px; }
+  .habilidad-btn { font-size: 13px; padding: 6px 8px; }
+  .back-btn { font-size: 15px; }
+}
+
+@media (max-width: 1050px) {
+  .side-panel { width: 122px; padding: 8px 6px; gap: 5px; }
+  .action-btn { font-size: 14px; padding: 6px 4px; }
+  .table-surface { width: 420px; height: 310px; }
+  .fan-wrap { width: 230px; height: 110px; }
+  .fan-card { width: 58px; height: 84px; margin-left: -29px; }
+  .far-card-img { height: 46px; }
+  .near-card-img { height: 66px; }
+  .rival-portrait { width: 46px; height: 46px; }
+  .scoreboard { padding: 6px 4px; }
+  .score-title { font-size: 7px; }
+  .score-row { font-size: 14px; }
+  .state-text { font-size: 13px; }
+  .back-btn { font-size: 14px; padding: 6px 4px; }
+}
+
 /* ── Overlay: rotá el dispositivo (solo portrait en mobile) ───────────────── */
 .rotate-overlay {
   display: none;

@@ -5,6 +5,13 @@
   overflow: hidden;
 }
 
+/* Cuando está embebido dentro de otro componente */
+:host([standalone="false"]),
+:host(.embebido) {
+  height: 100%;
+  flex: 1;
+}
+
 main {
   flex: 1;
   min-height: 0;
@@ -226,6 +233,50 @@ main {
   box-shadow: 0 0 10px rgba(200, 144, 48, 0.25);
 }
 
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+/* Desktop mediano: 4 cartas más chicas */
+@media (max-width: 1300px) {
+  .tarjeta { width: 240px; height: 340px; }
+  .contenedor-cartas { gap: 1.2em; padding: 1em; }
+}
+
+@media (max-width: 1050px) {
+  .tarjeta { width: 200px; height: 290px; }
+  .contenedor-cartas { gap: 1em; padding: 0.8em; }
+  .nombre { font-size: 1.1em; }
+  .stats { font-size: 0.75em; }
+  .descripcion p { font-size: 0.75em; }
+}
+
+/* Tablet portrait / móvil: 2 columnas */
+@media (max-width: 800px) {
+  main { padding: 0.8rem; overflow-y: auto; justify-content: flex-start; }
+  :host { overflow-y: auto; }
+  .contenedor-cartas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8em;
+    padding: 0.5em;
+    width: 100%;
+    max-width: 500px;
+  }
+  .tarjeta { width: 100%; height: 260px; }
+  .nombre { font-size: 1em; }
+  .stats { font-size: 0.7em; }
+  .acciones-confirmar { flex-direction: column; gap: 8px; padding: 0.6rem; }
+  .confirmar-heroe, .btn-volver, .btn-elegir-otro { width: 100%; justify-content: center; }
+}
+
+/* Móvil chico: 2 columnas compactas */
+@media (max-width: 480px) {
+  .contenedor-cartas { max-width: 360px; gap: 0.5em; }
+  .tarjeta { height: 220px; }
+  .nombre { font-size: 0.9em; }
+  .stats { font-size: 0.65em; }
+  .descripcion { display: none; }
+}
+
 .confirmar-heroe:active:not(.disabled) {
   background: #140e04;
   color: #a07020;
@@ -234,4 +285,52 @@ main {
 .confirmar-heroe:disabled {
     opacity: 0.6;
     cursor: default;
+}
+
+.acciones-confirmar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1rem;
+}
+
+.btn-volver {
+  height: 50px;
+  padding: 0 1.6rem;
+  font-family: 'Jersey 10', monospace;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+  color: #8a7050;
+  background: #1a1208;
+  border: 2px solid #3a2a10;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  white-space: nowrap;
+}
+
+.btn-volver:hover {
+  background: #2a1e0e;
+  color: #c89030;
+  border-color: #5a4020;
+}
+
+.btn-elegir-otro {
+  height: 50px;
+  padding: 0 1.6rem;
+  font-family: 'Jersey 10', monospace;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+  color: #7090a0;
+  background: #0e1820;
+  border: 2px solid #2a5a7a;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  white-space: nowrap;
+}
+
+.btn-elegir-otro:hover {
+  background: #162030;
+  color: #88ccff;
+  border-color: #4a8aaa;
 }

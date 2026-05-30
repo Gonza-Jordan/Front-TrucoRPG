@@ -127,9 +127,25 @@ main {
     cursor: default;
 }
 
+@media (max-width: 768px) {
+    .menu-wrapper { width: min(380px, 90vw); }
+    .contenedor-menu { padding: 56px 20px 44px; gap: 10px; }
+    .contenedor-menu a { height: 52px; font-size: 0.95rem; }
+}
+
 @media (max-width: 480px) {
-    main { padding: 1rem; }
-    .contenedor-menu { padding: 20px 20px 24px; }
+    main { padding: 0.8rem; }
+    .menu-wrapper { width: min(320px, 95vw); }
+    .contenedor-menu { padding: 48px 16px 36px; gap: 8px; }
+    .contenedor-menu a { height: 46px; font-size: 0.9rem; }
+    .modal-panel { padding: 28px 16px 24px; }
+    .modal-input { font-size: 1.2rem; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .menu-wrapper { width: min(320px, 55vw); }
+    .contenedor-menu { padding: 36px 16px 28px; gap: 6px; }
+    .contenedor-menu a { height: 40px; font-size: 0.85rem; }
 }
 
 @keyframes flotar {

@@ -1,7 +1,5 @@
-const backendHost = `${window.location.hostname}:5001`;
-
 export const environment = {
   production: false,
-  apiUrl: `http://${backendHost}`,
-  hubUrl: `http://${backendHost}/gamehub`,
+  apiUrl: '',       // relativo: el proxy de Vite redirige /api → localhost:5001
+  hubUrl: '/gamehub', // relativo: el proxy redirige /gamehub → localhost:5001
 };
