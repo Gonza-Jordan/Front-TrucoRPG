@@ -142,9 +142,23 @@ main {
     .modal-input { font-size: 1.2rem; }
 }
 
-@media (max-height: 500px) and (orientation: landscape) {
-    .menu-wrapper { width: min(320px, 55vw); }
-    .contenedor-menu { padding: 36px 16px 28px; gap: 6px; }
+/* Pantalla baja: 2 columnas */
+@media (max-height: 620px) {
+    .menu-wrapper { width: min(480px, 92vw); animation: none; }
+    .contenedor-menu {
+        padding: 42px 20px 32px;
+        gap: 8px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .menu-sep { grid-column: 1 / -1; margin: 0; }
+    .contenedor-menu a { height: 48px; font-size: 0.9rem; width: 100%; }
+}
+
+@media (max-height: 500px) {
+    :host { height: 100dvh; }
+    main { padding: 0.5rem; }
+    .contenedor-menu { padding: 34px 14px 22px; gap: 6px; }
     .contenedor-menu a { height: 40px; font-size: 0.85rem; }
 }
 

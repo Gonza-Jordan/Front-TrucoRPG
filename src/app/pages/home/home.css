@@ -127,7 +127,7 @@ main {
     cursor: default;
 }
 
-/* Desktop chico */
+/* ── Desktop / tablet chico ──────────────────────────────────── */
 @media (max-width: 768px) {
     .menu-logo { width: 130px; margin-bottom: -42px; }
     .menu-wrapper { width: min(380px, 90vw); }
@@ -143,37 +143,28 @@ main {
     .contenedor-menu a { height: 46px; font-size: 0.9rem; letter-spacing: 1.5px; }
 }
 
-/* Landscape mobile */
-@media (max-height: 500px) and (orientation: landscape) {
-    .menu-logo { width: 80px; margin-bottom: -28px; }
-    .menu-wrapper { width: min(320px, 55vw); }
+/* ── Pantalla baja (landscape mobile / tablet landscape chico) ── */
+@media (max-height: 620px) {
+    .menu-logo { width: 100px; margin-bottom: -34px; }
+    .menu-wrapper { width: min(540px, 92vw); animation: none; }
+    .contenedor-menu {
+        padding: 42px 20px 32px;
+        gap: 8px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    /* separadores ocupan todo el ancho */
+    .menu-sep { grid-column: 1 / -1; margin: 0; }
+    .contenedor-menu a { height: 48px; font-size: 0.9rem; letter-spacing: 1px; width: 100%; }
 }
 
-/* ── Landscape mobile: todo entra sin scroll ─────────────────────────────── */
-@media (max-height: 500px) and (orientation: landscape) {
-
-    :host {
-        height: 100dvh;
-    }
-
-    main {
-        padding: 0.4rem;
-        align-items: flex-start;
-    }
-
-    .contenedor-menu {
-        padding: 32px 24px;
-        gap: 0.35em;
-        animation: none;
-        width: min(360px, 96%);
-    }
-
-    .contenedor-menu a {
-        height: 42px;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-        width: 80%;
-    }
+@media (max-height: 500px) {
+    :host { height: 100dvh; }
+    main { padding: 0.5rem; align-items: center; }
+    .menu-logo { width: 80px; margin-bottom: -26px; }
+    .menu-wrapper { width: min(580px, 96vw); }
+    .contenedor-menu { padding: 34px 16px 22px; gap: 6px; }
+    .contenedor-menu a { height: 40px; font-size: 0.85rem; letter-spacing: 0.5px; }
 }
 
 @keyframes flotar {
