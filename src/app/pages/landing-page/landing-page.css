@@ -1,8 +1,7 @@
 :host {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
 }
 
 body {
@@ -13,6 +12,30 @@ main {
     flex: 1;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    padding: 3rem;
+
+background: linear-gradient(
+    to bottom,
+    #441310,
+    #000000
+);
+}
+
+.contenedor-landing {
+    width: min(1000px, 90%);
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+
+    background: rgba(14, 12, 8, 0.94);
+    border: 2px solid #5a4020;
+    outline: 1px solid rgba(200, 144, 48, 0.18);
+    outline-offset: 4px;
+    box-shadow:
+        0 0 40px rgba(0, 0, 0, 0.8),
+        inset 0 0 24px rgba(0, 0, 0, 0.4);
 }
 
 .seccion-1 {
@@ -20,20 +43,15 @@ main {
     height: auto;
 
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 4rem;
+    gap: 0.5rem;
 
     padding: 4rem 2rem;
     box-sizing: border-box;
 
-    background-image: url('/assets/pasto-pixel.png');
-    background-repeat: repeat;
-    background-size: 12rem;
-
     text-align: center;
-
-    flex-wrap: wrap;
 }
 
 .seccion-2 {
@@ -41,98 +59,135 @@ main {
     height: auto;
 
     display: flex;
+    align-items: center;
+
+    justify-content: space-evenly;
+    align-items: center;
+
+    padding: 4rem 2rem;
+    box-sizing: border-box;
+
+    text-align: center;
+}
+
+.seccion-3 {
+    width: 100%;
+    height: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
     justify-content: center;
     align-items: center;
 
     padding: 4rem 2rem;
     box-sizing: border-box;
 
-    background-image: url('/assets/tablones-fondo.jpg');
-    background-repeat: repeat;
-    background-size: 25rem;
-
     text-align: center;
 }
 
+.seccion-1 a {
+    width: 40%;
+    height: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    font-family: 'Jersey 10', monospace;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    color: #c89030;
+    background: #1e1508;
+    border: 2px solid #5a4020;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s, border-color 0.1s, box-shadow 0.1s;
+}
+
+.seccion-1 a:hover:not(.inactivo) {
+    background: #2e1f0e;
+    color: #f0b050;
+    border-color: #8a6030;
+    box-shadow: 0 0 10px rgba(200, 144, 48, 0.25);
+}
+
+.seccion-1 a:active:not(.inactivo) {
+    background: #140e04;
+    color: #a07020;
+}
+
+
 .seccion-2 .texto-landing {
-    color: #fff;
+    max-width: 35rem;
+    text-align: left;
+}
+
+.seccion-3 .texto-landing {
+    width: 100%;
+}
+
+.imagen-hero-landing {
+    width: min(30rem, 90vw);
+    height: auto;
+    animation: flotar 2.5s infinite ease-in-out;
+}
+
+.imagen-seccion-2 {
+    width: 10rem;
+    height: auto;
+    animation: balanceo 6s infinite ease-in-out;
+}
+
+.personajes {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 1rem;
+}
+
+.personajes img {
+    width: 10rem;
+    height: auto;
 }
 
 .titulo-landing {
     font-family: 'Jersey 20';
     font-size: 3rem;
-    color: white
-}
+    color: #c89030;
 
-.imagen-landing {
-    width: min(30rem, 90vw);
-    height: auto;
 }
 
 .texto-landing {
-    text-align: center;
-    max-width: 35rem;
     font-family: 'Jersey 20';
     font-size: 2rem;
-    color: #333;
+    color: #c89030;
 }
 
-.texto-landing a {
-    position: relative;
-    margin: 0 auto;
-    width: min(280px, 100%);
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    text-decoration: none;
-    color: white;
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-    background-image: url('/UI/boton.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    image-rendering: pixelated;
-    transition: transform 0.08s ease,
-        filter 0.08s ease;
-    user-select: none;
-    border: none;
-    padding-inline: 1rem;
-    padding-bottom: 6px;
-    text-shadow:
-        -2px -2px 0 #000,
-        2px -2px 0 #000,
-        -2px 2px 0 #000,
-        2px 2px 0 #000;
+@keyframes flotar {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
 }
 
-.texto-landing a span {
-    transform: translateY(-1px);
-}
+@keyframes balanceo {
+    0% {
+        transform: rotate(-25deg);
+    }
 
-.texto-landing a:hover {
-    transform: scale(1.03);
-    filter:
-        brightness(1.08) drop-shadow(0 0 6px rgba(255, 255, 255, 0.25));
-    cursor: pointer;
-}
+    50% {
+        transform: rotate(25deg);
+    }
 
-.texto-landing a:active {
-    background-image: url("/UI/boton-apretar.png");
-    transform: translateY(3px);
-    filter: brightness(0.95);
-}
-
-.texto-landing a::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(to bottom,
-            rgba(255, 255, 255, 0.18),
-            transparent 40%);
-    opacity: 0.5;
-    pointer-events: none;
+    100% {
+        transform: rotate(-25deg);
+    }
 }
