@@ -185,9 +185,23 @@
   }
 
 
-  <!-- se puede comentar -->
+  <!-- Toast -->
   @if (toastMsg) {
   <div class="toast">{{ toastMsg }}</div>
+  }
+
+  <!-- ── CONFIRMAR SALIR ────────────────────────────────────────────────────── -->
+  @if (mostrarConfirmSalir) {
+  <div class="confirm-overlay" (click)="cancelarSalir()">
+    <div class="confirm-box" (click)="$event.stopPropagation()">
+      <div class="confirm-title">¿Salir de la partida?</div>
+      <div class="confirm-sub">Perdés el progreso de la mano actual.</div>
+      <div class="confirm-btn-row">
+        <button class="confirm-btn confirm-btn-si" (click)="confirmarSalir()">Sí, salir</button>
+        <button class="confirm-btn confirm-btn-no" (click)="cancelarSalir()">Cancelar</button>
+      </div>
+    </div>
+  </div>
   }
 
 </div>
