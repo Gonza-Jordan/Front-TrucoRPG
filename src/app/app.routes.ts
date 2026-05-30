@@ -16,7 +16,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent, data: { header: 'login' } },
   { path: 'home', component: Home, data: { header: 'home' } },
   { path: 'configuracion', component: ConfiguracionComponent, data: { header: 'configuracion' } },
-  { path: 'juego/maquina', component: TrucoSoloComponent },
+  { path: 'maquina', component: TrucoSoloComponent },
   { path: 'juego/:modo', component: GameComponent },
   { path: 'menu-multijugador', component: MenuMultijugador, data: { header: 'home' } },
   { path: 'menu-multijugador-tradicional', component: MenuMultijugadorTradicional, data: { header: 'home' } },
