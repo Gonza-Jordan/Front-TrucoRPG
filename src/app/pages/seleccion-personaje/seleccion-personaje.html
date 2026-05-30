@@ -1,44 +1,49 @@
-<app-header></app-header>
 <main>
-  <section class="contenedor-cartas">
-    @for (heroe of heroes; track heroe.id) {
-      <div 
-        class="tarjeta" 
-        [class.seleccionada]="selectedHeroId === heroe.id" 
-        [class.girada]="selectedHeroId !== null && selectedHeroId !== heroe.id"
-      >
-        <div class="interior-tarjeta">
-          <!-- Frente -->
-          <div class="cara frente">
-            <div class="indice superior">{{ heroe.id }}</div>
+<section class="contenedor-cartas">
+  @for (heroe of heroes; track heroe.id) {
+    <div 
+      class="tarjeta" 
+      [class.seleccionada]="selectedHeroId === heroe.id" 
+      [class.girada]="selectedHeroId !== null && selectedHeroId !== heroe.id"
+    >
+      <div class="interior-tarjeta">
+        <div class="cara frente">
+          <div class="indice superior">{{ heroe.id }}</div>
 
-            <div class="marco-personaje">
-              <img class="personaje" src="/Imagenes/ejemplo.png" [alt]="heroe.nombre" />
-            </div>
-
-            <div class="info-personaje">
-              <h2 class="nombre">{{ heroe.nombre }}</h2>
-
-              <span class="stats">{{ heroe.pasiva }}</span>
-
-              <div class="descripcion">
-                <p>{{ heroe.activa }}</p>
-              </div>
-
-              <button class="btn-seleccionar" (click)="seleccionarHeroe(heroe.id)">
-                Seleccionar
-              </button>
-            </div>
-
-            <div class="indice inferior">{{ heroe.id }}</div>
+          <div class="marco-personaje">
+            <img class="personaje" src="/Imagenes/ejemplo.png" [alt]="heroe.nombre" />
           </div>
 
-          <div class="cara atras">
-            <img class="dorso" src="/Imagenes/dorso.png" alt="Dorso" />
+          <div class="info-personaje">
+            <h2 class="nombre">{{ heroe.nombre }}</h2>
+            <span class="stats">{{ heroe.pasiva }}</span>
+
+            <div class="descripcion">
+              <p>{{ heroe.activa }}</p>
+            </div>
+
+            <button class="btn-seleccionar" (click)="seleccionarHeroe(heroe.id)">
+              Seleccionar
+            </button>
           </div>
+
+          <div class="indice inferior">{{ heroe.id }}</div>
+        </div>
+
+        <div class="cara atras">
+          <img class="dorso" src="/Imagenes/dorso.png" alt="Dorso" />
         </div>
       </div>
-    }
-  </section>
+    </div>
+  }
+</section>
+
+<div class="acciones-confirmar">
+  <button 
+    class="confirmar-heroe" 
+    [disabled]="selectedHeroId === null" 
+    (click)="enviarConfirmacion()">
+    Confirmar Personaje y Jugar
+  </button>
+</div>
 </main>
-<app-footer></app-footer>

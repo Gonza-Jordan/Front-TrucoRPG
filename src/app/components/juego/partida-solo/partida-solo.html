@@ -1,0 +1,27 @@
+<app-header></app-header>
+@if (vistaActual === 'menu-principal') {
+  <main class="contenedor-config">
+    <div class="menu-wrapper">
+      <div class="contenedor-menu">
+        <div class="menu-sep"></div>
+        <a (click)="vistaActual = 'seleccion-heroe'">
+          <span>PARTIDA CON HABILIDADES</span>
+        </a>
+        <a (click)="jugarTradicional()">
+          <span>PARTIDA TRADICIONAL</span>
+        </a>
+        <div class="menu-sep"></div>
+        <a routerLink="/home"><span>VOLVER</span></a>
+      </div>
+    </div>
+  </main>
+}
+
+@if (vistaActual === 'seleccion-heroe') {
+  <!--Permitir que el usuario vuelva para atras?-->
+  <!--<a class="btn-volver" (click)="vistaActual = 'menu-principal'">← Cambiar Modo</a>-->
+
+  <app-seleccion-personaje (heroeConfirmado)="alConfirmarHeroe($event)"></app-seleccion-personaje>
+}
+
+<app-footer></app-footer>

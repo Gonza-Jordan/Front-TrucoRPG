@@ -10,6 +10,7 @@ import { MenuMultijugadorTradicional } from './pages/menu-multijugador-tradicion
 import { MenuMultijugadorTradicionalSala } from './pages/menu-multijugador-tradicional-sala/menu-multijugador-tradicional-sala';
 import { TrucoSoloComponent } from '../game/truco-solo/truco-solo.component';
 import { SeleccionPersonaje } from './pages/seleccion-personaje/seleccion-personaje';
+import { PartidaSoloComponent } from './components/juego/partida-solo/partida-solo';
 
 export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
@@ -17,11 +18,12 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent, data: { header: 'login' } },
   { path: 'home', component: Home, data: { header: 'home' } },
   { path: 'configuracion', component: ConfiguracionComponent, data: { header: 'configuracion' } },
-  { path: 'maquina', component: TrucoSoloComponent },
   { path: 'juego/:modo', component: GameComponent },
   { path: 'menu-multijugador', component: MenuMultijugador, data: { header: 'home' } },
   { path: 'menu-multijugador-tradicional', component: MenuMultijugadorTradicional, data: { header: 'home' } },
   { path: 'menu-multijugador-tradicional-sala', component: MenuMultijugadorTradicionalSala, data: { header: 'home' } },
   { path: 'seleccion-personaje', component: SeleccionPersonaje, data: { header: 'home' } },
+  { path: 'partidaSolo/configuracion', component: PartidaSoloComponent , data: { header: 'home' } },
+  { path: 'jugar/solitario', component: TrucoSoloComponent },
   { path: '**', redirectTo: '' },
 ];
