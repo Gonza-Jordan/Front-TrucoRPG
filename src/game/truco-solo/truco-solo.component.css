@@ -17,14 +17,16 @@
   display: block;
   width: 100%;
   height: 100%;
+  flex: 1;
+  min-height: 0;
 }
 
 /* ── Root layout ──────────────────────────────────────────────────────────── */
 .root {
   display: flex;
   width: 100%;
-  height: 100vh;
-  min-height: 580px;
+  height: 100%;
+  min-height: 0;
   background-color: black;
   position: relative;
   overflow: hidden;
@@ -956,87 +958,75 @@
 
 /* ── Responsive mobile landscape ─────────────────────────────────────────── */
 @media (max-width: 900px) and (orientation: landscape) {
-  /* Paneles laterales más angostos */
-  .side-panel {
-    width: 130px;
-    padding: 8px 6px;
-  }
+  .side-panel { width: 130px; padding: 8px 6px; }
+  .action-btn { font-size: 15px; padding: 6px 4px; min-height: 44px; }
+  .fan-wrap { height: 110px; width: 240px; margin-top: 4px; }
+  .fan-card { width: 60px; height: 86px; margin-left: -30px; }
+  .fan-card-img { width: 120%; height: 120%; }
+  .arena { padding-top: 52px; }
+  .table-wrap { perspective: 600px; margin-top: 4px; }
+  .table-surface { width: 420px; height: 300px; }
+  .far-card-img { height: 44px; }
+  .near-card-img { height: 64px; }
+  .back-btn { min-height: 44px; font-size: 15px; }
+  .habilidad-btn { min-height: 44px; font-size: 13px; }
+  .score-title { font-size: 6px; }
+  .score-row { font-size: 14px; }
+  .state-text { font-size: 13px; }
+}
 
-  .action-btn {
-    font-size: 15px;
-    padding: 6px 4px;
-  }
+/* ── Pantalla baja (cualquier dispositivo < 540px alto) ─────────────────── */
+@media (max-height: 540px) {
+  .side-panel { width: 110px; padding: 6px 5px; gap: 4px; }
+  .action-btn { font-size: 13px; padding: 5px 3px; min-height: 36px; }
+  .arena { padding-top: 38px; }
+  .rival-portrait { width: 38px; height: 38px; font-size: 22px; }
+  .rival-label { font-size: 11px; }
+  .table-wrap { perspective: 500px; margin-top: 2px; }
+  .table-surface { width: 340px; height: 240px; }
+  .far-card-img { height: 34px; }
+  .near-card-img { height: 52px; }
+  .fan-wrap { height: 90px; width: 200px; margin-top: 2px; }
+  .fan-card { width: 50px; height: 72px; margin-left: -25px; }
+  .fan-card-img { width: 110%; height: 110%; }
+  .scoreboard { padding: 4px; gap: 3px; }
+  .score-title { font-size: 5px; }
+  .score-row { font-size: 12px; }
+  .tally-svg { height: 36px; }
+  .state-section { padding-top: 4px; gap: 1px; }
+  .state-title { font-size: 7px; }
+  .state-text { font-size: 11px; }
+  .back-btn { font-size: 13px; padding: 5px 4px; }
+  .habilidad-btn { font-size: 11px; padding: 4px; }
+  .heroe-nombre { font-size: 11px; }
+  .heroe-desc { font-size: 10px; }
+}
 
-  /* Abanico más compacto */
-  .fan-wrap {
-    height: 110px;
-    width: 240px;
-    margin-top: 4px;
-  }
+/* ── Pantalla muy baja (< 400px alto, ej. teléfono landscape pequeño) ─────── */
+@media (max-height: 400px) {
+  .side-panel { width: 95px; padding: 4px; gap: 3px; }
+  .action-btn { font-size: 12px; padding: 4px 2px; min-height: 30px; }
+  .arena { padding-top: 28px; }
+  .rival-portrait { width: 28px; height: 28px; font-size: 16px; }
+  .rival-label { display: none; }
+  .table-wrap { margin-top: 1px; }
+  .table-surface { width: 260px; height: 180px; }
+  .fan-wrap { height: 72px; width: 165px; margin-top: 1px; }
+  .fan-card { width: 40px; height: 58px; margin-left: -20px; }
+  .state-section { display: none; }
+  .heroe-section .heroe-desc { display: none; }
+  .tally-svg { height: 28px; }
+  .score-row { font-size: 11px; }
+}
 
-  .fan-card {
-    width: 60px;
-    height: 86px;
-    margin-left: -30px;
-  }
-
-  .fan-card-img {
-    width: 120%;
-    height: 120%;
-  }
-
-  /* Arena con menos padding superior */
-  .arena {
-    padding-top: 52px;
-  }
-
-  /* Mesa más pequeña */
-  .table-wrap {
-    perspective: 600px;
-    margin-top: 4px;
-  }
-
-  .table-surface {
-    width: 420px;
-    height: 300px;
-  }
-
-  /* Imágenes de bazas más chicas */
-  .far-card-img {
-    height: 44px;
-  }
-
-  .near-card-img {
-    height: 64px;
-  }
-
-  /* Botones táctiles más grandes (área de toque) */
-  .action-btn {
-    min-height: 44px;
-  }
-
-  .back-btn {
-    min-height: 44px;
-    font-size: 15px;
-  }
-
-  .habilidad-btn {
-    min-height: 44px;
-    font-size: 13px;
-  }
-
-  /* Score más compacto */
-  .score-title {
-    font-size: 6px;
-  }
-
-  .score-row {
-    font-size: 14px;
-  }
-
-  .state-text {
-    font-size: 13px;
-  }
+/* ── Pantalla muy estrecha (< 640px ancho, tablet portrait con game) ──────── */
+@media (max-width: 640px) {
+  .side-panel { width: 90px; padding: 6px 4px; gap: 4px; }
+  .action-btn { font-size: 13px; padding: 6px 3px; }
+  .table-surface { width: min(360px, 55vw); height: 260px; }
+  .fan-wrap { width: min(200px, 40vw); }
+  .score-title { font-size: 6px; }
+  .state-text { font-size: 13px; }
 }
 
 /* Touch: estados activos explícitos para dispositivos táctiles */

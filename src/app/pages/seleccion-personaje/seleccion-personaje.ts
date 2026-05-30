@@ -18,6 +18,7 @@ export class SeleccionPersonaje {
   readonly esTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
   @Output() heroeConfirmado = new EventEmitter<number>();
+  @Output() solicitarVolver = new EventEmitter<void>();
 
   constructor(private location: Location) {}
 
@@ -36,6 +37,10 @@ export class SeleccionPersonaje {
   }
 
   volver(): void {
-    this.location.back();
+    if (!this.standalone) {
+      this.solicitarVolver.emit();
+    } else {
+      this.location.back();
+    }
   }
 }

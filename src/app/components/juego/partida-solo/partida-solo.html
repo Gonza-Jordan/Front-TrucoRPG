@@ -19,6 +19,6 @@
 }
 
 @if (vistaActual === 'seleccion-heroe') {
-  <app-seleccion-personaje [standalone]="false" (heroeConfirmado)="alConfirmarHeroe($event)"></app-seleccion-personaje>
+  <app-seleccion-personaje [standalone]="false" (heroeConfirmado)="alConfirmarHeroe($event)" (solicitarVolver)="vistaActual = 'menu-principal'"></app-seleccion-personaje>
 }
 
