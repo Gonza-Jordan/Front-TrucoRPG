@@ -1,0 +1,1133 @@
+/* ── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap');
+
+/* ── Variables ────────────────────────────────────────────────────────────── */
+:host {
+  --green-felt: #0c4a0c;
+  --green-mid: #0e5c0e;
+  --green-light: #1a7a1a;
+  --gold: #c89030;
+  --cream: #f5e6c8;
+  --cream-dark: #d4c4a0;
+  --red-back: #7a1a1a;
+  --panel-bg: #0d0b08;
+  --divider: #5a4020;
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-data: 'VT323', monospace;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Root layout ──────────────────────────────────────────────────────────── */
+.root {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  min-height: 580px;
+  background-color: black;
+  position: relative;
+  overflow: hidden;
+  background-image: url('/assets/multijugador.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ── Paneles laterales ────────────────────────────────────────────────────── */
+.side-panel {
+  width: 178px;
+  flex-shrink: 0;
+  background: var(--panel-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 12px 10px;
+  gap: 8px;
+  z-index: 10;
+}
+
+.left-panel {
+  border-right: 2px solid var(--divider);
+}
+
+.right-panel {
+  border-left: 2px solid var(--divider);
+}
+
+/* ── Botones de acción ────────────────────────────────────────────────────── */
+.btn-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.action-btn {
+  font-family: var(--font-data);
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: var(--btn-color, #aaa);
+  background: #1e1a14;
+  border: 1px solid #3a3020;
+  padding: 8px 6px;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.08s;
+  text-align: center;
+  border-radius: 3px;
+}
+
+.action-btn:not(.disabled):hover {
+  background: #2e2818;
+  transform: scale(1.03);
+}
+
+.action-btn:not(.disabled):active {
+  transform: scale(0.97);
+}
+
+.action-btn.disabled {
+  color: #3a3020;
+  border-color: #1e1a10;
+  cursor: not-allowed;
+}
+
+/* ── Arena central ────────────────────────────────────────────────────────── */
+.arena {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  overflow: hidden;
+  padding-top: 76px;
+  /* espacio para el sprite del rival */
+}
+
+/* ── Zona rival (fuera de la perspectiva, arriba) ─────────────────────────── */
+.rival-zone {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  z-index: 20;
+}
+
+.rival-portrait {
+  width: 56px;
+  height: 56px;
+  border: 2px solid #aa4444;
+  border-radius: 6px;
+  background: #1a0808;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 0 10px #aa444455;
+}
+
+.rival-label {
+  font-family: var(--font-data);
+  font-size: 14px;
+  color: #aaa;
+  background: #00000099;
+  padding: 2px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+/* ── Burbuja de diálogo ───────────────────────────────────────────────────── */
+.bubble {
+  position: absolute;
+  top: 12px;
+  left: calc(100% + 12px);
+  background: #fffff0;
+  border: 2px solid #333;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-family: var(--font-data);
+  font-size: 18px;
+  color: #111;
+  white-space: nowrap;
+  animation: bubblePop 0.18s ease-out;
+}
+
+.bubble-tail {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border: 7px solid transparent;
+  border-right-color: #333;
+}
+
+@keyframes bubblePop {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ── Mesa en perspectiva CSS ──────────────────────────────────────────────── */
+.table-wrap {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  perspective: 860px;
+  perspective-origin: 50% 5%;
+  margin-top: 10px;
+}
+
+.table-surface {
+  width: 600px;
+  height: 440px;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 35%, #145c14 0%, var(--green-felt) 60%, #082808 100%);
+  border: 3px solid #2a7a2a;
+  border-radius: 26px;
+  box-shadow:
+    inset 0 0 50px #041204,
+    0 6px 32px #000a;
+  transform: rotateX(26deg);
+  transform-origin: 50% 0%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Textura de paño */
+  background-image:
+    radial-gradient(ellipse 80% 55% at 50% 35%, #145c14 0%, var(--green-felt) 60%, #082808 100%),
+    repeating-linear-gradient(90deg, transparent 0px, transparent 3px, #ffffff05 3px, #ffffff05 4px);
+}
+
+/* ── Cartas rival (reverso) ───────────────────────────────────────────────── */
+.rival-hand {
+  display: flex;
+  gap: 10px;
+  margin-top: 9px;
+}
+
+.card-back {
+  width: 34px;
+  height: 50px;
+  background: var(--red-back);
+  border: 1.5px solid #eee;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffdddd;
+  font-family: var(--font-data);
+  font-size: 16px;
+  box-shadow: 1px 2px 6px #0009;
+  transition: opacity 0.2s;
+}
+
+.card-back.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+
+/* ── Bazas ────────────────────────────────────────────────────────────────── */
+.bazas {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 16px;
+}
+
+.baza-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.baza-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  font-family: var(--font-data);
+  transition: background 0.15s;
+  box-shadow: 1px 2px 5px #0008;
+}
+
+/* Carta máquina — zona lejana (más pequeña por perspectiva) */
+.far-card {
+  width: 44px;
+  height: 62px;
+  background: var(--green-light);
+  border: 1px solid #4aaa4a;
+  font-size: 10px;
+  color: #1a4a1a;
+}
+
+.far-card.played {
+  background: var(--cream-dark);
+  border-color: #998840;
+  color: #111;
+}
+
+.far-card.pending {
+  background: #ffe880;
+  border-color: #cc9900;
+  color: #333;
+}
+
+/* Carta jugador — zona cercana (tamaño completo) */
+.near-card {
+  width: 72px;
+  height: 100px;
+  background: var(--green-light);
+  border: 1px solid #4aaa4a;
+  font-size: 13px;
+  color: #1a4a1a;
+}
+
+.near-card.played {
+  background: var(--cream-dark);
+  border-color: #998840;
+  color: #111;
+}
+
+.baza-card .card-num {
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.baza-card .card-palo {
+  font-size: 0.85em;
+  margin-top: 2px;
+}
+
+.baza-card .card-val {
+  font-size: 0.7em;
+  color: #666;
+  margin-top: 1px;
+}
+
+.baza-empty-label {
+  font-size: 0.65em;
+  opacity: 0.4;
+  letter-spacing: 1px;
+}
+
+.baza-winner {
+  font-family: var(--font-data);
+  font-size: 12px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #00000099;
+}
+
+.winner-human {
+  color: #aaffaa;
+}
+
+.winner-maq {
+  color: #ffaaaa;
+}
+
+.winner-parda {
+  color: #ffff88;
+}
+
+/* ── Badge de turno ───────────────────────────────────────────────────────── */
+.turno-badge {
+  position: absolute;
+  top: 88%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  font-family: var(--font-data);
+  font-size: 13px;
+  color: #ffff88;
+
+  background: #000000cc;
+  padding: 4px 14px;
+  border-radius: 4px;
+
+  white-space: nowrap;
+  z-index: 30;
+}
+
+.zone-label {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: #aaffaa;
+  background: #00000066;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+/* ── Abanico ──────────────────────────────────────────────────────────────── */
+.fan-wrap {
+  position: relative;
+  height: 142px;
+  width: 300px;
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+.fan-card {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 78px;
+  height: 112px;
+  margin-left: -39px;
+
+  transform: translateX(var(--xoff)) rotate(var(--angle)) translateY(0px);
+  transform-origin: bottom center;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s cubic-bezier(.22, 1, .36, 1);
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fan-card-img {
+  width: 130%;
+  height: 130%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.baza-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.fan-card:hover:not(.hidden):not(.played-out) {
+  transform: translateX(var(--xoff)) rotate(var(--angle)) translateY(-20px);
+  box-shadow: 3px 7px 18px #0009;
+}
+
+.fan-card:active:not(.hidden):not(.played-out) {
+  transform: translateX(var(--xoff)) rotate(var(--angle)) translateY(-10px) scale(0.96);
+}
+
+.fan-card.hidden,
+.fan-card.played-out {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(var(--xoff)) rotate(var(--angle)) translateY(40px);
+}
+
+.card-corner {
+  position: absolute;
+  font-size: 15px;
+  font-weight: bold;
+  color: #111;
+  line-height: 1;
+}
+
+.card-corner.tl {
+  top: 5px;
+  left: 6px;
+}
+
+.card-corner.br {
+  bottom: 5px;
+  right: 6px;
+  transform: rotate(180deg);
+}
+
+.card-palo-center {
+  font-size: 28px;
+  color: #111;
+  line-height: 1;
+}
+
+.card-palo-name {
+  font-size: 12px;
+  color: #444;
+}
+
+.card-val-fan {
+  font-size: 10px;
+  color: #777;
+}
+
+/* ── Panel derecho ────────────────────────────────────────────────────────── */
+.scoreboard {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border: 1px solid var(--divider);
+  padding: 8px 6px;
+  background: #0d0b08;
+  border-radius: 4px;
+}
+
+.score-title {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--gold);
+  letter-spacing: 1px;
+  text-align: center;
+  border-bottom: 1px solid var(--divider);
+  padding-bottom: 4px;
+}
+
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-data);
+  font-size: 17px;
+}
+
+.score-vos {
+  color: #66dd44;
+}
+
+.score-maq {
+  color: #dd4433;
+}
+
+.tally-svg {
+  width: 100%;
+  height: 52px;
+  border-top: 1px solid #3a2a0a;
+  padding-top: 2px;
+}
+
+.state-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-top: 1px solid var(--divider);
+  padding-top: 7px;
+}
+
+.state-title {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  letter-spacing: 1px;
+}
+
+.envido-title {
+  color: #55aadd;
+}
+
+.truco-title {
+  color: #ddcc44;
+}
+
+.state-text {
+  font-family: var(--font-data);
+  font-size: 15px;
+  color: #bbb;
+  line-height: 1.3;
+}
+
+.back-btn {
+  margin-top: auto;
+  font-family: var(--font-data);
+  font-size: 17px;
+  color: #aa6633;
+  background: #1a1208;
+  border: 1px solid var(--divider);
+  padding: 8px 6px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.12s;
+}
+
+.back-btn:hover {
+  background: #2a1e10;
+}
+
+/* ── Game Over Overlay ────────────────────────────────────────────────────── */
+.game-over-overlay {
+  position: absolute;
+  inset: 0;
+  background: #000000cc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.game-over-box {
+  background: #0a0703;
+  border: 3px solid var(--divider);
+  border-radius: 12px;
+  padding: 44px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 0 70px #00000099;
+  animation: slideUp 0.32s cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(36px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.go-title {
+  font-family: var(--font-pixel);
+  font-size: 34px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.go-win {
+  color: #ffdd44;
+  text-shadow: 0 0 18px #ffdd4455;
+}
+
+.go-lose {
+  color: #ff6633;
+  text-shadow: 0 0 18px #ff663355;
+}
+
+.go-subtitle {
+  font-family: var(--font-data);
+  font-size: 19px;
+  color: #ccc;
+  text-align: center;
+}
+
+.go-btn-row {
+  display: flex;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.go-btn {
+  font-family: var(--font-data);
+  font-size: 21px;
+  padding: 11px 26px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.1s;
+}
+
+.go-btn:active {
+  transform: scale(0.96);
+}
+
+.go-btn-play {
+  background: #1a4a1a;
+  border: 2px solid #44bb44;
+  color: #66ee66;
+}
+
+.go-btn-play:hover {
+  background: #286628;
+}
+
+.go-btn-exit {
+  background: #4a1a1a;
+  border: 2px solid #bb4444;
+  color: #ee6666;
+}
+
+.go-btn-exit:hover {
+  background: #662828;
+}
+
+/* ── Toast ────────────────────────────────────────────────────────────────── */
+.toast {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #880000;
+  border: 1px solid #ff4444;
+  color: #ffcccc;
+  font-family: var(--font-data);
+  font-size: 15px;
+  padding: 9px 22px;
+  border-radius: 4px;
+  z-index: 200;
+  animation: toastIn 0.2s ease;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+
+
+/* foto de rival provisoria (turro) */
+.rival-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+
+/* eeee cambios descripcion habilidad, falta */
+
+.character-section {
+  margin-top: 14px;
+}
+
+.character-title {
+  color: #b987ff;
+}
+
+.character-name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 6px;
+  color: #f5e6ff;
+}
+
+.character-desc {
+  margin-top: 6px;
+  font-size: .9rem;
+  line-height: 1.3;
+  color: #d8d8d8;
+}
+
+.character-status {
+  margin-top: 10px;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.character-status.ready {
+  color: #7dff7d;
+}
+
+.character-status.used {
+  color: #ff8d8d;
+}
+
+
+/* testeo habilidades heroe*/
+
+/* Sección del héroe */
+.heroe-section {
+  border-left: 2px solid #444;
+  padding-left: 6px;
+}
+
+.heroe-nombre {
+  font-family: "Jersey 10", monospace;
+  font-size: 14px;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.heroe-desc {
+  font-family: "Jersey 10", monospace;
+  font-size: 11px;
+  color: #999;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+/* Botón usar habilidad */
+.habilidad-btn {
+  font-family: "Jersey 10", monospace;
+  font-size: 12px;
+  width: 100%;
+  padding: 6px 4px;
+  border-radius: 3px;
+  border: 1px solid #333;
+  background: #161616;
+  color: #444;
+  cursor: not-allowed;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.habilidad-btn.disponible {
+  background: #162210;
+  border-color: #55aa33;
+  color: #88ff44;
+  cursor: pointer;
+}
+
+.habilidad-btn.disponible:hover {
+  background: #1e3318;
+}
+
+.habilidad-btn.usada {
+  background: #111;
+  border-color: #2a3a2a;
+  color: #3a5a3a;
+  cursor: not-allowed;
+}
+
+.habilidad-btn.esperando-carta {
+  border-color: #aa66ff;
+  color: #aa66ff;
+  cursor: not-allowed;
+}
+
+/* Log de eventos */
+.heroe-log {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.heroe-log-linea {
+  font-family: "Jersey 10", monospace;
+  font-size: 11px;
+  color: #ffdd88;
+  background: #1a1400;
+  border: 1px solid #5a4400;
+  border-radius: 3px;
+  padding: 4px 6px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* Carta seleccionada (Manipulador) */
+.carta-seleccionada {
+  filter: drop-shadow(0 0 8px #aa44ff) drop-shadow(0 0 3px #aa44ff);
+}
+
+/* Hint del Manipulador sobre el abanico */
+.manipulador-hint {
+  position: absolute;
+  bottom: 170px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Jersey 10", monospace;
+  font-size: 14px;
+  color: #cc88ff;
+  background: #1a0a2a;
+  border: 1px solid #aa44ff;
+  border-radius: 4px;
+  padding: 5px 12px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Responsive: desktop mediano (1100–1400px) ───────────────────────────── */
+@media (max-width: 1400px) {
+  .side-panel { width: 155px; }
+  .table-surface { width: 540px; height: 400px; }
+}
+
+@media (max-width: 1200px) {
+  .side-panel { width: 140px; padding: 10px 8px; }
+  .action-btn { font-size: 16px; padding: 7px 5px; }
+  .table-surface { width: 480px; height: 360px; }
+  .fan-wrap { width: 260px; height: 126px; }
+  .fan-card { width: 68px; height: 98px; margin-left: -34px; }
+  .scoreboard { padding: 8px 6px; }
+  .score-title { font-size: 8px; }
+  .score-row { font-size: 16px; }
+  .state-section { padding: 6px 8px; }
+  .state-title { font-size: 10px; }
+  .state-text { font-size: 15px; }
+  .heroe-nombre { font-size: 14px; }
+  .heroe-desc { font-size: 13px; }
+  .habilidad-btn { font-size: 13px; padding: 6px 8px; }
+  .back-btn { font-size: 15px; }
+}
+
+@media (max-width: 1050px) {
+  .side-panel { width: 122px; padding: 8px 6px; gap: 5px; }
+  .action-btn { font-size: 14px; padding: 6px 4px; }
+  .table-surface { width: 420px; height: 310px; }
+  .fan-wrap { width: 230px; height: 110px; }
+  .fan-card { width: 58px; height: 84px; margin-left: -29px; }
+  .far-card-img { height: 46px; }
+  .near-card-img { height: 66px; }
+  .rival-portrait { width: 46px; height: 46px; }
+  .scoreboard { padding: 6px 4px; }
+  .score-title { font-size: 7px; }
+  .score-row { font-size: 14px; }
+  .state-text { font-size: 13px; }
+  .back-btn { font-size: 14px; padding: 6px 4px; }
+}
+
+/* ── Overlay: rotá el dispositivo (solo portrait en mobile) ───────────────── */
+.rotate-overlay {
+  display: none;
+}
+
+@media (max-width: 900px) and (orientation: portrait) {
+  .rotate-overlay {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    background: #080604ee;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+}
+
+.rotate-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: rotateHint 1.6s ease-in-out infinite;
+}
+
+.rotate-icon {
+  font-size: 64px;
+  transform-origin: center;
+}
+
+.rotate-text {
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: #ffdd44;
+  text-align: center;
+}
+
+.rotate-sub {
+  font-family: var(--font-data);
+  font-size: 18px;
+  color: #aaa;
+  text-align: center;
+}
+
+@keyframes rotateHint {
+  0%, 100% { transform: rotate(0deg); }
+  40%       { transform: rotate(90deg); }
+  60%       { transform: rotate(90deg); }
+}
+
+/* ── Responsive mobile landscape ─────────────────────────────────────────── */
+@media (max-width: 900px) and (orientation: landscape) {
+  /* Paneles laterales más angostos */
+  .side-panel {
+    width: 130px;
+    padding: 8px 6px;
+  }
+
+  .action-btn {
+    font-size: 15px;
+    padding: 6px 4px;
+  }
+
+  /* Abanico más compacto */
+  .fan-wrap {
+    height: 110px;
+    width: 240px;
+    margin-top: 4px;
+  }
+
+  .fan-card {
+    width: 60px;
+    height: 86px;
+    margin-left: -30px;
+  }
+
+  .fan-card-img {
+    width: 120%;
+    height: 120%;
+  }
+
+  /* Arena con menos padding superior */
+  .arena {
+    padding-top: 52px;
+  }
+
+  /* Mesa más pequeña */
+  .table-wrap {
+    perspective: 600px;
+    margin-top: 4px;
+  }
+
+  .table-surface {
+    width: 420px;
+    height: 300px;
+  }
+
+  /* Imágenes de bazas más chicas */
+  .far-card-img {
+    height: 44px;
+  }
+
+  .near-card-img {
+    height: 64px;
+  }
+
+  /* Botones táctiles más grandes (área de toque) */
+  .action-btn {
+    min-height: 44px;
+  }
+
+  .back-btn {
+    min-height: 44px;
+    font-size: 15px;
+  }
+
+  .habilidad-btn {
+    min-height: 44px;
+    font-size: 13px;
+  }
+
+  /* Score más compacto */
+  .score-title {
+    font-size: 6px;
+  }
+
+  .score-row {
+    font-size: 14px;
+  }
+
+  .state-text {
+    font-size: 13px;
+  }
+}
+
+/* Touch: estados activos explícitos para dispositivos táctiles */
+@media (pointer: coarse) {
+  .fan-card:active:not(.hidden):not(.played-out) {
+    transform: translateX(var(--xoff)) rotate(var(--angle)) translateY(-16px) scale(0.97);
+    filter: brightness(1.15);
+  }
+
+  .action-btn:not(.disabled):active {
+    background: #3a3020;
+    transform: scale(0.95);
+  }
+
+  .go-btn:active {
+    transform: scale(0.93);
+  }
+}
+
+/* ── Confirmar salir ──────────────────────────────────────────────────────── */
+.confirm-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: fadeIn 0.15s ease;
+}
+
+.confirm-box {
+  background: #0e0c08;
+  border: 2px solid #5a4020;
+  outline: 1px solid rgba(200, 144, 48, 0.2);
+  outline-offset: 4px;
+  padding: 36px 40px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 280px;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+}
+
+.confirm-title {
+  font-family: var(--font-data);
+  font-size: 22px;
+  color: #c89030;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.confirm-sub {
+  font-family: var(--font-data);
+  font-size: 15px;
+  color: #7a6040;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.confirm-btn-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.confirm-btn {
+  font-family: var(--font-data);
+  font-size: 17px;
+  padding: 10px 28px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.12s, transform 0.1s;
+  letter-spacing: 1px;
+}
+
+.confirm-btn:active { transform: scale(0.96); }
+
+.confirm-btn-si {
+  background: #3a1010;
+  border: 2px solid #aa3333;
+  color: #ee6666;
+}
+
+.confirm-btn-si:hover { background: #551818; }
+
+.confirm-btn-no {
+  background: #1a1a0e;
+  border: 2px solid #5a4020;
+  color: #c89030;
+}
+
+.confirm-btn-no:hover { background: #2a2010; }

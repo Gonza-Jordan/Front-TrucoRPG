@@ -694,8 +694,8 @@ export default class TrucoSoloScene extends BaseScene {
 
             // ── Estado normal: mostrar botones de canto habilitados/deshabilitados ──
 
-            // ENVIDO — solo válido antes de la primera baza y antes de que el truco esté resuelto
-            const envidoPosible = !m.envidoCantado && !m.trucoResuelto
+            // ENVIDO — válido antes de la primera baza (independientemente del estado del truco)
+            const envidoPosible = !m.envidoCantado
                 && (m.bazas?.length ?? 0) === 0 && !manoEnd;
             if (envidoPosible) {
                 btns.push(['Envido',       '#4488ff', esMiTurno ? () => this._call('cantar-envido-tipo', { manoId: m.id, tipo: 'Envido'       }) : null]);

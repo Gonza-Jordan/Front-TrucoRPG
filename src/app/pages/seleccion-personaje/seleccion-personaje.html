@@ -1,0 +1,80 @@
+<main>
+  @if (!esTouch) {
+    <!-- DESKTOP: cartas con gaucho y flip -->
+    <section class="contenedor-cartas">
+      @for (heroe of heroes; track heroe.id) {
+        <div
+          class="tarjeta"
+          [class.seleccionada]="selectedHeroId === heroe.id"
+          [class.girada]="selectedHeroId !== null && selectedHeroId !== heroe.id"
+          (click)="seleccionarHeroe(heroe.id)"
+        >
+          <div class="interior-tarjeta">
+            <div class="cara frente">
+              <div class="indice superior">{{ heroe.id }}</div>
+              <div class="marco-personaje">
+                <img class="personaje" src="/Imagenes/ejemplo.png" [alt]="heroe.nombre" />
+              </div>
+              <div class="info-personaje">
+                <h2 class="nombre">{{ heroe.nombre }}</h2>
+                <span class="stats">{{ heroe.pasiva }}</span>
+                <div class="descripcion"><p>{{ heroe.activa }}</p></div>
+                <button class="btn-seleccionar" (click)="$event.stopPropagation(); seleccionarHeroe(heroe.id)">
+                  Seleccionar
+                </button>
+              </div>
+              <div class="indice inferior">{{ heroe.id }}</div>
+            </div>
+            <div class="cara atras">
+              @if (selectedHeroId !== null && selectedHeroId !== heroe.id) {
+                <img class="dorso" src="/Imagenes/dorso.png" alt="Dorso" />
+              } @else {
+                <div class="flip-content">
+                  <div class="flip-nombre">{{ heroe.nombre }}</div>
+                  <div class="flip-desc">{{ heroe.activa }}</div>
+                  <button class="btn-seleccionar" (click)="$event.stopPropagation(); seleccionarHeroe(heroe.id)">
+                    Seleccionar
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </section>
+  } @else {
+    <!-- MOBILE: lista estilo menú, sin gaucho -->
+    <div class="lista-heroes">
+      @for (heroe of heroes; track heroe.id) {
+        <div
+          class="heroe-item"
+          [class.heroe-seleccionado]="selectedHeroId === heroe.id"
+          (click)="seleccionarHeroe(heroe.id)"
+        >
+          <div class="heroe-item-header">
+            <span class="heroe-item-nombre">{{ heroe.nombre }}</span>
+            @if (selectedHeroId === heroe.id) {
+              <span class="heroe-check">✓</span>
+            }
+          </div>
+          <div class="heroe-item-pasiva">⚡ {{ heroe.pasiva }}</div>
+          <div class="heroe-item-activa">🗡 {{ heroe.activa }}</div>
+        </div>
+      }
+    </div>
+  }
+</main>
+
+<!-- Botones siempre visibles, fuera de main -->
+<div class="acciones-confirmar">
+  <button class="btn-volver" (click)="volver()">← VOLVER</button>
+  @if (selectedHeroId !== null) {
+    <button class="btn-elegir-otro" (click)="elegirOtro()">↺ ELEGIR OTRO</button>
+  }
+  <button
+    class="confirmar-heroe"
+    [disabled]="selectedHeroId === null"
+    (click)="enviarConfirmacion()">
+    Confirmar Personaje y Jugar
+  </button>
+</div>
