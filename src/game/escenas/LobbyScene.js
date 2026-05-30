@@ -115,7 +115,7 @@ export default class LobbyScene extends BaseScene {
 
         btnVolver.on('pointerdown', async () => {
             await multiplayerManager.desconectar();
-            this.scene.start('MenuScene');
+            window.location.href = '/home';
         });
     }
 

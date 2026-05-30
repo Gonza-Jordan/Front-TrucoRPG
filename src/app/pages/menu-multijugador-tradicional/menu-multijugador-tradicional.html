@@ -1,17 +1,44 @@
-<app-header></app-header>
 <main>
-    <div class="connection-container">
-        <app-connection-status></app-connection-status>
+  <div class="connection-container">
+    <app-connection-status></app-connection-status>
+  </div>
+  <div class="menu-wrapper">
+    <div class="contenedor-menu">
+      <div class="menu-sep"></div>
+      <a routerLink="/menu-multijugador-tradicional-sala" [queryParams]="{mode:'crear'}">
+        <span>CREAR SALA</span>
+      </a>
+      <a (click)="abrirModalUnirse()" style="cursor:pointer">
+        <span>UNIRSE A SALA</span>
+      </a>
+      <a class="inactivo"><span>BUSCAR PARTIDA</span></a>
+      <div class="menu-sep"></div>
+      <a routerLink="/menu-multijugador"><span>VOLVER</span></a>
     </div>
-    <div class="menu-wrapper">
-      <div class="contenedor-menu">
-        <div class="menu-sep"></div>
-        <a routerLink="/menu-multijugador-tradicional-sala"><span>CREAR SALA</span></a>
-        <a routerLink="/"><span>UNIRSE A SALA</span></a>
-        <a routerLink="/juego/:modo"><span>BUSCAR PARTIDA</span></a>
-        <div class="menu-sep"></div>
-        <a routerLink="/menu-multijugador"><span>VOLVER</span></a>
-      </div>
-    </div>
+  </div>
 </main>
-<app-footer></app-footer>
+
+<!-- Modal: Unirse a sala -->
+@if (modalAbierto) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+      <h2 class="modal-titulo">UNIRSE A SALA</h2>
+      <div class="menu-sep"></div>
+      <input
+        class="modal-input"
+        [(ngModel)]="codigoIngresado"
+        placeholder="CÓDIGO DE SALA"
+        maxlength="6"
+        (keyup.enter)="confirmarUnirse()"
+        autofocus
+      />
+      @if (errorUnirse) {
+        <p class="modal-error">{{ errorUnirse }}</p>
+      }
+      <button class="boton-unirse" (click)="confirmarUnirse()" [disabled]="cargando">
+        {{ cargando ? 'Conectando...' : 'UNIRSE' }}
+      </button>
+      <a class="boton-cancelar" (click)="cerrarModal()">CANCELAR</a>
+    </div>
+  </div>
+}

@@ -15,30 +15,23 @@ export class Header {
 
   headerType = signal('');
 
- constructor() {
+  constructor() {
+    // Leer la ruta actual inmediatamente (cubre refresh y navegación directa)
+    this.actualizarTipo();
 
-  this.router.events
-    .pipe(
-      filter(event => event instanceof NavigationEnd)
-    )
-    .subscribe(() => {
+    // Escuchar navegaciones futuras
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => this.actualizarTipo());
+  }
 
-      let currentRoute = this.router.routerState.root;
-
-      while (currentRoute.firstChild) {
-        currentRoute = currentRoute.firstChild;
-      }
-
-      const data = currentRoute.snapshot.data;
-
-      console.log('DATA:', data);
-
-      this.headerType.set(data['header'] || 'default');
-
-      console.log('HEADER TYPE:', this.headerType());
-
-    });
-
-}
+  private actualizarTipo(): void {
+    let currentRoute = this.router.routerState.root;
+    while (currentRoute.firstChild) {
+      currentRoute = currentRoute.firstChild;
+    }
+    const data = currentRoute.snapshot.data;
+    this.headerType.set(data['header'] || 'default');
+  }
 
 }

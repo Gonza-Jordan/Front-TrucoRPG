@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5001',
-  hubUrl: 'http://localhost:5001/gamehub',
+  apiUrl: '',       // relativo: el proxy de Vite redirige /api → localhost:5001
+  hubUrl: '/gamehub', // relativo: el proxy redirige /gamehub → localhost:5001
 };
