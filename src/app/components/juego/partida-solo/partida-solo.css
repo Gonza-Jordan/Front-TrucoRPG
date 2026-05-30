@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
-
 :host {
     display: flex;
     flex-direction: column;
@@ -17,24 +15,15 @@ main {
     overflow:hidden;
     font-family: 'Jersey 20';
     background: url('/assets/home.png') center center / cover no-repeat;
+    color:#ffffff;
 }
 
-/* ── Wrapper logo + panel ────────────────────────────────────── */
 .menu-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: min(430px, 90vw);
     animation: flotar 2.5s infinite ease-in-out;
-}
-
-.menu-logo {
-    width: 160px;
-    image-rendering: pixelated;
-    margin-bottom: -55px;
-    position: relative;
-    z-index: 1;
-    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.9));
 }
 
 /* ── Panel ───────────────────────────────────────────────────── */
@@ -78,7 +67,7 @@ main {
     background: #1e1508;
     border: 2px solid #5a4020;
     cursor: pointer;
-    transition: background 0.1s, color 0.1s, border-color 0.1s, box-shadow 0.1s;
+    transition: background-color 0.1s, color 0.1s, border-color 0.1s, box-shadow 0.1s;
 }
 
 .contenedor-menu a:hover:not(.inactivo) {
@@ -93,70 +82,9 @@ main {
     color: #a07020;
 }
 
-/* Multijugador — acento azul */
-.contenedor-menu a.btn-multi {
-    color: #55aadd;
-    border-color: #2a5a7a;
-    background: #0e1820;
-}
-
-.contenedor-menu a.btn-multi:hover {
-    background: #162030;
-    color: #88ccff;
-    border-color: #4a8aaa;
-    box-shadow: 0 0 10px rgba(85, 170, 221, 0.25);
-}
-
-/* Configuración — acento gris */
-.contenedor-menu a.btn-config {
-    color: #8a8070;
-    border-color: #3a3020;
-    background: #181410;
-}
-
-.contenedor-menu a.btn-config:hover {
-    background: #221c14;
-    color: #aaa090;
-    border-color: #5a5040;
-    box-shadow: 0 0 10px rgba(138, 128, 112, 0.2);
-}
-
-/* Inactivos */
-.contenedor-menu a.inactivo {
-    opacity: 0.3;
-    cursor: default;
-}
-
 @media (max-width: 480px) {
     main { padding: 1rem; }
     .contenedor-menu { padding: 20px 20px 24px; }
-}
-
-/* ── Landscape mobile: todo entra sin scroll ─────────────────────────────── */
-@media (max-height: 500px) and (orientation: landscape) {
-
-    :host {
-        height: 100dvh;
-    }
-
-    main {
-        padding: 0.4rem;
-        align-items: flex-start;
-    }
-
-    .contenedor-menu {
-        padding: 32px 24px;
-        gap: 0.35em;
-        animation: none;
-        width: min(360px, 96%);
-    }
-
-    .contenedor-menu a {
-        height: 42px;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-        width: 80%;
-    }
 }
 
 @keyframes flotar {
