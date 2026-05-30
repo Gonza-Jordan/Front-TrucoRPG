@@ -137,3 +137,108 @@ main {
     50%  { transform: translateY(-5px); }
     100% { transform: translateY(0px); }
 }
+
+/* ── Modal ───────────────────────────────────────────────────── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    animation: fadeIn 0.15s ease;
+}
+
+.modal-panel {
+    width: min(400px, 90vw);
+    padding: 40px 28px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    background: rgba(14, 12, 8, 0.97);
+    border: 2px solid #5a4020;
+    outline: 1px solid rgba(200, 144, 48, 0.18);
+    outline-offset: 4px;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+}
+
+.modal-titulo {
+    margin: 0;
+    font-family: 'Jersey 10', monospace;
+    font-size: 1.3rem;
+    letter-spacing: 3px;
+    color: #c89030;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background: #1e1508;
+    border: 2px solid #5a4020;
+    color: #f0d080;
+    font-family: 'Jersey 10', monospace;
+    font-size: 1.5rem;
+    letter-spacing: 0.4rem;
+    text-align: center;
+    text-transform: uppercase;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.modal-input:focus {
+    border-color: #8a6030;
+}
+
+.modal-error {
+    margin: 0;
+    color: #e05050;
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.boton-unirse {
+    width: 100%;
+    height: 56px;
+    background: #1e1508;
+    border: 2px solid #5a4020;
+    color: #c89030;
+    font-family: 'Jersey 10', monospace;
+    font-size: 1.05rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+
+.boton-unirse:hover:not(:disabled) {
+    background: #2e1f0e;
+    border-color: #8a6030;
+    color: #f0b050;
+}
+
+.boton-unirse:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.boton-cancelar {
+    color: #6a5535;
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.1s;
+}
+
+.boton-cancelar:hover {
+    color: #9a7545;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}

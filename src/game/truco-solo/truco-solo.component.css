@@ -1015,3 +1015,79 @@
     transform: scale(0.93);
   }
 }
+
+/* ── Confirmar salir ──────────────────────────────────────────────────────── */
+.confirm-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: fadeIn 0.15s ease;
+}
+
+.confirm-box {
+  background: #0e0c08;
+  border: 2px solid #5a4020;
+  outline: 1px solid rgba(200, 144, 48, 0.2);
+  outline-offset: 4px;
+  padding: 36px 40px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 280px;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+}
+
+.confirm-title {
+  font-family: var(--font-data);
+  font-size: 22px;
+  color: #c89030;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.confirm-sub {
+  font-family: var(--font-data);
+  font-size: 15px;
+  color: #7a6040;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.confirm-btn-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.confirm-btn {
+  font-family: var(--font-data);
+  font-size: 17px;
+  padding: 10px 28px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.12s, transform 0.1s;
+  letter-spacing: 1px;
+}
+
+.confirm-btn:active { transform: scale(0.96); }
+
+.confirm-btn-si {
+  background: #3a1010;
+  border: 2px solid #aa3333;
+  color: #ee6666;
+}
+
+.confirm-btn-si:hover { background: #551818; }
+
+.confirm-btn-no {
+  background: #1a1a0e;
+  border: 2px solid #5a4020;
+  color: #c89030;
+}
+
+.confirm-btn-no:hover { background: #2a2010; }

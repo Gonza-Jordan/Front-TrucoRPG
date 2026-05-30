@@ -1,5 +1,7 @@
+const backendHost = `${window.location.hostname}:5001`;
+
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5001',
-  hubUrl: 'http://localhost:5001/gamehub',
+  apiUrl: `http://${backendHost}`,
+  hubUrl: `http://${backendHost}/gamehub`,
 };
