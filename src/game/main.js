@@ -17,11 +17,6 @@ export function initGame(parent = 'contenedor-juego', modo = 'maquina') {
     callbacks: {
       postBoot: (game) => {
         game.registry.set('modo', modo);
-        // Intentar lockear orientación landscape en mobile
-        const esTactil = navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
-        if (esTactil && screen.orientation?.lock) {
-          screen.orientation.lock('landscape').catch(() => {});
-        }
       },
     },
     scale: {

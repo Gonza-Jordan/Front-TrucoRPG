@@ -9,7 +9,7 @@
       <img src="/Logo.png" alt="Truco y maña - Logo" class="logo" />
     </a>
   }
-  @if (headerType() === 'registro' || headerType() === 'login' || headerType() === 'configuracion' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala') {
+  @if (headerType() === 'registro' || headerType() === 'login' || headerType() === 'configuracion') {
     <a routerLink="home">
       <img src="/Logo.png" alt="Truco y maña - Logo" class="logo" />
     </a>
@@ -18,11 +18,11 @@
   <nav>
     <ul>
       @if (headerType() === 'landing') {
-        <li><app-boton enlace="login">Iniciar Sesión</app-boton></li>
-        <li><app-boton enlace="registro">Registrarse</app-boton></li>
+        <li><a routerLink="login">Iniciar Sesión</a></li>
+        <li><a routerLink="registro">Registrarse</a></li>
       }
-      @if (headerType() === 'home' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala') {
-        <li><app-boton enlace="">Cerrar Sesión</app-boton></li>
+      @if (headerType() === 'home') {
+        <li><a routerLink="">Cerrar Sesión</a></li>
       }
     </ul>
   </nav>

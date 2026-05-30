@@ -59,7 +59,7 @@ export default class HeroSelectScene extends BaseScene {
             .setStrokeStyle(1, 0x555555).setInteractive();
         this.add.text(x, y, label, { fontFamily: FONT, fontSize: '18px', fill: color }).setOrigin(0.5);
         bg.on('pointerover', () => bg.setFillStyle(0x333333));
-        bg.on('pointerout', () => bg.setFillStyle(0x222222));
+        bg.on('pointerout',  () => bg.setFillStyle(0x222222));
         bg.on('pointerdown', cb);
         return { bg, txt: null, color };
     }
@@ -93,13 +93,6 @@ export default class HeroSelectScene extends BaseScene {
     }
 
     _continuar() {
-        // Guardar el héroe elegido para que el componente Angular lo pueda leer
-        if (this.modoJuego === 1) {
-            localStorage.setItem('heroeId', String(this.claseHeroe));
-        } else {
-            localStorage.removeItem('heroeId');
-        }
-
         this.scene.start('GameScene', {
             playerSprite: this.playerSprite,
             multijugador: false,
@@ -107,5 +100,4 @@ export default class HeroSelectScene extends BaseScene {
             claseHeroe: this.modoJuego === 1 ? this.claseHeroe : null,
         });
     }
-
 }

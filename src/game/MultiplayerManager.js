@@ -60,9 +60,6 @@ class MultiplayerManager {
     }
 
     // ── Truco ──────────────────────────────────────────────────
-    async listoParaJugar() {
-        await this.connection.invoke("ListoParaJugar");
-    }
     async iniciarTruco() {
         await this.connection.invoke("IniciarTruco");
     }
@@ -74,9 +71,6 @@ class MultiplayerManager {
     }
     async responderEnvido(aceptar) {
         await this.connection.invoke("ResponderEnvido", aceptar);
-    }
-    async escalarEnvido(tipo) {
-        await this.connection.invoke("EscalarEnvido", tipo);
     }
     async solicitarTruco() {
         await this.connection.invoke("SolicitarTruco");
