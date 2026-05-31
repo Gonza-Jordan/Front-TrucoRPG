@@ -107,6 +107,10 @@ header ul {
         width: 40px;
     }
 
+    header .logo-nombre {
+        display: none;
+    }
+
     header ul {
         gap: 0.5rem;
     }
