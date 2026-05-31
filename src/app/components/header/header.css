@@ -3,7 +3,7 @@ header {
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    padding: 0.6rem 2rem;
+    padding: 0.8rem 2rem;
     background: #1e1408;
     border-bottom: 2px solid #6a4a20;
     box-shadow:
@@ -17,6 +17,18 @@ header {
 header .logo {
     width: 7%;
     height: auto;
+}
+
+header .logo {
+    width: 36px;
+    height: auto;
+    border: 0.5px solid #6a4a20;
+    border-radius: 6px;
+}
+
+header .logo-nombre {
+    width: auto;
+    height: 32px;
 }
 
 header ul {
@@ -87,12 +99,17 @@ header ul {
 
     header {
         flex-direction: row;
+        justify-content: space-between;
         padding: 0.3rem 1rem;
         gap: 0.5rem;
     }
 
     header .logo {
         width: 40px;
+    }
+
+    header .logo-nombre {
+        display: none;
     }
 
     header ul {
