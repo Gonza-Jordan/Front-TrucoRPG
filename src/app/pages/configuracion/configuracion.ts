@@ -23,10 +23,24 @@ export class ConfiguracionComponent {
     localStorage.setItem('cfg_volumen', String(this.volumen));
     localStorage.setItem('cfg_musica',  String(this.musica));
     localStorage.setItem('cfg_pantalla', String(this.pantallaCompleta));
+    this.aplicarPantallaCompleta(this.pantallaCompleta);
     this.router.navigate(['/home']);
   }
 
   cancelar() {
     this.router.navigate(['/home']);
+  }
+
+  private aplicarPantallaCompleta(activar: boolean): void {
+    if (activar) {
+      const el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if ((el as any).webkitRequestFullscreen) (el as any).webkitRequestFullscreen();
+    } else {
+      if (document.fullscreenElement) {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if ((document as any).webkitExitFullscreen) (document as any).webkitExitFullscreen();
+      }
+    }
   }
 }

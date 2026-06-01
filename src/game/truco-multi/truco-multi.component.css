@@ -1,0 +1,26 @@
+/* Override: toast en el panel derecho para no tapar las cartas */
+.toast {
+  left: auto;
+  right: 210px;
+  transform: none;
+  bottom: 18px;
+  max-width: 280px;
+  text-align: center;
+}
+
+.nueva-mano-countdown {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 10, 4, 0.82);
+  border: 1px solid #7a4a18;
+  color: #c89030;
+  font-family: var(--font-data, monospace);
+  font-size: 14px;
+  letter-spacing: 2px;
+  padding: 7px 24px;
+  border-radius: 4px;
+  z-index: 199;
+  pointer-events: none;
+}
