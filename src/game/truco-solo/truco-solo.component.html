@@ -174,12 +174,12 @@
       </div>
       <div class="go-subtitle">
         {{ gameOverWon
-        ? '¡Llegaste a 30 puntos! El troll cayó derrotado.'
-        : 'El troll llegó a 30 puntos. ¡La próxima será!' }}
+        ? '¡Llegaste a 30 puntos! Tu oponente cayó derrotado.'
+        : 'Tu oponente llegó a 30 puntos. ¡La próxima será!' }}
       </div>
       <div class="go-btn-row">
         <button class="go-btn go-btn-play" (click)="nuevaPartida()">Volver a jugar</button>
-        <button class="go-btn go-btn-exit" (click)="salirPartida()">Salir al mapa</button>
+        <button class="go-btn go-btn-exit" (click)="confirmarSalir()">Salir al mapa</button>
       </div>
     </div>
   </div>
