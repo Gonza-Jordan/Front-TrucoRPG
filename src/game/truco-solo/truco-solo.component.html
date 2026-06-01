@@ -101,8 +101,9 @@
         <span class="score-vos">VOS: {{ mano?.puntosHumano ?? 0 }}</span>
         <span class="score-maq">MÁQ: {{ mano?.puntosMaquina ?? 0 }}</span>
       </div>
-      <svg class="tally-svg" viewBox="0 0 160 52" xmlns="http://www.w3.org/2000/svg">
-        <line x1="80" y1="0" x2="80" y2="52" stroke="#5a3a10" stroke-width="1" />
+      <svg class="tally-svg" viewBox="0 0 160 108" xmlns="http://www.w3.org/2000/svg">
+        <line x1="80" y1="0" x2="80" y2="108" stroke="#5a3a10" stroke-width="1" />
+        <line x1="0" y1="54" x2="160" y2="54" stroke="#3a2a0a" stroke-width="1" />
         @for (s of tallySticks; track $index) {
         <line [attr.x1]="s.x1" [attr.y1]="s.y1" [attr.x2]="s.x2" [attr.y2]="s.y2" [attr.stroke]="s.color"
           stroke-width="2" />

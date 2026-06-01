@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
 // ── Tipos ────────────────────────────────────────────────────────────────────
 
 export type Palo = 'Oro' | 'Espada' | 'Copa' | 'Basto';
-export type TipoEnvido = 'Envido' | 'Real Envido' | 'Falta Envido';
+export type TipoEnvido = 'Envido' | 'EnvidoEnvido' | 'Real Envido' | 'Falta Envido';
 
 export interface Carta {
   numero: number;
@@ -55,6 +55,9 @@ export interface ManoState {
   nivelTruco?: number;
   cantorTruco?: 'Humano' | 'Maquina';
   tipoEnvidoCantado?: TipoEnvido;
+  tantoCantadoMaquina?: number;
+  tantoHumano?: number;
+  envidoResuelto?: boolean;
   ganadorMano?:    'Humano' | 'Maquina' | 'Parda';
   ganadorPartida?: 'Humano' | 'Maquina';
   partidaTerminada?: boolean;
@@ -176,10 +179,11 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
 
   // ── Estado interno ────────────────────────────────────────────────────────
   private loading          = false;
-  private prevEstadoTruco  = '';
-  private prevEstadoEnvido = '';
-  private prevPendTru      = false;
-  private prevPendEnv      = false;
+  private prevEstadoTruco    = '';
+  private prevEstadoEnvido   = '';
+  private prevPendTru        = false;
+  private prevPendEnv        = false;
+  private prevEnvidoResuelto = false;
   private bubbleTimer: ReturnType<typeof setTimeout> | null = null;
   private toastTimer:  ReturnType<typeof setTimeout> | null = null;
 
@@ -223,7 +227,7 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
       this.updateEventosHabilidad(data);
       this.updateUI(data);
     } catch (err: any) {
-      const msg = err?.error?.message ?? err?.message ?? String(err);
+      const msg = (typeof err?.error === 'string' ? err.error : null) ?? err?.error?.message ?? err?.message ?? String(err);
       this.showToast(`Error en ${endpoint}: ${msg}`);
     } finally {
       this.loading = false;
@@ -351,10 +355,11 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
       : (pendEnv || pendTru) ? 'Respondé el canto de la máquina' : '';
 
     this.updateBubble(m, pendTru, pendEnv);
-    this.prevEstadoTruco  = m.estadoTruco  ?? '';
-    this.prevEstadoEnvido = m.estadoEnvido ?? '';
-    this.prevPendTru = pendTru;
-    this.prevPendEnv = pendEnv;
+    this.prevEstadoTruco    = m.estadoTruco  ?? '';
+    this.prevEstadoEnvido   = m.estadoEnvido ?? '';
+    this.prevPendTru        = pendTru;
+    this.prevPendEnv        = pendEnv;
+    this.prevEnvidoResuelto = !!m.envidoResuelto;
 
     const cantOp = m.maquina?.mano?.length ?? 0;
     this.opCards = [0, 1, 2].map(i => ({ visible: i < cantOp }));
@@ -392,8 +397,10 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
       if (pendTru && envidoChanged && m.envidoCantado && !this.prevPendEnv) {
         const e = (m.estadoEnvido ?? '').toLowerCase();
         let rsp = '';
+        const justResolved = !!m.envidoResuelto && !this.prevEnvidoResuelto;
         if      (e.includes('no quiso') || e.includes('no quiere')) rsp = '¡No quiero!';
-        else if (e.includes('quiso')    || e.includes('quiere'))    rsp = '¡Quiero!';
+        else if (justResolved && m.tantoCantadoMaquina != null)      rsp = this.prevPendEnv ? `Tengo ${m.tantoCantadoMaquina}.` : `¡Quiero! Tengo ${m.tantoCantadoMaquina}.`;
+        else if (e.includes('quiso')    || e.includes('quiere'))     rsp = m.tantoCantadoMaquina != null ? (this.prevPendEnv ? `Tengo ${m.tantoCantadoMaquina}.` : `¡Quiero! Tengo ${m.tantoCantadoMaquina}.`) : '¡Quiero!';
         if (rsp) {
           this.showTempBubble(rsp, 2000);
           setTimeout(() => {
@@ -414,12 +421,22 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
           ? '¡No quiero!'
           : (t.includes('quiso') || t.includes('quiere') || t.includes('acepto'))
             ? '¡Quiero!' : '';
-      } else if (envidoChanged && m.envidoCantado && !this.prevPendEnv) {
+      } else if (envidoChanged && m.envidoCantado) {
         const e = (m.estadoEnvido ?? '').toLowerCase();
-        resp = (e.includes('no quiso') || e.includes('no quiere'))
-          ? '¡No quiero!'
-          : (e.includes('quiso') || e.includes('quiere') || e.includes('acepto'))
-            ? '¡Quiero!' : '';
+        const justResolved = !!m.envidoResuelto && !this.prevEnvidoResuelto;
+        if (e.includes('no quiso') || e.includes('no quiere')) {
+          resp = '¡No quiero!';
+        } else if (justResolved && m.tantoCantadoMaquina != null) {
+          // Si el humano aceptó el envido de la máquina (prevPendEnv=true) → solo "Tengo X"
+          // Si la máquina aceptó la escalación del humano (prevPendEnv=false) → "¡Quiero! Tengo X"
+          resp = this.prevPendEnv
+            ? `Tengo ${m.tantoCantadoMaquina}.`
+            : `¡Quiero! Tengo ${m.tantoCantadoMaquina}.`;
+        } else if (e.includes('quiso') || e.includes('quiere') || e.includes('acepto')) {
+          resp = m.tantoCantadoMaquina != null
+            ? (this.prevPendEnv ? `Tengo ${m.tantoCantadoMaquina}.` : `¡Quiero! Tengo ${m.tantoCantadoMaquina}.`)
+            : '¡Quiero!';
+        }
       }
       if (resp) {
         this.showTempBubble(resp, 2500);
@@ -493,6 +510,9 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
         () => this.call('responder-envido', { manoId: m.id, aceptar: true })]);
       const tipoEnv = m.tipoEnvidoCantado;
       if (tipoEnv === 'Envido')
+        raw.push(['ENVIDO', '#ffdd00',
+          () => this.call('responder-envido', { manoId: m.id, aceptar: true, escalarA: 'Envido Envido' })]);
+      if (tipoEnv === 'Envido' || tipoEnv === 'EnvidoEnvido')
         raw.push(['REAL ENVIDO', '#ffaa00',
           () => this.call('responder-envido', { manoId: m.id, aceptar: true, escalarA: 'Real Envido' })]);
       if (tipoEnv !== 'Falta Envido')
@@ -546,12 +566,16 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
   // ── Tanteador SVG ─────────────────────────────────────────────────────────
   private redrawTally(ptsVos: number, ptsMaq: number): void {
     const sticks: typeof this.tallySticks = [];
-    this.drawPalitos(sticks, 36,  Math.min(ptsVos, 15), false);
-    this.drawPalitos(sticks, 124, Math.min(ptsMaq, 15), true);
+    this.drawPalitos(sticks, 36,  Math.min(ptsVos, 15), false, 4);
+    this.drawPalitos(sticks, 124, Math.min(ptsMaq, 15), true,  4);
+    // Buenas (puntos > 15)
+    if (ptsVos > 15) this.drawPalitos(sticks, 36,  ptsVos - 15, false, 58);
+    if (ptsMaq > 15) this.drawPalitos(sticks, 124, ptsMaq - 15, true,  58);
     this.tallySticks = sticks;
   }
 
-  private drawPalitos(out: typeof this.tallySticks, cx: number, pts: number, isMaq: boolean): void {
+  private drawPalitos(out: typeof this.tallySticks, cx: number, pts: number, isMaq: boolean, yTop: number): void {
+    if (pts <= 0) return;
     const color = isMaq ? '#d46010' : '#c8a030';
     const BS = 16, BGAP = 4, SL = 10, SGAP = 4;
     const full = Math.floor(pts / 5), rem = pts % 5;
@@ -559,7 +583,7 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
       const totalW = full * BS + (full - 1) * BGAP;
       let bx = cx - totalW / 2;
       for (let i = 0; i < full; i++) {
-        const by = 6;
+        const by = yTop;
         this.stick(out, bx, by+BS, bx, by, color);
         this.stick(out, bx, by, bx+BS, by, color);
         this.stick(out, bx+BS, by, bx+BS, by+BS, color);
@@ -571,7 +595,7 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
     if (rem > 0) {
       const totalW = rem * SL + (rem - 1) * SGAP;
       let sx = cx - totalW / 2;
-      const sy = full > 0 ? 6 + BS + 6 : 10;
+      const sy = full > 0 ? yTop + BS + 4 : yTop + 4;
       for (let i = 0; i < rem; i++) {
         this.stick(out, sx, sy+SL, sx+SL, sy, color);
         sx += SL + SGAP;
