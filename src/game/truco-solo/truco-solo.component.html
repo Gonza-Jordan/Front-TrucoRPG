@@ -186,6 +186,10 @@
   }
 
 
+  @if (countdown !== null) {
+  <div class="nueva-mano-countdown">Nueva mano en {{ countdown }}</div>
+  }
+
   <!-- Toast -->
   @if (toastMsg) {
   <div class="toast">{{ toastMsg }}</div>

@@ -186,6 +186,8 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
   private prevEnvidoResuelto = false;
   private prevGanadorMano: string | null = null;
   private nuevaManoTimer: ReturnType<typeof setTimeout> | null = null;
+  private countdownInterval: ReturnType<typeof setInterval> | null = null;
+  countdown: number | null = null;
   private bubbleTimer: ReturnType<typeof setTimeout> | null = null;
   private toastTimer:  ReturnType<typeof setTimeout> | null = null;
 
@@ -202,9 +204,9 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.bubbleTimer)    clearTimeout(this.bubbleTimer);
-    if (this.toastTimer)     clearTimeout(this.toastTimer);
-    if (this.nuevaManoTimer) clearTimeout(this.nuevaManoTimer);
+    if (this.bubbleTimer) clearTimeout(this.bubbleTimer);
+    if (this.toastTimer)  clearTimeout(this.toastTimer);
+    this.cancelarCountdown();
   }
 
   // ── Template helpers ──────────────────────────────────────────────────────
@@ -301,6 +303,26 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
     this.call('activar-habilidad', { manoId: this.mano.id });
   }
 
+  private iniciarCountdown(onComplete: () => void): void {
+    this.cancelarCountdown();
+    this.countdown = 3;
+    this.cdr.markForCheck();
+    this.countdownInterval = setInterval(() => {
+      this.countdown = (this.countdown ?? 1) - 1;
+      this.cdr.markForCheck();
+      if ((this.countdown ?? 0) <= 0) {
+        this.cancelarCountdown();
+        onComplete();
+      }
+    }, 1000);
+  }
+
+  private cancelarCountdown(): void {
+    if (this.countdownInterval) { clearInterval(this.countdownInterval); this.countdownInterval = null; }
+    if (this.nuevaManoTimer)    { clearTimeout(this.nuevaManoTimer);     this.nuevaManoTimer = null; }
+    this.countdown = null;
+  }
+
   nuevaPartida(): void {
     this.gameOver = false;
     this.eventosHabilidad = [];
@@ -343,18 +365,15 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
       this.rivalLabel = m.ganadorMano === 'Humano' ? '¡Perdí la mano!' : '¡Gané la mano!';
       this.habilidadCartaIdx = null;
       this.modoSeleccionCarta = false;
-      // Auto nueva mano tras 4 segundos
       if (m.ganadorMano !== this.prevGanadorMano && !m.partidaTerminada) {
-        if (this.nuevaManoTimer) clearTimeout(this.nuevaManoTimer);
-        this.nuevaManoTimer = setTimeout(() => {
-          this.nuevaManoTimer = null;
+        this.iniciarCountdown(() => {
           if (this.mano?.ganadorMano && !this.mano?.partidaTerminada)
             this.call('nueva-mano', { manoAnteriorId: this.mano.id });
-        }, 4000);
+        });
       }
     } else {
       this.rivalLabel = m.turnoActual === 'Maquina' ? 'Pensando...' : '...';
-      if (this.nuevaManoTimer) { clearTimeout(this.nuevaManoTimer); this.nuevaManoTimer = null; }
+      this.cancelarCountdown();
     }
     this.prevGanadorMano = m.ganadorMano ?? null;
 
@@ -516,7 +535,7 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
 
     } else if (m.ganadorMano) {
       raw.push(['Nueva mano', '#cc8800', () => {
-        if (this.nuevaManoTimer) { clearTimeout(this.nuevaManoTimer); this.nuevaManoTimer = null; }
+        this.cancelarCountdown();
         this.call('nueva-mano', { manoAnteriorId: m.id });
       }]);
 
