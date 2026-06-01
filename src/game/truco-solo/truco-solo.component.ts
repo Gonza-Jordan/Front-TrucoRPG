@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
 // ── Tipos ────────────────────────────────────────────────────────────────────
 
 export type Palo = 'Oro' | 'Espada' | 'Copa' | 'Basto';
-export type TipoEnvido = 'Envido' | 'EnvidoEnvido' | 'Real Envido' | 'Falta Envido';
+export type TipoEnvido = 'Envido' | 'EnvidoEnvido' | 'Real Envido' | 'RealEnvido' | 'Falta Envido' | 'FaltaEnvido';
 
 export interface Carta {
   numero: number;
@@ -184,6 +184,8 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
   private prevPendTru        = false;
   private prevPendEnv        = false;
   private prevEnvidoResuelto = false;
+  private prevGanadorMano: string | null = null;
+  private nuevaManoTimer: ReturnType<typeof setTimeout> | null = null;
   private bubbleTimer: ReturnType<typeof setTimeout> | null = null;
   private toastTimer:  ReturnType<typeof setTimeout> | null = null;
 
@@ -200,8 +202,9 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.bubbleTimer) clearTimeout(this.bubbleTimer);
-    if (this.toastTimer)  clearTimeout(this.toastTimer);
+    if (this.bubbleTimer)    clearTimeout(this.bubbleTimer);
+    if (this.toastTimer)     clearTimeout(this.toastTimer);
+    if (this.nuevaManoTimer) clearTimeout(this.nuevaManoTimer);
   }
 
   // ── Template helpers ──────────────────────────────────────────────────────
@@ -338,12 +341,22 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
 
     if (m.ganadorMano) {
       this.rivalLabel = m.ganadorMano === 'Humano' ? '¡Perdí la mano!' : '¡Gané la mano!';
-      // Al terminar la mano limpiar estado del Manipulador
       this.habilidadCartaIdx = null;
       this.modoSeleccionCarta = false;
+      // Auto nueva mano tras 4 segundos
+      if (m.ganadorMano !== this.prevGanadorMano && !m.partidaTerminada) {
+        if (this.nuevaManoTimer) clearTimeout(this.nuevaManoTimer);
+        this.nuevaManoTimer = setTimeout(() => {
+          this.nuevaManoTimer = null;
+          if (this.mano?.ganadorMano && !this.mano?.partidaTerminada)
+            this.call('nueva-mano', { manoAnteriorId: this.mano.id });
+        }, 4000);
+      }
     } else {
       this.rivalLabel = m.turnoActual === 'Maquina' ? 'Pensando...' : '...';
+      if (this.nuevaManoTimer) { clearTimeout(this.nuevaManoTimer); this.nuevaManoTimer = null; }
     }
+    this.prevGanadorMano = m.ganadorMano ?? null;
 
     const pendEnv   = !!m.envidoPendienteRespuestaHumano;
     const pendTru   = !!m.trucoPendienteRespuestaHumano;
@@ -502,8 +515,10 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
       raw.push(['Nueva partida', '#226622', () => this.nuevaPartida()]);
 
     } else if (m.ganadorMano) {
-      raw.push(['Nueva mano', '#cc8800',
-        () => this.call('nueva-mano', { manoAnteriorId: m.id })]);
+      raw.push(['Nueva mano', '#cc8800', () => {
+        if (this.nuevaManoTimer) { clearTimeout(this.nuevaManoTimer); this.nuevaManoTimer = null; }
+        this.call('nueva-mano', { manoAnteriorId: m.id });
+      }]);
 
     } else if (pendEnv) {
       raw.push(['QUIERO', '#44ff44',

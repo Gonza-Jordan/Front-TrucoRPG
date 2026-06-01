@@ -13,6 +13,7 @@ export class SalaService {
   miListo$ = new BehaviorSubject<boolean>(false);
   juegoIniciado$ = new BehaviorSubject<boolean>(false);
   jugadorDesconectado$ = new BehaviorSubject<boolean>(false);
+  trucoEstado$ = new BehaviorSubject<unknown>(null);
   error$ = new BehaviorSubject<string>('');
 
   constructor(private auth: AuthService) {
@@ -29,9 +30,10 @@ export class SalaService {
       this.salaLista$.next(true);
     });
 
-    // Cuando ambos llaman ListoParaJugar el servidor emite TrucoEstado
-    this.hub.on('TrucoEstado', () => {
-      this.juegoIniciado$.next(true);
+    // TrucoEstado: primera vez = inicio de juego; luego = actualizaciones de estado
+    this.hub.on('TrucoEstado', (data: unknown) => {
+      if (!this.juegoIniciado$.value) this.juegoIniciado$.next(true);
+      this.trucoEstado$.next(data);
     });
 
     this.hub.on('JugadorDesconectado', () => {
@@ -66,6 +68,10 @@ export class SalaService {
     await this.hub.invoke('ListoParaJugar');
   }
 
+  async invocarHub(method: string, ...args: unknown[]): Promise<void> {
+    await this.hub.invoke(method, ...args);
+  }
+
   async abandonar(): Promise<void> {
     this.reset();
     try { await this.hub.stop(); } catch { /* ignore */ }
@@ -77,6 +83,7 @@ export class SalaService {
     this.miListo$.next(false);
     this.juegoIniciado$.next(false);
     this.jugadorDesconectado$.next(false);
+    this.trucoEstado$.next(null);
     this.error$.next('');
   }
 }
