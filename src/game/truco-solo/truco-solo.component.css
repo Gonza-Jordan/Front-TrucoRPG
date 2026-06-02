@@ -1049,17 +1049,17 @@
     mask-image: none;
     -webkit-mask-image: none;
   }
-  .rival-zone { top: -5px; }
-  .rival-hand { margin-top: 6px; }
+  .rival-zone { top: 10px; left: 22%; }
+  .rival-hand { margin-top: 4px; }
   .bubble { top: 50px; left: calc(100% + 8px); font-size: 13px; }
   .table-wrap { perspective: 500px; margin-top: 2px; }
-  .table-surface { width: 300px; height: 200px; }
-  .far-card-img { height: 28px; }
-  .near-card-img { height: 42px; }
-  .fan-wrap { height: 75px; width: 170px; margin-top: 2px; }
-  .fan-card { width: 42px; height: 60px; margin-left: -21px; }
+  .table-surface { width: 280px; height: 190px; }
+  .far-card-img { height: 24px; }
+  .near-card-img { height: 36px; }
+  .fan-wrap { height: 70px; width: 155px; margin-top: 2px; }
+  .fan-card { width: 38px; height: 55px; margin-left: -19px; }
   .fan-card-img { width: 100%; height: 100%; }
-  .card-back-img { height: 50px; }
+  .card-back-img { height: 40px; }
   .scoreboard { padding: 4px; gap: 3px; }
   .score-title { font-size: 5px; }
   .score-row { font-size: 12px; }
