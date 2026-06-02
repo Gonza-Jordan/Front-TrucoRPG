@@ -1,7 +1,9 @@
-import { Component, signal, OnInit, OnDestroy } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, signal, OnInit, OnDestroy, inject } from '@angular/core';
+import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 import { Header } from './components/header/header';
 import { Footer } from './components/footer/footer';
+import { AudioService } from './services/audio.service';
 
 @Component({
   selector: 'app-root',
@@ -15,15 +17,42 @@ export class App implements OnInit, OnDestroy {
   private readonly _esTactil =
     navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
 
+  private audio = inject(AudioService);
+
+  constructor(private router: Router) {}
+
   ngOnInit(): void {
     if (this._esTactil) {
       screen.orientation?.addEventListener('change', this._onOrientationChange);
     }
+
+    document.addEventListener('click', this._onButtonClick);
+
+    const rutasPartida = ['/maquina', '/juego/multi', '/jugar/solitario'];
+
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe((e: any) => {
+        const enPartida = rutasPartida.some(r => e.urlAfterRedirects.startsWith(r));
+        if (enPartida) {
+          this.audio.pausar();
+        } else {
+          this.audio.sincronizar();
+        }
+      });
   }
 
   ngOnDestroy(): void {
     screen.orientation?.removeEventListener('change', this._onOrientationChange);
+    document.removeEventListener('click', this._onButtonClick);
   }
+
+  private _onButtonClick = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('button, a[routerLink], a[href]')) {
+      this.audio.playButton();
+    }
+  };
 
   private _onOrientationChange = () => {
     if (screen.orientation?.type?.includes('landscape') && !document.fullscreenElement) {
