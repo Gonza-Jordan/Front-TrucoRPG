@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Card } from '../../components/card/card';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { AudioService } from '../../services/audio.service';
 
 @Component({
   selector: 'app-configuracion',
@@ -17,11 +18,19 @@ export class ConfiguracionComponent {
   musica  = localStorage.getItem('cfg_musica') !== 'false';
   pantallaCompleta = localStorage.getItem('cfg_pantalla') === 'true';
 
+  private audio = inject(AudioService);
+
   constructor(private router: Router) {}
 
+  onVolumenChange(): void {
+    this.audio.setVolumen(this.volumen);
+  }
+
+  onMusicaChange(): void {
+    this.audio.setMusica(this.musica);
+  }
+
   guardar() {
-    localStorage.setItem('cfg_volumen', String(this.volumen));
-    localStorage.setItem('cfg_musica',  String(this.musica));
     localStorage.setItem('cfg_pantalla', String(this.pantallaCompleta));
     this.aplicarPantallaCompleta(this.pantallaCompleta);
     this.router.navigate(['/home']);

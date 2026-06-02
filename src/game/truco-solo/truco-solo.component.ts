@@ -195,7 +195,6 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   countdown: number | null = null;
   private bubbleTimer: ReturnType<typeof setTimeout> | null = null;
   private toastTimer:  ReturnType<typeof setTimeout> | null = null;
-
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngAfterViewInit(): void {
     const video = this.gauchoVideo?.nativeElement;
@@ -211,6 +210,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       const id = parseInt(heroeIdStr, 10);
       this.heroe = HEROES.find(h => h.id === id) ?? null;
     }
+
     const body: Record<string, unknown> = { modo: this.heroe ? 1 : 0 };
     if (this.heroe) body['claseHeroe'] = this.heroe.id;
     this.call('nueva-partida', body);
@@ -297,6 +297,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // Flujo normal: jugar la carta
+    new Audio('/assets/musica/card.mp3').play().catch(() => {});
     this.call('jugar-carta', { manoId: this.mano.id, numero: c.numero, palo: c.palo });
   }
 
