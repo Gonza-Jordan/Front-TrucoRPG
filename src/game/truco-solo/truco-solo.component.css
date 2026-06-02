@@ -932,7 +932,26 @@
   .fan-card { width: 58px; height: 84px; margin-left: -29px; }
   .far-card-img { height: 46px; }
   .near-card-img { height: 66px; }
-  .rival-portrait { width: 46px; height: 46px; }
+  .rival-portrait {
+    width: 56px;
+    height: 56px;
+    border: 2px solid #aa4444;
+    border-radius: 50%;
+    background: #1a0808;
+    box-shadow: 0 0 10px #aa444488;
+    overflow: hidden;
+  }
+  .rival-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  .rival-zone { top: -10px; }
+  .arena { padding-top: 75px; }
+  .rival-hand { margin-top: 8px; }
   .scoreboard { padding: 6px 4px; }
   .score-title { font-size: 7px; }
   .score-row { font-size: 14px; }
@@ -1015,15 +1034,32 @@
   .side-panel { width: 110px; padding: 6px 5px; gap: 4px; }
   .action-btn { font-size: 13px; padding: 5px 3px; min-height: 36px; }
   .arena { padding-top: 38px; }
-  .rival-portrait { width: 38px; height: 38px; font-size: 22px; }
-  .rival-label { font-size: 11px; }
+  .rival-portrait {
+    width: 48px; height: 48px;
+    border: 2px solid #aa4444;
+    border-radius: 50%;
+    background: #1a0808;
+    overflow: hidden;
+    box-shadow: 0 0 8px #aa444488;
+  }
+  .rival-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  .rival-zone { top: -5px; }
+  .rival-hand { margin-top: 6px; }
+  .bubble { top: 50px; left: calc(100% + 8px); font-size: 13px; }
   .table-wrap { perspective: 500px; margin-top: 2px; }
-  .table-surface { width: 340px; height: 240px; }
-  .far-card-img { height: 34px; }
-  .near-card-img { height: 52px; }
-  .fan-wrap { height: 90px; width: 200px; margin-top: 2px; }
-  .fan-card { width: 50px; height: 72px; margin-left: -25px; }
-  .fan-card-img { width: 110%; height: 110%; }
+  .table-surface { width: 300px; height: 200px; }
+  .far-card-img { height: 28px; }
+  .near-card-img { height: 42px; }
+  .fan-wrap { height: 75px; width: 170px; margin-top: 2px; }
+  .fan-card { width: 42px; height: 60px; margin-left: -21px; }
+  .fan-card-img { width: 100%; height: 100%; }
+  .card-back-img { height: 50px; }
   .scoreboard { padding: 4px; gap: 3px; }
   .score-title { font-size: 5px; }
   .score-row { font-size: 12px; }
@@ -1062,6 +1098,27 @@
   .fan-wrap { width: min(200px, 40vw); }
   .score-title { font-size: 6px; }
   .state-text { font-size: 13px; }
+
+  /* Gaucho: avatar pequeño en mobile */
+  .rival-zone { top: -10px; }
+  .rival-portrait {
+    width: 56px;
+    height: 56px;
+    border: 2px solid #aa4444;
+    border-radius: 50%;
+    background: #1a0808;
+    box-shadow: 0 0 10px #aa444488;
+    overflow: hidden;
+  }
+  .rival-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+  .arena { padding-top: 70px; }
+  .rival-hand { margin-top: 8px; }
+  .bubble { top: 60px; left: calc(100% + 8px); font-size: 14px; }
 }
 
 /* Touch: estados activos explícitos para dispositivos táctiles */
