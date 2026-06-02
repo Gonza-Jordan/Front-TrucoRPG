@@ -2,6 +2,9 @@ import {
   Component,
   OnInit,
   OnDestroy,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
   ChangeDetectorRef,
   ChangeDetectionStrategy,
   inject,
@@ -116,7 +119,9 @@ const FAN_X      = [-84, 0, 84];
   templateUrl: './truco-solo.component.html',
   styleUrl: './truco-solo.component.css',
 })
-export class TrucoSoloComponent implements OnInit, OnDestroy {
+export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  @ViewChild('gauchoVideo') gauchoVideo!: ElementRef<HTMLVideoElement>;
 
   private http   = inject(HttpClient);
   private router = inject(Router);
@@ -192,6 +197,14 @@ export class TrucoSoloComponent implements OnInit, OnDestroy {
   private toastTimer:  ReturnType<typeof setTimeout> | null = null;
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
+  ngAfterViewInit(): void {
+    const video = this.gauchoVideo?.nativeElement;
+    if (video) {
+      video.muted = true;
+      video.play().catch(() => {});
+    }
+  }
+
   ngOnInit(): void {
     const heroeIdStr = localStorage.getItem('heroeId');
     if (heroeIdStr !== null) {

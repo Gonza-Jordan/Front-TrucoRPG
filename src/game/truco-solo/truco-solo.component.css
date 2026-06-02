@@ -50,6 +50,7 @@
 
 .left-panel {
   border-right: 2px solid var(--divider);
+  z-index: 30;
 }
 
 .right-panel {
@@ -100,35 +101,35 @@
   align-items: center;
   justify-content: flex-start;
   position: relative;
-  overflow: hidden;
-  padding-top: 76px;
+  overflow: visible;
+  padding-top: 160px;
   /* espacio para el sprite del rival */
 }
 
 /* ── Zona rival (fuera de la perspectiva, arriba) ─────────────────────────── */
 .rival-zone {
   position: absolute;
-  top: 4px;
+  top: -40px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   z-index: 20;
 }
 
 .rival-portrait {
-  width: 56px;
-  height: 56px;
-  border: 2px solid #aa4444;
-  border-radius: 6px;
-  background: #1a0808;
+  width: 420px;
+  height: 260px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  font-size: 30px;
-  box-shadow: 0 0 10px #aa444455;
+  overflow: visible;
+  box-shadow: none;
 }
 
 .rival-label {
@@ -139,12 +140,15 @@
   padding: 2px 8px;
   border-radius: 3px;
   white-space: nowrap;
+  position: absolute;
+  left: -130px;
+  top: 40%;
 }
 
 /* ── Burbuja de diálogo ───────────────────────────────────────────────────── */
 .bubble {
   position: absolute;
-  top: 12px;
+  top: 80px;
   left: calc(100% + 12px);
   background: #fffff0;
   border: 2px solid #333;
@@ -218,7 +222,7 @@
 .rival-hand {
   display: flex;
   gap: 10px;
-  margin-top: 9px;
+  margin-top: 40px;
 }
 
 .card-back {
@@ -237,9 +241,21 @@
   transition: opacity 0.2s;
 }
 
-.card-back.hidden {
+.card-back-img {
+  height: 80px;
+  width: auto;
+  border-radius: 4px;
+  box-shadow: 1px 2px 6px #0009;
+  transition: opacity 0.2s, width 0.2s;
+}
+
+.card-back.hidden,
+.card-back-img.hidden {
   opacity: 0;
   pointer-events: none;
+  width: 0;
+  margin: 0;
+  padding: 0;
 }
 
 
@@ -731,12 +747,14 @@
 
 
 
-/* foto de rival provisoria (turro) */
+/* gaucho rival */
 .rival-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 4px;
+  width: 420px;
+  height: auto;
+  border-radius: 0;
+  mask-image: none;
+  -webkit-mask-image: none;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.9));
 }
 
 
