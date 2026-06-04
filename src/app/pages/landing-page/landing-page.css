@@ -1,14 +1,196 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
 :host {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
+    flex: 1;
+    overflow: auto;
+}
+
+body {
+    margin: 0;
 }
 
 main {
     flex: 1;
-    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem;
+
+background: linear-gradient(
+    to bottom,
+    #441310,
+    #000000
+);
+}
+
+.contenedor-landing {
+    width: min(1000px, 90%);
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+
+    background: rgba(14, 12, 8, 0.94);
+    border: 2px solid #5a4020;
+    outline: 1px solid rgba(200, 144, 48, 0.18);
+    outline-offset: 4px;
+    box-shadow:
+        0 0 40px rgba(0, 0, 0, 0.8),
+        inset 0 0 24px rgba(0, 0, 0, 0.4);
+}
+
+.seccion-1 {
+    width: 100%;
+    height: auto;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+
+    padding: 4rem 2rem;
+    box-sizing: border-box;
+
+    text-align: center;
+}
+
+.seccion-2 {
+    width: 100%;
+    height: auto;
+
+    display: flex;
+    align-items: center;
+
+    justify-content: space-evenly;
+    align-items: center;
+
+    padding: 4rem 2rem;
+    box-sizing: border-box;
+
+    text-align: center;
+}
+
+.seccion-3 {
+    width: 100%;
+    height: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 4rem 2rem;
+    box-sizing: border-box;
+
+    text-align: center;
+}
+
+.seccion-1 a {
+    width: 40%;
+    height: 4rem;
     display: flex;
     justify-content: center;
     align-items: center;
+    text-decoration: none;
+    font-family: 'Jersey 10';
+    font-size: 2rem;
+    letter-spacing: 2px;
+    color: #c89030;
+    background: #1e1508;
+    border: 2px solid #5a4020;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s, border-color 0.1s, box-shadow 0.1s;
+}
+
+.seccion-1 a:hover:not(.inactivo) {
+    background: #2e1f0e;
+    color: #f0b050;
+    border-color: #8a6030;
+    box-shadow: 0 0 10px rgba(200, 144, 48, 0.25);
+}
+
+.seccion-1 a:active:not(.inactivo) {
+    background: #140e04;
+    color: #a07020;
+}
+
+
+.seccion-2 .texto-landing {
+    max-width: 35rem;
+    text-align: left;
+}
+
+.seccion-3 .texto-landing {
+    width: 100%;
+}
+
+.imagen-hero-landing {
+    width: min(30rem, 90vw);
+    height: auto;
+    animation: flotar 2.5s infinite ease-in-out;
+}
+
+.imagen-seccion-2 {
+    width: 10rem;
+    height: auto;
+    animation: balanceo 6s infinite ease-in-out;
+}
+
+.personajes {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 1rem;
+}
+
+.personajes img {
+    width: 10rem;
+    height: auto;
+}
+
+.titulo-landing {
+    font-family: 'Jersey 20';
+    font-size: 3rem;
+    color: #c89030;
+
+}
+
+.texto-landing {
+    font-family: 'Jersey 20';
+    font-size: 2rem;
+    color: #c89030;
+}
+
+@keyframes flotar {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+@keyframes balanceo {
+    0% {
+        transform: rotate(-25deg);
+    }
+
+    50% {
+        transform: rotate(25deg);
+    }
+
+    100% {
+        transform: rotate(-25deg);
+    }
 }
