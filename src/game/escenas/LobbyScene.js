@@ -55,7 +55,7 @@ export default class LobbyScene extends BaseScene {
             this.crearBotones();
         } catch (e) {
             this.statusText.setStyle({ fill: '#ff0000', backgroundColor: '#ffcccc' });
-            this.statusText.setText('Error de conexion. ¿Backend en http://localhost:5000? Reiniciá npm start.');
+            this.statusText.setText('Error de conexion. ¿Backend en http://localhost:5001? Reiniciá npm start.');
             console.error('[Lobby] Error de conexión:', e);
         }
     }

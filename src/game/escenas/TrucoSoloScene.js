@@ -371,7 +371,7 @@ export default class TrucoSoloScene extends BaseScene {
                 const errMsg = await res.text();
                 console.warn('[TrucoSolo]', endpoint, res.status, errMsg);
                 this._showToast(
-                    `Error en ${endpoint} (${res.status}): ${errMsg || 'sin detalle. ¿Backend en http://localhost:5000?'}`
+                    `Error en ${endpoint} (${res.status}): ${errMsg || 'sin detalle. ¿Backend en http://localhost:5001?'}`
                 );
                 return;
             }
@@ -380,7 +380,7 @@ export default class TrucoSoloScene extends BaseScene {
         } catch (e) {
             console.error('[TrucoSolo]', endpoint, e);
             this._showToast(
-                `Sin conexión al backend en ${endpoint}. Verificá que la API esté en http://localhost:5000 y reiniciá npm start.`
+                `Sin conexión al backend en ${endpoint}. Verificá que la API esté en http://localhost:5001 y reiniciá npm start.`
             );
         } finally {
             this._loading = false;
