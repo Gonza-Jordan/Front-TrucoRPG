@@ -2,14 +2,14 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Card } from '../../components/card/card';
-import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { Header } from '../../components/header/header';
+import { Footer } from '../../components/footer/footer';
 import { AudioService } from '../../services/audio.service';
 
 @Component({
   selector: 'app-configuracion',
   standalone: true,
-  imports: [CommonModule, FormsModule, Card, PageWrapper],
+  imports: [CommonModule, FormsModule, Header, Footer],
   templateUrl: './configuracion.html',
   styleUrl: './configuracion.css'
 })

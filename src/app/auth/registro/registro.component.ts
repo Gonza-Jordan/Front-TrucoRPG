@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModul
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth.service';
-import { Card } from '../../components/card/card';
-import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { Header } from '../../components/header/header';
+import { Footer } from '../../components/footer/footer';
 
 function passwordsIguales(control: AbstractControl) {
   const password = control.get('password');
@@ -20,7 +20,7 @@ function passwordsIguales(control: AbstractControl) {
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, Card, PageWrapper],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, Header, Footer],
   templateUrl: './registro.component.html',
   styleUrl: './registro.component.css'
 })

@@ -3,13 +3,13 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth.service';
-import { Card } from '../../components/card/card';
-import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { Header } from '../../components/header/header';
+import { Footer } from '../../components/footer/footer';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, Card, PageWrapper],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, Header, Footer],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
