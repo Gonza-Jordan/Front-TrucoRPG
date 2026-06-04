@@ -1,28 +1,31 @@
 <header>
   @if (headerType() === 'landing') {
     <a routerLink="home">
-      <img src="/Logo.png" alt="Truco y maña - Logo" class="logo" />
+      <img src="/icon-2-sin-borde.png" alt="Truco y maña - Logo" class="logo" />
+      <img src="/TyM-horizontal.png" alt="Truco y maña - Logotipo" class="logo-nombre" />
     </a>
   }
   @if (headerType() === 'home') {
     <a routerLink="home">
-      <img src="/Logo.png" alt="Truco y maña - Logo" class="logo" />
+      <img src="/icon-2-sin-borde.png" alt="Truco y maña - Logo" class="logo" />
+      <img src="/TyM-horizontal.png" alt="Truco y maña - Logotipo" class="logo-nombre" />
     </a>
   }
-  @if (headerType() === 'registro' || headerType() === 'login' || headerType() === 'configuracion') {
+  @if (headerType() === 'registro' || headerType() === 'login' || headerType() === 'configuracion' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala') {
     <a routerLink="home">
-      <img src="/Logo.png" alt="Truco y maña - Logo" class="logo" />
+      <img src="/icon-2-sin-borde.png" alt="Truco y maña - Logo" class="logo" />
+      <img src="/TyM-horizontal.png" alt="Truco y maña - Logotipo" class="logo-nombre" />
     </a>
   }
 
   <nav>
     <ul>
       @if (headerType() === 'landing') {
-        <li><a routerLink="login">Iniciar Sesión</a></li>
-        <li><a routerLink="registro">Registrarse</a></li>
+        <li><app-boton enlace="login">Iniciar Sesión</app-boton></li>
+        <li><app-boton enlace="registro">Registrarse</app-boton></li>
       }
-      @if (headerType() === 'home') {
-        <li><a routerLink="">Cerrar Sesión</a></li>
+      @if (headerType() === 'home' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala') {
+        <li><app-boton enlace="">Cerrar Sesión</app-boton></li>
       }
     </ul>
   </nav>

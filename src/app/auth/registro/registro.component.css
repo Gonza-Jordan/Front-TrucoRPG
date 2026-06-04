@@ -1,113 +1,70 @@
-@import url('https://fonts.googleapis.com/css2?family=Jersey+10&family=Press+Start+2P&display=swap');
-
-* {
-  box-sizing: border-box;
-}
-
-.barra-top {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 36px;
-  background-color: #5C3317;
-  z-index: 10;
-}
-
-.barra-bottom {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 36px;
-  background-color: #5C3317;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-
-.barra-bottom span {
-  color: #F5EDD0;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-}
+* { box-sizing: border-box; }
 
 :host {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.registro-wrapper {
   flex: 1;
   min-height: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Press Start 2P', monospace;
-  background: url('/assets/home.png') center center / cover no-repeat;
-  overflow: auto;
-}
-
-.registro-card {
-  background-color: #C8955A;
-  border: 6px solid #5C3317;
-  border-radius: 4px;
-  padding: 32px 40px;
-  width: 100%;
-  max-width: 460px;
-  image-rendering: pixelated;
+  overflow: hidden;
 }
 
 .titulo {
   text-align: center;
   font-family: 'Jersey 10', monospace;
-  font-size: 42px;
-  color: #2B1500;
-  margin: 0 0 24px;
+  font-size: 2.4rem;
+  color: #e8aa40;
+  margin: 0 0 8px;
+  letter-spacing: 3px;
   line-height: 1.2;
-  text-shadow: 2px 2px 0px #F5D9A8;
+  text-shadow: 0 0 20px rgba(200, 144, 48, 0.4);
+}
+
+.sep {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #6a4a20, transparent);
+  margin: 0 0 28px;
 }
 
 .campo {
   display: flex;
   flex-direction: column;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 label {
-  color: #2B1500;
-  font-size: 9px;
-  margin-bottom: 6px;
+  color: #c89030;
+  font-family: 'Jersey 10', monospace;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  margin-bottom: 7px;
 }
 
 input {
-  background: #F5EDD0;
-  border: 3px solid #5C3317;
-  border-radius: 2px;
-  color: #2B1500;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  padding: 10px 10px;
+  background: #241808;
+  border: 2px solid #5a4020;
+  color: #e8d090;
+  font-family: 'Jersey 10', monospace;
+  font-size: 1rem;
+  padding: 11px 14px;
   outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 input:focus {
-  background: #FFF8E7;
-  border-color: #8B4513;
+  border-color: #c89030;
+  box-shadow: 0 0 8px rgba(200, 144, 48, 0.25);
 }
 
 input::placeholder {
-  color: #A0856A;
-  font-size: 8px;
+  color: #8a6840;
 }
 
 .error {
-  color: #CC0000;
-  font-size: 7px;
-  margin-top: 4px;
+  color: #e05050;
+  font-family: 'Jersey 10', monospace;
+  font-size: 0.85rem;
+  margin-top: 5px;
 }
 
 .error-servidor {
@@ -116,40 +73,48 @@ input::placeholder {
   margin-bottom: 8px;
 }
 
-button {
+.btn-submit {
   width: 100%;
-  margin-top: 12px;
-  padding: 12px;
-  background: #8B4513;
-  color: #F5EDD0;
-  border: 3px solid #5C3317;
-  border-radius: 2px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 11px;
+  margin-top: 8px;
+  padding: 14px;
+  background: #2e1e08;
+  color: #e8aa40;
+  border: 2px solid #6a4a20;
+  font-family: 'Jersey 10', monospace;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 3px 3px 0px #5C3317;
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition: background 0.1s, color 0.1s, border-color 0.1s, box-shadow 0.1s;
 }
 
-button:hover:not(:disabled) {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px #5C3317;
+.btn-submit:hover:not(:disabled) {
+  background: #3a2510;
+  color: #f5c050;
+  border-color: #a07028;
+  box-shadow: 0 0 14px rgba(200, 144, 48, 0.3);
 }
 
-button:disabled {
-  opacity: 0.6;
+.btn-submit:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .login-link {
   text-align: center;
-  color: #2B1500;
-  font-size: 7px;
-  margin-top: 18px;
-  line-height: 1.8;
+  color: #7a6040;
+  font-family: 'Jersey 10', monospace;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  margin-top: 22px;
 }
 
 .login-link a {
-  color: #1a4fa0;
+  color: #c89030;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  color: #f0b050;
   text-decoration: underline;
 }

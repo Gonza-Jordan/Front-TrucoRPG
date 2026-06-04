@@ -1,10 +1,9 @@
-import { Component } from '@angular/core';
-import { Header } from "../../components/header/header";
-import { Footer } from "../../components/footer/footer";
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-landing-page',
-  imports: [Header, Footer],
+  imports: [ RouterLink],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.css',
 })

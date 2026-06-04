@@ -1,7 +1,8 @@
-<app-header></app-header>
-<div class="login-wrapper">
-  <div class="login-card">
+
+<app-page-wrapper>
+  <app-card>
     <h1 class="titulo">INICIAR SESIÓN</h1>
+    <div class="sep"></div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
@@ -20,7 +21,7 @@
 
       <span class="error error-servidor" *ngIf="errorServidor">{{ errorServidor }}</span>
 
-      <button type="submit" [disabled]="cargando">
+      <button type="submit" class="btn-submit" [disabled]="cargando">
         {{ cargando ? 'Ingresando...' : 'Ingresar' }}
       </button>
 
@@ -29,6 +30,6 @@
     <p class="registro-link">
       ¿No tenés cuenta? <a routerLink="/registro">Registrate</a>
     </p>
-  </div>
-</div>
-<app-footer></app-footer>
+  </app-card>
+</app-page-wrapper>
+

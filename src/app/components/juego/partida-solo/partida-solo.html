@@ -1,0 +1,24 @@
+
+@if (vistaActual === 'menu-principal') {
+  <main class="contenedor-config">
+    <div class="menu-wrapper">
+      <img src="/Logo.png" alt="Truco y Maña" class="menu-logo" />
+      <div class="contenedor-menu">
+        <div class="menu-sep"></div>
+        <a (click)="vistaActual = 'seleccion-heroe'">
+          <span>PARTIDA CON HABILIDADES</span>
+        </a>
+        <a (click)="jugarTradicional()">
+          <span>PARTIDA TRADICIONAL</span>
+        </a>
+        <div class="menu-sep"></div>
+        <a routerLink="/home"><span>VOLVER</span></a>
+      </div>
+    </div>
+  </main>
+}
+
+@if (vistaActual === 'seleccion-heroe') {
+  <app-seleccion-personaje [standalone]="false" (heroeConfirmado)="alConfirmarHeroe($event)" (solicitarVolver)="vistaActual = 'menu-principal'"></app-seleccion-personaje>
+}
+
