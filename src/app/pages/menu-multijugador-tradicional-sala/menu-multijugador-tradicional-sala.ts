@@ -13,11 +13,19 @@ import { SalaService } from '../../services/sala.service';
 })
 export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
   mode: 'crear' | 'unirse' = 'crear';
+  gameMode: '1v1' | '2v2' = '1v1';
   codigoSala = '';
   copiado = false;
+  qrUrl = '';
 
+  // 1v1
   salaLista = false;
   miListo = false;
+
+  // 2v2 lobby
+  jugadoresEnSala = 0;
+  readonly maxJugadores2v2 = 4;
+
   errorMsg = '';
   cargandoConexion = true;
 
@@ -30,20 +38,46 @@ export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit() {
-    this.mode = (this.route.snapshot.queryParamMap.get('mode') as any) ?? 'crear';
+    this.mode     = (this.route.snapshot.queryParamMap.get('mode')     as any) ?? 'crear';
+    this.gameMode = (this.route.snapshot.queryParamMap.get('gameMode') as any) ?? '1v1';
+
+    // Si modo 2v2 y creador: inicializar con 1 jugador
+    if (this.gameMode === '2v2' && this.mode === 'crear') {
+      this.jugadoresEnSala = 1;
+    }
 
     this.subs.push(
-      this.sala.codigoSala$.subscribe(c => (this.codigoSala = c)),
+      this.sala.codigoSala$.subscribe(c => {
+        this.codigoSala = c;
+        if (c) this.actualizarQr(c);
+      }),
+
+      // 1v1
       this.sala.salaLista$.subscribe(v => (this.salaLista = v)),
       this.sala.miListo$.subscribe(v => (this.miListo = v)),
+
+      // 2v2 lobby
+      this.sala.lobbyActualizado$.subscribe(data => {
+        if (data) this.jugadoresEnSala = data.jugadoresEnSala;
+      }),
+      this.sala.salaCompleta$.subscribe(completa => {
+        if (completa) {
+          // Todos los 4 jugadores están en sala → ir a selección de equipos
+          setTimeout(() => {
+            this.router.navigate(['/menu-2v2-equipos']);
+          }, 600);
+        }
+      }),
+
       this.sala.juegoIniciado$.subscribe(v => {
         if (v) this.router.navigate(['/juego/multi']);
       }),
       this.sala.jugadorDesconectado$.subscribe(v => {
         if (v) {
-          this.errorMsg = 'El oponente se desconectó.';
+          this.errorMsg = 'Un jugador se desconectó.';
           this.salaLista = false;
           this.miListo = false;
+          this.jugadoresEnSala = Math.max(0, this.jugadoresEnSala - 1);
         }
       }),
     );
@@ -51,17 +85,36 @@ export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
     if (this.mode === 'crear') {
       try {
         await this.sala.conectar();
-        await this.sala.crearSala();
+        await this.sala.crearSala(this.gameMode);
       } catch {
         this.errorMsg = 'No se pudo conectar al servidor.';
       }
     }
-    // mode 'unirse': la conexión y join ya ocurrieron en el menú anterior
+
+    // Si ya está completa (race condition: unirse llega después de SalaCompleta)
+    if (this.gameMode === '2v2' && this.sala.salaCompleta$.value) {
+      this.router.navigate(['/menu-2v2-equipos']);
+    }
+
     this.cargandoConexion = false;
   }
 
   ngOnDestroy() {
     this.subs.forEach(s => s.unsubscribe());
+  }
+
+  private actualizarQr(codigo: string): void {
+    const joinUrl = `${window.location.origin}/unirse?code=${codigo}`;
+    const encoded = encodeURIComponent(joinUrl);
+    this.qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=c89030&bgcolor=0e0c08&data=${encoded}`;
+  }
+
+  get slotsLobby(): { lleno: boolean }[] {
+    const slots = [];
+    for (let i = 0; i < this.maxJugadores2v2; i++) {
+      slots.push({ lleno: i < this.jugadoresEnSala });
+    }
+    return slots;
   }
 
   async copiarCodigo() {
@@ -82,6 +135,8 @@ export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
 
   async abandonar() {
     await this.sala.abandonar();
-    this.router.navigate(['/menu-multijugador-tradicional']);
+    this.router.navigate(['/menu-multijugador-tradicional'], {
+      queryParams: { gameMode: this.gameMode },
+    });
   }
 }

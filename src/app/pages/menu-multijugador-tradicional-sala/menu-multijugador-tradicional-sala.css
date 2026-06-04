@@ -60,6 +60,110 @@ main {
     margin: 2px 0;
 }
 
+/* ── QR Code ─────────────────────────────────────────────────── */
+.qr-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+}
+
+.qr-img {
+    width: 128px;
+    height: 128px;
+    image-rendering: pixelated;
+    border: 3px solid #5a4020;
+    padding: 6px;
+    background: #0e0c08;
+    box-shadow: 0 0 16px rgba(200, 144, 48, 0.2);
+}
+
+.qr-hint {
+    margin: 0;
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    color: #6a5535;
+    text-transform: uppercase;
+}
+
+.qr-placeholder {
+    width: 128px;
+    height: 128px;
+    border: 3px solid #3a2a10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+
+.qr-loading {
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: #4a3a20;
+    text-transform: uppercase;
+}
+
+/* ── Modo badge ──────────────────────────────────────────────── */
+.modo-badge {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0;
+}
+
+.modo-label {
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    color: #6a5535;
+}
+
+.modo-valor {
+    font-family: 'Jersey 10', monospace;
+    font-size: 1rem;
+    letter-spacing: 3px;
+    color: #c89030;
+    font-weight: bold;
+}
+
+/* ── Equipos 2v2 ─────────────────────────────────────────────── */
+.equipos-wrapper {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.equipo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.equipo-titulo {
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    color: #8a6030;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.equipo-vs {
+    font-family: 'Jersey 10', monospace;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    color: #5a4020;
+    min-width: 28px;
+    text-align: center;
+}
+
 /* ── Código de sala ──────────────────────────────────────────── */
 .codigo-sala-box {
     width: 100%;
@@ -267,6 +371,114 @@ main {
     color: #ffaa66;
     border-color: #c87a3a;
     background: rgba(120, 50, 15, 0.55);
+}
+
+/* ── Lobby 2v2 ───────────────────────────────────────────────── */
+.lobby-2v2 {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.lobby-titulo {
+    margin: 0;
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 3px;
+    color: #6a5535;
+    text-transform: uppercase;
+}
+
+.lobby-slots {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.lobby-slot {
+    position: relative;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0 0.8rem;
+    background: rgba(105, 100, 100, 0.12);
+    border: 2px solid transparent;
+    color: #fff;
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.95rem;
+    letter-spacing: 1.5px;
+    transition: border-color 0.3s, background 0.3s;
+}
+
+.lobby-slot.lleno {
+    border-color: #2a7a3a;
+    background: rgba(30, 80, 40, 0.3);
+}
+
+.slot-avatar {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #5c4325 0%, #3f2c18 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    position: relative;
+    transition: opacity 0.3s;
+}
+
+.slot-avatar::before {
+    content: '';
+    width: 55%;
+    height: 55%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 35%, #f4e1a4 35%, transparent 36%);
+}
+
+.slot-avatar.dim { opacity: 0.25; }
+
+.slot-label {
+    flex: 1;
+    text-align: center;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+}
+
+.slot-label.dim-txt { color: #4a3a20; }
+
+.slot-check {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    color: #4aaa5a;
+    font-size: 0.9rem;
+}
+
+.lobby-contador {
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    color: #7a6040;
+    margin-top: 2px;
+}
+
+.lobby-completo {
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: #4adc6a;
+    animation: parpadeo 0.8s infinite;
+}
+
+@keyframes parpadeo {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.5; }
 }
 
 /* ── Animación ───────────────────────────────────────────────── */

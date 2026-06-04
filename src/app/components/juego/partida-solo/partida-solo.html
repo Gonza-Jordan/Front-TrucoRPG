@@ -8,11 +8,31 @@
         <a (click)="vistaActual = 'seleccion-heroe'">
           <span>PARTIDA CON HABILIDADES</span>
         </a>
-        <a (click)="jugarTradicional()">
+        <a (click)="vistaActual = 'seleccion-modo-tradicional'">
           <span>PARTIDA TRADICIONAL</span>
         </a>
         <div class="menu-sep"></div>
         <a routerLink="/home"><span>VOLVER</span></a>
+      </div>
+    </div>
+  </main>
+}
+
+@if (vistaActual === 'seleccion-modo-tradicional') {
+  <main class="contenedor-config">
+    <div class="menu-wrapper">
+      <img src="/Logo.png" alt="Truco y Maña" class="menu-logo" />
+      <div class="contenedor-menu">
+        <div class="menu-sep"></div>
+        <a (click)="jugarTradicional('1v1')">
+          <span>1 VS 1</span>
+        </a>
+        <a (click)="jugarTradicional('2v2')">
+          <span>2 VS 2</span>
+        </a>
+        <a class="inactivo">3 VS 3</a>
+        <div class="menu-sep"></div>
+        <a (click)="vistaActual = 'menu-principal'"><span>VOLVER</span></a>
       </div>
     </div>
   </main>

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ConnectionStatusComponent } from '../../components/connection-status/connection-status';
 import { SalaService } from '../../services/sala.service';
@@ -10,13 +10,18 @@ import { SalaService } from '../../services/sala.service';
   templateUrl: './menu-multijugador-tradicional.html',
   styleUrl: './menu-multijugador-tradicional.css',
 })
-export class MenuMultijugadorTradicional {
+export class MenuMultijugadorTradicional implements OnInit {
   modalAbierto = false;
   codigoIngresado = '';
   errorUnirse = '';
   cargando = false;
+  gameMode: '1v1' | '2v2' = '1v1';
 
-  constructor(private sala: SalaService, private router: Router) {}
+  constructor(private sala: SalaService, private router: Router, private route: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    this.gameMode = (this.route.snapshot.queryParamMap.get('gameMode') as any) ?? '1v1';
+  }
 
   abrirModalUnirse() {
     this.codigoIngresado = '';
@@ -47,7 +52,7 @@ export class MenuMultijugadorTradicional {
         return;
       }
       this.router.navigate(['/menu-multijugador-tradicional-sala'], {
-        queryParams: { mode: 'unirse' },
+        queryParams: { mode: 'unirse', gameMode: this.gameMode },
       });
     } catch {
       this.errorUnirse = 'Error de conexión. Verificá que el servidor esté activo.';

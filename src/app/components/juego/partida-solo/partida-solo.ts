@@ -12,11 +12,15 @@ import { SeleccionPersonaje } from '../../../pages/seleccion-personaje/seleccion
 })
 export class PartidaSoloComponent {
   private router = inject(Router);
-  vistaActual: 'menu-principal' | 'seleccion-heroe' = 'menu-principal';
+  vistaActual: 'menu-principal' | 'seleccion-heroe' | 'seleccion-modo-tradicional' = 'menu-principal';
 
-  jugarTradicional(): void {
+  jugarTradicional(modo: '1v1' | '2v2'): void {
     localStorage.removeItem('heroeId');
-    this.router.navigate(['/jugar/solitario']);
+    if (modo === '2v2') {
+      this.router.navigate(['/jugar/solitario-2v2']);
+    } else {
+      this.router.navigate(['/jugar/solitario']);
+    }
   }
 
   alConfirmarHeroe(idHeroe: number): void {
