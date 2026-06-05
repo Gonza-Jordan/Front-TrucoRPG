@@ -12,6 +12,7 @@ import { TrucoSoloComponent } from '../game/truco-solo/truco-solo.component';
 import { TrucoMultiComponent } from '../game/truco-multi/truco-multi.component';
 import { SeleccionPersonaje } from './pages/seleccion-personaje/seleccion-personaje';
 import { PartidaSoloComponent } from './components/juego/partida-solo/partida-solo';
+import { Tutorial } from './pages/tutorial/tutorial';
 
 export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
@@ -19,6 +20,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent, data: { header: 'login' } },
   { path: 'home', component: Home, data: { header: 'home' } },
   { path: 'configuracion', component: ConfiguracionComponent, data: { header: 'configuracion' } },
+  {path: 'tutorial', component: Tutorial, data: { header: 'tutorial' }},
 
   { path: 'maquina', component: TrucoSoloComponent },
   { path: 'juego/multi', component: TrucoMultiComponent },
