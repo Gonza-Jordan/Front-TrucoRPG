@@ -13,7 +13,7 @@
       <div class="equipos-arena">
 
         <!-- Equipo San Martín -->
-        <div class="equipo-panel equipo-san-martin" [class.seleccionado]="miEquipo === 'sanMartin'" [class.lleno]="estadoEquipos?.countSanMartin === 2 && miEquipo !== 'sanMartin'">
+        <div class="equipo-panel equipo-san-martin" [class.seleccionado]="miEquipo === 'sanMartin'" [class.lleno]="equipoDeshabilitado('sanMartin')">
           <div class="equipo-header">
             <span class="equipo-escudo">⚔</span>
             <div class="equipo-nombre-wrap">
@@ -41,7 +41,7 @@
           <button
             class="btn-unirse btn-san-martin"
             (click)="elegirEquipo('sanMartin')"
-            [disabled]="miEquipo === 'sanMartin' || (estadoEquipos?.countSanMartin === 2 && miEquipo !== 'sanMartin') || miListo"
+            [disabled]="equipoDeshabilitado('sanMartin')"
           >
             @if (miEquipo === 'sanMartin') { ✓ EN ESTE EQUIPO }
             @else if (estadoEquipos?.countSanMartin === 2) { COMPLETO }
@@ -55,7 +55,7 @@
         </div>
 
         <!-- Equipo Belgrano -->
-        <div class="equipo-panel equipo-belgrano" [class.seleccionado]="miEquipo === 'belgrano'" [class.lleno]="estadoEquipos?.countBelgrano === 2 && miEquipo !== 'belgrano'">
+        <div class="equipo-panel equipo-belgrano" [class.seleccionado]="miEquipo === 'belgrano'" [class.lleno]="equipoDeshabilitado('belgrano')">
           <div class="equipo-header">
             <span class="equipo-escudo">🏛</span>
             <div class="equipo-nombre-wrap">
@@ -83,7 +83,7 @@
           <button
             class="btn-unirse btn-belgrano"
             (click)="elegirEquipo('belgrano')"
-            [disabled]="miEquipo === 'belgrano' || (estadoEquipos?.countBelgrano === 2 && miEquipo !== 'belgrano') || miListo"
+            [disabled]="equipoDeshabilitado('belgrano')"
           >
             @if (miEquipo === 'belgrano') { ✓ EN ESTE EQUIPO }
             @else if (estadoEquipos?.countBelgrano === 2) { COMPLETO }

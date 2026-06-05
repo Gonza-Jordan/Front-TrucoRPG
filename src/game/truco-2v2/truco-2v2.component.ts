@@ -99,6 +99,13 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
     this.redrawTally();
 
     this.subs.push(
+      // Estado en tiempo real del juego 2v2 multijugador
+      this.sala.trucoEstado2v2$.subscribe(data => {
+        if (data) {
+          this.showToast('¡Partida iniciada! (lógica 2v2 multi próximamente)');
+          this.cdr.markForCheck();
+        }
+      }),
       this.sala.jugadorDesconectado$.subscribe(v => {
         if (v) {
           this.showToast('Un jugador se desconectó de la partida.');

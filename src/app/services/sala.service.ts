@@ -41,12 +41,15 @@ export class SalaService {
   error$               = new BehaviorSubject<string>('');
 
   // ── 2v2 observables ─────────────────────────────────────────
-  salaCompleta$     = new BehaviorSubject<boolean>(false);
-  lobbyActualizado$ = new BehaviorSubject<LobbyActualizado | null>(null);
-  estadoEquipos$    = new BehaviorSubject<EstadoEquipos | null>(null);
-  equiposListos$    = new BehaviorSubject<boolean>(false);
-  miPosicion$       = new BehaviorSubject<number>(0);
-  lobbyListos$      = new BehaviorSubject<LobbyListos | null>(null);
+  salaCompleta$      = new BehaviorSubject<boolean>(false);
+  lobbyActualizado$  = new BehaviorSubject<LobbyActualizado | null>(null);
+  estadoEquipos$     = new BehaviorSubject<EstadoEquipos | null>(null);
+  equiposListos$     = new BehaviorSubject<boolean>(false);
+  miPosicion$        = new BehaviorSubject<number>(0);
+  lobbyListos$       = new BehaviorSubject<LobbyListos | null>(null);
+  /** Estado del juego 2v2 multijugador (para TrucoMulti2v2Component) */
+  trucoEstado2v2$    = new BehaviorSubject<unknown>(null);
+  juegoIniciado2v2$  = new BehaviorSubject<boolean>(false);
 
   constructor(private auth: AuthService) {
     this.hub = new signalR.HubConnectionBuilder()
@@ -90,6 +93,14 @@ export class SalaService {
 
     this.hub.on('LobbyListos', (data: LobbyListos) => {
       this.lobbyListos$.next(data);
+    });
+
+    // ── 2v2 game events ────────────────────────────────────────
+    this.hub.on('TrucoEstado2v2', (data: unknown) => {
+      if (!this.juegoIniciado2v2$.value) this.juegoIniciado2v2$.next(true);
+      // También dispara juegoIniciado$ para que la navegación funcione
+      if (!this.juegoIniciado$.value) this.juegoIniciado$.next(true);
+      this.trucoEstado2v2$.next(data);
     });
   }
 
@@ -145,5 +156,7 @@ export class SalaService {
     this.equiposListos$.next(false);
     this.miPosicion$.next(0);
     this.lobbyListos$.next(null);
+    this.trucoEstado2v2$.next(null);
+    this.juegoIniciado2v2$.next(false);
   }
 }

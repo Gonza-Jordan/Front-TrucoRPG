@@ -13,6 +13,7 @@ import { Menu2v2EquiposComponent } from './pages/menu-2v2-equipos/menu-2v2-equip
 import { TrucoSoloComponent } from '../game/truco-solo/truco-solo.component';
 import { TrucoMultiComponent } from '../game/truco-multi/truco-multi.component';
 import { TrucoMulti2v2Component } from '../game/truco-2v2/truco-2v2.component';
+import { TrucoSolo2v2Component } from '../game/truco-solo-2v2/truco-solo-2v2.component';
 import { SeleccionPersonaje } from './pages/seleccion-personaje/seleccion-personaje';
 import { PartidaSoloComponent } from './components/juego/partida-solo/partida-solo';
 
@@ -35,6 +36,6 @@ export const routes: Routes = [
   { path: 'seleccion-personaje', component: SeleccionPersonaje, data: { header: 'home' } },
   { path: 'partidaSolo/configuracion', component: PartidaSoloComponent , data: { header: 'home' } },
   { path: 'jugar/solitario', component: TrucoSoloComponent },
-  { path: 'jugar/solitario-2v2', component: TrucoSoloComponent }, // placeholder hasta implementar lógica 2v2
+  { path: 'jugar/solitario-2v2', component: TrucoSolo2v2Component },
   { path: '**', redirectTo: '' },
 ];

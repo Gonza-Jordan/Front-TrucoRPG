@@ -21,7 +21,7 @@ interface Slot {
 export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
   estadoEquipos: EstadoEquipos | null = null;
   lobbyListos: LobbyListos | null = null;
-  miEquipo: 'sanMartin' | 'belgrano' | null = null;
+  miEquipo: string | null = null;
   miListo = false;
   errorMsg = '';
 
@@ -108,21 +108,27 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
     return slots;
   }
 
-  async elegirEquipo(equipo: 'sanMartin' | 'belgrano'): Promise<void> {
+  /** Devuelve true si el botón del equipo debe estar deshabilitado */
+  equipoDeshabilitado(equipo: string): boolean {
+    if (this.miListo) return true;
+    if (this.miEquipo === equipo) return false; // ya estoy en él → siempre habilitado para mostrar estado
+    const count = equipo === 'sanMartin'
+      ? (this.estadoEquipos?.countSanMartin ?? 0)
+      : (this.estadoEquipos?.countBelgrano ?? 0);
+    return count >= 2;
+  }
+
+  async elegirEquipo(equipo: string): Promise<void> {
     if (this.miListo) return;
-    // Validación: no puede unirse a un equipo lleno si no está ya en él
-    if (equipo === 'sanMartin' && this.estadoEquipos?.countSanMartin === 2 && this.miEquipo !== 'sanMartin') {
-      this.errorMsg = 'El Equipo San Martín ya está completo.';
-      setTimeout(() => (this.errorMsg = ''), 2500);
-      return;
-    }
-    if (equipo === 'belgrano' && this.estadoEquipos?.countBelgrano === 2 && this.miEquipo !== 'belgrano') {
-      this.errorMsg = 'El Equipo Belgrano ya está completo.';
+    if (this.equipoDeshabilitado(equipo) && this.miEquipo !== equipo) {
+      this.errorMsg = equipo === 'sanMartin'
+        ? 'El Equipo San Martín ya está completo.'
+        : 'El Equipo Belgrano ya está completo.';
       setTimeout(() => (this.errorMsg = ''), 2500);
       return;
     }
     try {
-      await this.sala.elegirEquipo(equipo);
+      await this.sala.elegirEquipo(equipo as 'sanMartin' | 'belgrano');
       this.errorMsg = '';
     } catch {
       this.errorMsg = 'Error al comunicarse con el servidor.';
