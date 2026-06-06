@@ -1,4 +1,19 @@
 <app-page-wrapper>
-    
+        <div class="menu-wrapper">      
+          <div class="contenedor-menu">
+            <h1>Tutorial</h1>
+            <div class="menu-sep"></div>
+            <h1>{{pasos[pasoActual].titulo}}</h1>
+            <p>{{pasos[pasoActual].contenido}}</p>
+            <div class="acciones">
+                @if (pasoActual === 0) {
+                  <a routerLink="/home"><span>VOLVER</span></a>  
+                }@else {
+                    <a (click)="anterior()"><span>ANTERIOR</span></a> 
+                }
+              <a (click)="siguiente()"><span>SIGUIENTE</span></a> 
+            </div>          
+          </div>
+        </div>
 </app-page-wrapper>
 

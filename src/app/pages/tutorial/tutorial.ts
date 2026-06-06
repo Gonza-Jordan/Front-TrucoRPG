@@ -10,4 +10,29 @@ import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 })
 export class Tutorial {
 
+  pasoActual: number = 0;
+
+  pasos = [
+    {
+      titulo: 'Reglas del truco',
+      contenido: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Repellendus illo consectetur iusto, eveniet vel, incidunt similique in assumenda inventore amet magnam. Illum repellendus inventore voluptates deleniti, nisi dicta distinctio nesciunt.'
+    },
+    {
+      titulo: 'Valores de las cartas',
+      contenido: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Repellendus illo consectetur iusto, eveniet vel, incidunt similique in assumenda inventore amet magnam. Illum repellendus inventore voluptates deleniti, nisi dicta distinctio nesciunt.'
+    }
+  ];
+
+  siguiente():void{
+    if(this.pasoActual < this.pasos.length - 1){
+      this.pasoActual++;
+    }
+  }
+
+  anterior():void{
+    if(this.pasoActual > 0){
+      this.pasoActual--;
+    } 
+  }
+
 }
