@@ -29,12 +29,15 @@
             }
           </div>
           <div class="player-portrait-row">
-            <img src="assets/gaucho.png" class="avatar-top" alt="compañero" />
+            <img src="assets/2v2/gaucho_compañero.png" class="avatar-top avatar-gaucho" alt="compañero" />
             <div class="player-tag">
               <span class="player-tag-role">COMPA</span>
               <span class="player-tag-name">{{ compa.nombre }}</span>
             </div>
           </div>
+          @if (dialogos['J3']) {
+            <div class="dialogo-burbuja burbuja-top">{{ dialogos['J3']!.texto }}</div>
+          }
         </div>
       }
     </div>
@@ -51,42 +54,46 @@
             }
           </div>
           <div class="side-info">
-            <img src="assets/rival.png" class="avatar-side" alt="rival" />
+            <img src="assets/2v2/gaucho_izquierda.png" class="avatar-side avatar-rival" alt="rival" />
             <span class="player-tag-name rival-tag">{{ rival1.nombre }}</span>
           </div>
+          @if (dialogos['J4']) {
+            <div class="dialogo-burbuja burbuja-left">{{ dialogos['J4']!.texto }}</div>
+          }
         </div>
       }
 
       <!-- Mesa -->
       <div class="table-wrap-2v2">
         <div class="table-surface-2v2">
-          <div class="bazas-2v2">
-            @for (slot of bazaSlots; track $index) {
-              <div class="baza-col-2v2">
-                <div class="baza-mini baza-top">
-                  @if (slot.compa) { <img class="baza-card" [src]="cardImg(slot.compa)" alt="" /> }
-                </div>
-                <div class="baza-laterales">
-                  <div class="baza-mini baza-left">
-                    @if (slot.op1) { <img class="baza-card baza-card-rot" [src]="cardImg(slot.op1)" alt="" /> }
-                  </div>
-                  <div class="baza-mini baza-right">
-                    @if (slot.op2) { <img class="baza-card baza-card-rot" [src]="cardImg(slot.op2)" alt="" /> }
-                  </div>
-                </div>
-                <div class="baza-mini baza-bottom">
-                  @if (slot.yo) { <img class="baza-card" [src]="cardImg(slot.yo)" alt="" /> }
-                </div>
-                @if (slot.ganador) {
-                  <div class="baza-ganador-badge"
-                       [class.badge-nosotros]="slot.ganador === 'nosotros'"
-                       [class.badge-ellos]="slot.ganador === 'ellos'"
-                       [class.badge-parda]="slot.ganador === 'parda'">
-                    {{ slot.ganador === 'nosotros' ? '★ NOS.' : slot.ganador === 'ellos' ? '★ ELLOS' : '— PARDA' }}
-                  </div>
+          <div class="mesa-cruz">
+            <!-- Compañero (arriba) -->
+            <div class="pila pila-top">
+              @for (c of mesa.compa; track $index) {
+                <img class="mesa-card" [style.--i]="$index" [src]="cardImg(c)" alt="" />
+              }
+            </div>
+            <div class="pila-medio">
+              <!-- Rival izquierda -->
+              <div class="pila pila-left">
+                @for (c of mesa.izq; track $index) {
+                  <img class="mesa-card" [style.--i]="$index" [src]="cardImg(c)" alt="" />
                 }
               </div>
-            }
+              <div class="pila-centro"></div>
+              <!-- Rival derecha -->
+              <div class="pila pila-right">
+                @for (c of mesa.der; track $index) {
+                  <img class="mesa-card" [style.--i]="$index" [src]="cardImg(c)" alt="" />
+                }
+              </div>
+            </div>
+            <!-- Vos (abajo) -->
+            <div class="pila pila-bottom">
+              @for (c of mesa.yo; track $index) {
+                <img class="mesa-card" [style.--i]="$index" [src]="cardImg(c)" alt="" />
+              }
+            </div>
           </div>
           @if (turnoBadge) {
             <div class="turno-badge-2v2">{{ turnoBadge }}</div>
@@ -98,7 +105,7 @@
       @if (rival2) {
         <div class="player-side player-right">
           <div class="side-info">
-            <img src="assets/rival.png" class="avatar-side" alt="rival" />
+            <img src="assets/2v2/gaucho_derecha.png" class="avatar-side avatar-rival" alt="rival" />
             <span class="player-tag-name rival-tag">{{ rival2.nombre }}</span>
           </div>
           <div class="side-cards side-cards-right">
@@ -106,6 +113,9 @@
               <img class="card-back card-back-side" src="assets/cards/back.PNG" alt="reverso" />
             }
           </div>
+          @if (dialogos['J2']) {
+            <div class="dialogo-burbuja burbuja-right">{{ dialogos['J2']!.texto }}</div>
+          }
         </div>
       }
 
@@ -117,6 +127,9 @@
         <div class="yo-info">
           <img src="assets/gaucho.png" class="avatar-yo" alt="yo" />
           <span class="yo-nombre">VOS</span>
+          @if (dialogos['J1']) {
+            <div class="dialogo-burbuja burbuja-bottom">{{ dialogos['J1']!.texto }}</div>
+          }
         </div>
         <div class="fan-wrap-2v2">
           @for (carta of yo.mano; track $index) {

@@ -78,15 +78,21 @@ export interface ManoTruco2v2 {
   puntosEquipoB: number;
   partidaTerminada: boolean;
   ganadorPartida: string | null;
+
+  // Consulta de envido del compañero (modo solo 2v2)
+  compaConsultaEnvido: boolean;
+  compaEnvidoConsultado: boolean;
+  compaConsultaTruco: boolean;
+  compaTrucoConsultado: boolean;
+  compaPista: string | null;
 }
 
 // ── Tipos de UI ───────────────────────────────────────────────────
-interface BazaDisplay {
-  yo: Carta2v2 | null;
-  compa: Carta2v2 | null;
-  op1: Carta2v2 | null;
-  op2: Carta2v2 | null;
-  ganador: 'nosotros' | 'ellos' | 'parda' | null;
+interface MesaJugadas {
+  yo: Carta2v2[];
+  compa: Carta2v2[];
+  izq: Carta2v2[];   // rival izquierda (J4)
+  der: Carta2v2[];   // rival derecha (J2)
 }
 
 interface BtnAccion {
@@ -94,6 +100,9 @@ interface BtnAccion {
   action: () => void;
   enabled: boolean;
 }
+
+interface EventoMaquina { jugador: string; tipo: string; texto: string; }
+interface PasoResponse  { mano: ManoTruco2v2; evento: EventoMaquina | null; }
 
 const API = '/api/truco2v2';
 
@@ -119,7 +128,7 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
 
   // ── UI ────────────────────────────────────────────────────────
   btns: BtnAccion[] = [];
-  bazaSlots: BazaDisplay[] = [];
+  mesa: MesaJugadas = { yo: [], compa: [], izq: [], der: [] };
   tantoInput = 0;
   mostrarInputTanto = false;
   mostrarConfirmSalir = false;
@@ -132,11 +141,19 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
 
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
+  // ── Diálogos por jugador (burbujas) ──────────────────────────
+  dialogos: Record<string, { texto: string } | null> = { J1: null, J2: null, J3: null, J4: null };
+  private dialogoTimers: Record<string, ReturnType<typeof setTimeout> | null> = { J1: null, J2: null, J3: null, J4: null };
+  private maquinasCorriendo = false;
+  private ultimaPista: string | null = null;
+
   // ── Helpers para template ─────────────────────────────────────
   get yo():     Jugador2v2 | null  { return this.mano?.posicion1 ?? null; }
   get compa():  Jugador2v2 | null  { return this.mano?.posicion3 ?? null; }
-  get rival1(): Jugador2v2 | null  { return this.mano?.posicion2 ?? null; }
-  get rival2(): Jugador2v2 | null  { return this.mano?.posicion4 ?? null; }
+  // La ronda va hacia la DERECHA: tras VOS (J1) juega el rival de la derecha (J2),
+  // luego el compañero (J3, arriba) y luego el rival de la izquierda (J4).
+  get rival1(): Jugador2v2 | null  { return this.mano?.posicion4 ?? null; } // asiento IZQUIERDA
+  get rival2(): Jugador2v2 | null  { return this.mano?.posicion2 ?? null; } // asiento DERECHA
 
   get puntosNosotros(): number { return this.mano?.puntosEquipoA ?? 0; }
   get puntosEllos():    number { return this.mano?.puntosEquipoB ?? 0; }
@@ -154,6 +171,10 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.toastTimer) clearTimeout(this.toastTimer);
+    for (const k of Object.keys(this.dialogoTimers)) {
+      const t = this.dialogoTimers[k];
+      if (t) clearTimeout(t);
+    }
   }
 
   // ── Acciones del humano ───────────────────────────────────────
@@ -164,33 +185,54 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
 
   async cantarEnvido(tipo: string): Promise<void> {
     if (!this.mano) return;
+    this.mostrarDialogo('J1', '¡' + tipo + '!');
     await this.call('cantar-envido', { manoId: this.mano.id, tipo });
+  }
+
+  async responderConsultaEnvido(aceptar: boolean): Promise<void> {
+    if (!this.mano) return;
+    this.mostrarDialogo('J1', aceptar ? '¡Cantá!' : 'No, jugá');
+    await this.call('responder-consulta-envido', { manoId: this.mano.id, aceptar });
+  }
+
+  async responderConsultaTruco(voy: boolean): Promise<void> {
+    if (!this.mano) return;
+    this.mostrarDialogo('J1', voy ? '¡Vamos!' : 'Poné carta');
+    await this.call('responder-consulta-truco', { manoId: this.mano.id, voy });
   }
 
   async responderEnvido(aceptar: boolean, escalarA?: string): Promise<void> {
     if (!this.mano) return;
+    this.mostrarDialogo('J1', escalarA ? '¡' + escalarA + '!' : (aceptar ? '¡Quiero!' : '¡No quiero!'));
     await this.call('responder-envido', { manoId: this.mano.id, aceptar, escalarA });
   }
 
   async declararTanto(): Promise<void> {
     if (!this.mano) return;
+    this.mostrarDialogo('J1', String(this.tantoInput));
     await this.call('declarar-tanto', { manoId: this.mano.id, tanto: this.tantoInput });
     this.mostrarInputTanto = false;
   }
 
   async sonBuenas(): Promise<void> {
     if (!this.mano) return;
+    this.mostrarDialogo('J1', '¡Son buenas!');
     await this.call('son-buenas', { manoId: this.mano.id });
     this.mostrarInputTanto = false;
   }
 
   async cantarTruco(): Promise<void> {
     if (!this.mano) return;
+    this.mostrarDialogo('J1', '¡Truco!');
     await this.call('cantar-truco', { manoId: this.mano.id });
   }
 
   async responderTruco(aceptar: boolean, escalarA?: string): Promise<void> {
     if (!this.mano) return;
+    const txt = escalarA
+      ? '¡' + (escalarA === 'retruco' ? 'Retruco' : 'Vale cuatro') + '!'
+      : (aceptar ? '¡Quiero!' : '¡No quiero!');
+    this.mostrarDialogo('J1', txt);
     await this.call('responder-truco', { manoId: this.mano.id, aceptar, escalarA });
   }
 
@@ -211,6 +253,7 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
         this.http.post<ManoTruco2v2>(`${API}/nueva-partida`, {})
       );
       this.actualizarEstado(res);
+      await this.correrMaquinas();
     } catch (e: any) {
       this.showToast('Error al iniciar partida: ' + (e?.error?.title ?? e?.message));
     }
@@ -223,15 +266,102 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
         this.http.post<ManoTruco2v2>(`${API}/${endpoint}`, body)
       );
       this.actualizarEstado(res);
+      await this.correrMaquinas();
     } catch (e: any) {
       this.showToast(e?.error?.detail ?? e?.error?.title ?? 'Error de conexión con el servidor.');
     }
   }
 
+  // ── Avance de máquinas paso a paso, con delay y diálogos ──────
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private esperaAccionHumano(m: ManoTruco2v2): boolean {
+    if (m.compaConsultaEnvido) return true;
+    if (m.compaConsultaTruco) return true;
+    // El envido va primero: si hay envido pendiente, decide su responsable (no el truco).
+    if ((m.faseEnvido === 'pendiente_respuesta' || m.faseEnvido === 'declarando_tantos')
+        && m.envidoPendienteRespuestaDe != null)
+      return m.envidoPendienteRespuestaDe === 'J1';
+    if (m.trucoPendienteRespuestaDe != null)
+      return m.trucoPendienteRespuestaDe === 'J1';
+    return m.turnoActual === 'J1';
+  }
+
+  private firmaEstado(m: ManoTruco2v2): string {
+    const cartas = m.vueltas.reduce((a, v) => a + Object.keys(v.cartasJugadas).length, 0)
+      + (m.vueltaActual ? Object.keys(m.vueltaActual.cartasJugadas).length : 0);
+    return [m.turnoActual, cartas, m.faseEnvido, m.trucoPendienteRespuestaDe,
+            m.envidoPendienteRespuestaDe, m.nivelTruco, m.manoTerminada].join('|');
+  }
+
+  private async correrMaquinas(): Promise<void> {
+    if (this.maquinasCorriendo) return;
+    this.maquinasCorriendo = true;
+    try {
+      let sinProgreso = 0;
+      while (this.mano) {
+        const m = this.mano;
+        if (m.partidaTerminada || m.manoTerminada || m.ganadorMano) break;
+        if (this.esperaAccionHumano(m)) break;
+
+        const firmaAntes = this.firmaEstado(m);
+
+        // Delay "pensando" antes de cada jugada de la máquina
+        await this.delay(1200);
+
+        let res: PasoResponse;
+        try {
+          res = await firstValueFrom(
+            this.http.post<PasoResponse>(`${API}/avanzar-maquina`, { manoId: m.id })
+          );
+        } catch {
+          this.showToast('Error de conexión con el servidor.');
+          break;
+        }
+
+        if (res.evento && res.evento.texto) {
+          this.mostrarDialogo(res.evento.jugador, res.evento.texto);
+        }
+        this.actualizarEstado(res.mano);
+        if (!res.evento) break;
+
+        // Guardia anti-cuelgue: si el estado no cambió, no insistir en loop infinito.
+        if (this.firmaEstado(res.mano) === firmaAntes) {
+          if (++sinProgreso >= 2) break;
+        } else {
+          sinProgreso = 0;
+        }
+      }
+    } finally {
+      this.maquinasCorriendo = false;
+    }
+  }
+
+  private mostrarDialogo(jugador: string, texto: string): void {
+    if (!texto) return;
+    this.dialogos[jugador] = { texto };
+    this.cdr.markForCheck();
+    const prev = this.dialogoTimers[jugador];
+    if (prev) clearTimeout(prev);
+    this.dialogoTimers[jugador] = setTimeout(() => {
+      this.dialogos[jugador] = null;
+      this.cdr.markForCheck();
+    }, 2400);
+  }
+
   // ── Actualizar todo el estado de UI ──────────────────────────
   private actualizarEstado(mano: ManoTruco2v2): void {
     this.mano = mano;
-    this.bazaSlots = this.buildBazas(mano);
+    // Pista de envido del compañero ("Tengo poco/algo/mucho") — se muestra una vez.
+    if (mano.compaPista && this.ultimaPista !== mano.compaPista) {
+      this.ultimaPista = mano.compaPista;
+      this.mostrarDialogo('J3', mano.compaPista);
+    } else if (!mano.compaPista) {
+      this.ultimaPista = null;
+    }
+    this.mesa = this.buildMesa(mano);
     this.tantoInput = this.calcularMiTanto(mano);
     this.mostrarInputTanto = mano.faseEnvido === 'declarando_tantos'
       && mano.envidoPendienteRespuestaDe === 'J1';
@@ -245,58 +375,39 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  private buildBazas(mano: ManoTruco2v2): BazaDisplay[] {
-    const slots: BazaDisplay[] = [];
-    for (const v of mano.vueltas) {
-      slots.push({
-        yo:     v.cartasJugadas['J1'] ?? null,
-        compa:  v.cartasJugadas['J3'] ?? null,
-        op1:    v.cartasJugadas['J2'] ?? null,
-        op2:    v.cartasJugadas['J4'] ?? null,
-        ganador: this.mapGanador(v.ganadorVuelta),
-      });
+  private buildMesa(mano: ManoTruco2v2): MesaJugadas {
+    const mesa: MesaJugadas = { yo: [], compa: [], izq: [], der: [] };
+    const vueltas: Vuelta2v2[] = [...mano.vueltas];
+    if (mano.vueltaActual) vueltas.push(mano.vueltaActual);
+    for (const v of vueltas) {
+      if (v.cartasJugadas['J1']) mesa.yo.push(v.cartasJugadas['J1']);
+      if (v.cartasJugadas['J3']) mesa.compa.push(v.cartasJugadas['J3']);
+      if (v.cartasJugadas['J4']) mesa.izq.push(v.cartasJugadas['J4']);
+      if (v.cartasJugadas['J2']) mesa.der.push(v.cartasJugadas['J2']);
     }
-    // vuelta en curso
-    if (mano.vueltaActual) {
-      const v = mano.vueltaActual;
-      slots.push({
-        yo:     v.cartasJugadas['J1'] ?? null,
-        compa:  v.cartasJugadas['J3'] ?? null,
-        op1:    v.cartasJugadas['J2'] ?? null,
-        op2:    v.cartasJugadas['J4'] ?? null,
-        ganador: null,
-      });
-    }
-    // Rellenar hasta 3 slots vacíos
-    while (slots.length < 3) {
-      slots.push({ yo: null, compa: null, op1: null, op2: null, ganador: null });
-    }
-    return slots;
-  }
-
-  private mapGanador(g: string | null): 'nosotros' | 'ellos' | 'parda' | null {
-    if (g === 'EquipoA') return 'nosotros';
-    if (g === 'EquipoB') return 'ellos';
-    if (g === 'Parda')   return 'parda';
-    return null;
+    return mesa;
   }
 
   private buildBtns(mano: ManoTruco2v2): void {
     const btns: BtnAccion[] = [];
     const esMiTurno  = mano.turnoActual === 'J1';
     const manoEnd    = mano.manoTerminada || !!mano.ganadorMano || mano.partidaTerminada;
+    const envidoDisponible = !mano.envidoCantado && !mano.envidoResuelto && mano.vueltas.length === 0
+      && (!mano.trucoCantado || mano.trucoPendienteRespuestaDe != null);
+    const envidoEnResolucion = (mano.faseEnvido === 'pendiente_respuesta' || mano.faseEnvido === 'declarando_tantos')
+      && mano.envidoPendienteRespuestaDe != null;
 
-    // ── Truco pending ─────────────────────────────────────────
-    if (mano.trucoPendienteRespuestaDe === 'J1') {
-      btns.push({ label: 'QUIERO',    color: '#44ff44', enabled: true, action: () => this.responderTruco(true)  });
-      if ((mano.nivelTruco ?? 0) < 3 && mano.puedeEscalarTruco === 'J1') {
-        const lbl = mano.nivelTruco === 1 ? 'RETRUCO' : 'VALE 4';
-        const esc = mano.nivelTruco === 1 ? 'retruco' : 'valecuatro';
-        btns.push({ label: lbl, color: '#ffaa00', enabled: true, action: () => this.responderTruco(true, esc) });
-      }
-      btns.push({ label: 'NO QUIERO', color: '#ff4444', enabled: true, action: () => this.responderTruco(false) });
+    // ── Tu compañero te pregunta si cantar los tantos ─────────
+    if (mano.compaConsultaEnvido) {
+      btns.push({ label: 'SÍ, CANTÁ', color: '#44ff44', enabled: true, action: () => this.responderConsultaEnvido(true) });
+      btns.push({ label: 'NO, JUGÁ',  color: '#ff4444', enabled: true, action: () => this.responderConsultaEnvido(false) });
     }
-    // ── Envido pending ────────────────────────────────────────
+    // ── Tu compañero te pregunta: ¿voy o pongo? (truco) ───────
+    else if (mano.compaConsultaTruco) {
+      btns.push({ label: 'VOY (truco)', color: '#dd4422', enabled: true, action: () => this.responderConsultaTruco(true) });
+      btns.push({ label: 'PONGO carta', color: '#4488ff', enabled: true, action: () => this.responderConsultaTruco(false) });
+    }
+    // ── Responder envido (va primero) ─────────────────────────
     else if (mano.envidoPendienteRespuestaDe === 'J1' && mano.faseEnvido === 'pendiente_respuesta') {
       btns.push({ label: 'QUIERO',       color: '#44ff44', enabled: true, action: () => this.responderEnvido(true) });
       const tipo = mano.tipoEnvidoCantado ?? 'Envido';
@@ -308,10 +419,29 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
         btns.push({ label: 'FALTA ENVIDO', color: '#4488ff', enabled: true, action: () => this.responderEnvido(true, 'Falta Envido') });
       btns.push({ label: 'NO QUIERO',    color: '#ff4444', enabled: true, action: () => this.responderEnvido(false) });
     }
-    // ── Declarar tanto ────────────────────────────────────────
+    // ── Declarar tanto (va primero) ───────────────────────────
     else if (mano.envidoPendienteRespuestaDe === 'J1' && mano.faseEnvido === 'declarando_tantos') {
       btns.push({ label: `TENGO ${this.tantoInput}`, color: '#44ff44', enabled: true, action: () => this.declararTanto() });
       btns.push({ label: 'SON BUENAS',               color: '#ffaa00', enabled: true, action: () => this.sonBuenas() });
+    }
+    // ── Esperando que los rivales/compañero resuelvan el envido ─
+    else if (envidoEnResolucion) {
+      // sin botones
+    }
+    // ── Responder truco ───────────────────────────────────────
+    else if (mano.trucoPendienteRespuestaDe === 'J1') {
+      btns.push({ label: 'QUIERO',    color: '#44ff44', enabled: true, action: () => this.responderTruco(true)  });
+      if ((mano.nivelTruco ?? 0) < 3 && mano.puedeEscalarTruco === 'J1') {
+        const lbl = mano.nivelTruco === 1 ? 'RETRUCO' : 'VALE 4';
+        const esc = mano.nivelTruco === 1 ? 'retruco' : 'valecuatro';
+        btns.push({ label: lbl, color: '#ffaa00', enabled: true, action: () => this.responderTruco(true, esc) });
+      }
+      btns.push({ label: 'NO QUIERO', color: '#ff4444', enabled: true, action: () => this.responderTruco(false) });
+      if (envidoDisponible) {
+        btns.push({ label: 'Envido',       color: '#4488ff', enabled: true, action: () => this.cantarEnvido('Envido') });
+        btns.push({ label: 'Real Envido',  color: '#4488ff', enabled: true, action: () => this.cantarEnvido('Real Envido') });
+        btns.push({ label: 'Falta Envido', color: '#4488ff', enabled: true, action: () => this.cantarEnvido('Falta Envido') });
+      }
     }
     // ── Mano terminada ────────────────────────────────────────
     else if (mano.manoTerminada && !mano.partidaTerminada) {
@@ -319,19 +449,14 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     }
     // ── Turno normal ──────────────────────────────────────────
     else if (!manoEnd) {
-      // Envido
-      const envPosible = !mano.envidoCantado && !mano.trucoCantado
-        && mano.vueltas.length === 0 && !mano.vueltaActual;
-      if (envPosible) {
+      if (envidoDisponible) {
         btns.push({ label: 'Envido',       color: '#4488ff', enabled: esMiTurno, action: () => this.cantarEnvido('Envido') });
         btns.push({ label: 'Real Envido',  color: '#4488ff', enabled: esMiTurno, action: () => this.cantarEnvido('Real Envido') });
         btns.push({ label: 'Falta Envido', color: '#4488ff', enabled: esMiTurno, action: () => this.cantarEnvido('Falta Envido') });
       }
-      // Truco
       if (!mano.trucoCantado) {
         btns.push({ label: 'Truco', color: '#dd4422', enabled: esMiTurno, action: () => this.cantarTruco() });
       }
-      // Ir al mazo
       btns.push({ label: 'Ir al mazo', color: '#884422', enabled: esMiTurno, action: () => this.irseAlMazo() });
     }
 
@@ -342,6 +467,8 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     const m = this.mano;
     if (!m) return '';
     if (m.partidaTerminada) return '';
+    if (m.compaConsultaEnvido) return 'Tu compañero pregunta: ¿canto los tantos?';
+    if (m.compaConsultaTruco) return 'Tu compañero pregunta: ¿voy o pongo?';
     if (m.manoTerminada) {
       const gan = m.ganadorMano === 'EquipoA' ? '¡Ganaron la mano!' : 'Perdieron la mano.';
       return gan;
@@ -354,7 +481,9 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
   }
 
   private calcularMiTanto(mano: ManoTruco2v2): number {
-    const cartas = mano.posicion1?.mano ?? [];
+    // El envido se calcula con las 3 cartas originales (mano + las ya jugadas).
+    const j = mano.posicion1;
+    const cartas: Carta2v2[] = [...(j?.mano ?? []), ...(j?.jugadas ?? [])];
     return this.calcularTanto(cartas);
   }
 
