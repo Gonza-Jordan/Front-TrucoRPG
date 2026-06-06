@@ -191,13 +191,23 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
 
   async responderConsultaEnvido(aceptar: boolean): Promise<void> {
     if (!this.mano) return;
-    this.mostrarDialogo('J1', aceptar ? '¡Cantá!' : 'No, jugá');
+    if (aceptar) {
+      this.mostrarDialogo('J1', '¡Dale!');
+      this.mostrarDialogo('J3', '¡Envido!');
+    } else {
+      this.mostrarDialogo('J1', 'No, jugá');
+    }
     await this.call('responder-consulta-envido', { manoId: this.mano.id, aceptar });
   }
 
   async responderConsultaTruco(voy: boolean): Promise<void> {
     if (!this.mano) return;
-    this.mostrarDialogo('J1', voy ? '¡Vamos!' : 'Poné carta');
+    if (voy) {
+      this.mostrarDialogo('J1', '¡Vamos!');
+      this.mostrarDialogo('J3', '¡Truco!');
+    } else {
+      this.mostrarDialogo('J1', 'Poné carta');
+    }
     await this.call('responder-consulta-truco', { manoId: this.mano.id, voy });
   }
 

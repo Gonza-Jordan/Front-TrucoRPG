@@ -116,7 +116,7 @@
   align-self: center;
   position: relative;
   display: flex;
-  flex-direction: row;          /* avatar y cartas en fila */
+  flex-direction: row-reverse;  /* cartas del lado de adentro (hacia la mesa) */
   align-items: center;
   justify-content: center;
   gap: 7px;
