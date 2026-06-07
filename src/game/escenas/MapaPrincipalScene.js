@@ -39,7 +39,7 @@ export default class MapaPrincipalScene extends BaseScene {
     map.createLayer('Arboles',[vegetacionTileset,arbol1Tileset]);
     map.createLayer('Arboles 2',[arbol2Tileset]);
     map.createLayer('Arboles 3',[arbol3Tileset,partesTileset]);
-    map.createLayer('Casas',[paredesTileset,techosTileset,fuegoTileset]);
+    map.createLayer('Casas',[paredesTileset,techosTileset,fuegoTileset,partesTileset]);
     map.createLayer('Gallinitas', [gallinasTileset]);
     map.createLayer('Objetos-Casa',[partesTileset,mateTileset,pavaTileset,fuegoTileset]);
     map.createLayer('Gallinitas 2', [gallinasTileset]);
