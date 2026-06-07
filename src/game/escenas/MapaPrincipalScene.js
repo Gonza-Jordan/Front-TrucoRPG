@@ -16,7 +16,7 @@ export default class MapaPrincipalScene extends BaseScene {
     this.botonPantallaCompleta();
     this.crearControlesMobile();
 
-    // A PARTIR DE ACÁ LA CREACION DEL MAPA CON TILEEEED 
+    // A PARTIR DE ACÁ LA CREACION DEL MAPA CON TILEEEED
     const map = this.make.tilemap({ key: 'mapa' });
 
     const pisoTileset = map.addTilesetImage('Piso 2', 'Piso 2');
@@ -34,15 +34,22 @@ export default class MapaPrincipalScene extends BaseScene {
     const vegetacionTileset = map.addTilesetImage('Vegetacion', 'Vegetacion');
 
     map.createLayer('Base', pisoTileset);
-    map.createLayer('Pasto',[piedrasTileset,vegetacionTileset]);
-    map.createLayer('Camino',pisoTileset);
-    map.createLayer('Arboles',[vegetacionTileset,arbol1Tileset]);
-    map.createLayer('Arboles 2',[arbol2Tileset]);
-    map.createLayer('Arboles 3',[arbol3Tileset,partesTileset]);
-    map.createLayer('Casas',[paredesTileset,techosTileset,fuegoTileset,partesTileset]);
+    map.createLayer('Pasto', [piedrasTileset, vegetacionTileset]);
+    map.createLayer('Camino', pisoTileset);
+    const arbolesLayer = map.createLayer('Arboles', [vegetacionTileset, arbol1Tileset]);
+    const arboles2Layer = map.createLayer('Arboles 2', [arbol2Tileset]);
+    const arboles3Layer = map.createLayer('Arboles 3', [arbol3Tileset, partesTileset]);
+    map.createLayer('Casas', [paredesTileset, techosTileset, fuegoTileset, partesTileset]);
     map.createLayer('Gallinitas', [gallinasTileset]);
-    map.createLayer('Objetos-Casa',[partesTileset,mateTileset,pavaTileset,fuegoTileset]);
+    map.createLayer('Objetos-Casa', [partesTileset, mateTileset, pavaTileset, fuegoTileset]);
     map.createLayer('Gallinitas 2', [gallinasTileset]);
+  
+    arbolesLayer.setDepth(2);
+    arboles2Layer.setDepth(2);
+    arboles3Layer.setDepth(2);
+
+    const colisionesLayer = map.createLayer('Colisiones', pisoTileset);
+    colisionesLayer.setCollisionByExclusion([-1]);
 
     this.JugadorPrincipal = new JugadorPrincipal(
       this,
@@ -51,6 +58,8 @@ export default class MapaPrincipalScene extends BaseScene {
       this.playerKey,
     ).setDepth(1);
     this.JugadorPrincipal.setCollideWorldBounds(true);
+
+    this.physics.add.collider(this.JugadorPrincipal, colisionesLayer);
 
     this.keys = this.input.keyboard.createCursorKeys();
   }
