@@ -27,6 +27,7 @@ main {
   overflow: hidden;
   font-family: 'Jersey 20';
   background: transparent; /* hereda del :host */
+  row-gap: 1.5em;
 }
 
 /* ── Grid de cartas ───────────────────────────────────────────────────────── */

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 import { HEROES } from '../../../game/data/heroes';
 
 @Component({
@@ -12,6 +13,7 @@ import { HEROES } from '../../../game/data/heroes';
 })
 export class SeleccionPersonaje {
   @Input() standalone = true; // false cuando se embebe dentro de otro componente
+  @Input() volverRuta: string | null = null; // ruta a la que debe volver el botón
 
   heroes = HEROES;
   selectedHeroId: number | null = null;
@@ -20,7 +22,7 @@ export class SeleccionPersonaje {
   @Output() heroeConfirmado = new EventEmitter<number>();
   @Output() solicitarVolver = new EventEmitter<void>();
 
-  constructor(private location: Location) {}
+  constructor(private location: Location, private router: Router) {}
 
   seleccionarHeroe(id: number): void {
     this.selectedHeroId = id;
@@ -37,6 +39,11 @@ export class SeleccionPersonaje {
   }
 
   volver(): void {
+    if (this.volverRuta) {
+      this.router.navigateByUrl(this.volverRuta).catch(() => this.location.back());
+      return;
+    }
+
     if (!this.standalone) {
       this.solicitarVolver.emit();
     } else {
