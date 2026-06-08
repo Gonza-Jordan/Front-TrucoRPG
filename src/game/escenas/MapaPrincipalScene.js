@@ -13,6 +13,10 @@ export default class MapaPrincipalScene extends BaseScene {
     this.startY = data.y || 470;
   }
 
+  preload(){
+     this.load.image('CartelOponentes','./assets/mapa-principal/CartelOponentes.png');
+  }
+
   create() {
     this.botonPantallaCompleta();
     this.crearControlesMobile();
@@ -104,6 +108,15 @@ export default class MapaPrincipalScene extends BaseScene {
     );
 
     this.physics.add.overlap(this.JugadorPrincipal, this.portalAPulperia.zone);
+
+    this.portalAOponentes = new Portal(
+      this,
+      1917,
+      300,
+      'MapaOponentesScene',
+      'CartelOponentes',
+      { x: 85, y: 470 },
+    );
   }
 
   update() {
@@ -125,5 +138,6 @@ export default class MapaPrincipalScene extends BaseScene {
 
     this.portalACasa.update(this.JugadorPrincipal, this.teclaE);
     this.portalAPulperia.update(this.JugadorPrincipal, this.teclaE);
+    this.portalAOponentes.update(this.JugadorPrincipal, this.teclaE);
   }
 }

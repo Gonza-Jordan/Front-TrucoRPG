@@ -8,11 +8,15 @@ export default class Portal {
     this.cercaDelPortal = false;
     this.datosDestino = datosDestino;
 
-    this.sprite = this.escena.add
-      .image(x, y, texturaSprite)
-      .setScale(0.8)
-      .setDepth(0)
-      .setVisible(false);
+    if (texturaSprite && texturaSprite !== 'false') {
+      this.sprite = this.escena.add
+        .image(x, y, texturaSprite)
+        .setScale(0.8)
+        .setDepth(0)
+        .setVisible(true);
+    } else {
+      this.sprite = null;
+    }
 
     this.zone = this.escena.add.zone(x, y, 16, 16);
     escena.physics.add.existing(this.zone);
@@ -44,7 +48,6 @@ export default class Portal {
     }
 
     if (enZona) {
-    
       this.textoE.x = jugador.x;
       this.textoE.y = jugador.y - 45; 
 
