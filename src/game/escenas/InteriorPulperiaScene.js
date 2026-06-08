@@ -1,9 +1,9 @@
 import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
 import BaseScene from './BaseScene.js';
 
-export default class InteriorCasaScene extends BaseScene {
+export default class InteriorPulperiaScene extends BaseScene {
   constructor() {
-    super('InteriorCasaScene');
+    super('InteriorPulperiaScene');
   }
 
   init(data) {
@@ -24,7 +24,7 @@ export default class InteriorCasaScene extends BaseScene {
       .tileSprite(0, 0, this.scale.width, this.scale.height, 'Piso')
       .setOrigin(0)
       .setDepth(0)
-      .setScale(1.8);
+      .setScale(1.2);
 
     this.JugadorPrincipal = new JugadorPrincipal(
       this,
@@ -44,19 +44,5 @@ export default class InteriorCasaScene extends BaseScene {
 
   update() {
     this.JugadorPrincipal.update(this.keys);
-
-    const seMueve =
-      this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
-
-    if (seMueve) {
-      this.estabaMoviendose = true;
-    } else if (this.estabaMoviendose) {
-      const xActual = Math.round(this.JugadorPrincipal.x);
-      const yActual = Math.round(this.JugadorPrincipal.y);
-
-      console.log(`📍 Personaje parado en coordenadas -> X: ${xActual}, Y: ${yActual}`);
-
-      this.estabaMoviendose = false;
-    }
   }
 }
