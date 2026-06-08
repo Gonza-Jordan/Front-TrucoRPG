@@ -136,6 +136,12 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
   gameOver = false;
   gameOverGanamos = false;
 
+  // Nueva mano automática con cuenta regresiva (como en el solitario)
+  countdown: number | null = null;
+  private countdownInterval: ReturnType<typeof setInterval> | null = null;
+  private nuevaManoTimer: ReturnType<typeof setTimeout> | null = null;
+  private prevGanadorMano: string | null = null;
+
   readonly fanAngles = [-12, 0, 12];
   readonly fanXOff   = [-18, 0, 18];
 
@@ -155,6 +161,9 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
   get rival1(): Jugador2v2 | null  { return this.mano?.posicion4 ?? null; } // asiento IZQUIERDA
   get rival2(): Jugador2v2 | null  { return this.mano?.posicion2 ?? null; } // asiento DERECHA
 
+  /** True si el jugador dado es el "mano" de la ronda (abre y juega primero tras una parda). */
+  esMano(id: string): boolean { return this.mano?.jugadorMano === id; }
+
   get puntosNosotros(): number { return this.mano?.puntosEquipoA ?? 0; }
   get puntosEllos():    number { return this.mano?.puntosEquipoB ?? 0; }
   get estadoEnvido():   string { return this.mano?.estadoEnvido ?? 'No se cantó.'; }
@@ -171,6 +180,7 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.cancelarCountdown();
     for (const k of Object.keys(this.dialogoTimers)) {
       const t = this.dialogoTimers[k];
       if (t) clearTimeout(t);
@@ -179,8 +189,34 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
 
   // ── Acciones del humano ───────────────────────────────────────
   async jugarCarta(carta: Carta2v2): Promise<void> {
-    if (!this.mano || this.mano.turnoActual !== 'J1') return;
+    if (!this.mano) return;
+    if (this.mano.manoTerminada || this.mano.ganadorMano || this.mano.partidaTerminada) {
+      this.showToast('La mano ha sido terminada.');
+      return;
+    }
+    if (this.mano.turnoActual !== 'J1') return;
     await this.call('jugar-carta', { manoId: this.mano.id, numero: carta.numero, palo: carta.palo });
+  }
+
+  // ── Cuenta regresiva para la nueva mano automática ────────────
+  private iniciarCountdown(onComplete: () => void): void {
+    this.cancelarCountdown();
+    this.countdown = 3;
+    this.cdr.markForCheck();
+    this.countdownInterval = setInterval(() => {
+      this.countdown = (this.countdown ?? 1) - 1;
+      this.cdr.markForCheck();
+      if ((this.countdown ?? 0) <= 0) {
+        this.cancelarCountdown();
+        onComplete();
+      }
+    }, 1000);
+  }
+
+  private cancelarCountdown(): void {
+    if (this.countdownInterval) { clearInterval(this.countdownInterval); this.countdownInterval = null; }
+    if (this.nuevaManoTimer)    { clearTimeout(this.nuevaManoTimer);     this.nuevaManoTimer = null; }
+    this.countdown = null;
   }
 
   async cantarEnvido(tipo: string): Promise<void> {
@@ -203,10 +239,12 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
   async responderConsultaTruco(voy: boolean): Promise<void> {
     if (!this.mano) return;
     if (voy) {
-      this.mostrarDialogo('J1', '¡Vamos!');
-      this.mostrarDialogo('J3', '¡Truco!');
+      // "Voy/Vení": el compañero juega una carta baja para que vos metas la alta.
+      this.mostrarDialogo('J1', '¡Vení!');
+      this.mostrarDialogo('J3', 'Va la baja');
     } else {
-      this.mostrarDialogo('J1', 'Poné carta');
+      // "Pongo": el compañero juega su carta más alta.
+      this.mostrarDialogo('J1', '¡Poné la alta!');
     }
     await this.call('responder-consulta-truco', { manoId: this.mano.id, voy });
   }
@@ -246,6 +284,13 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     await this.call('responder-truco', { manoId: this.mano.id, aceptar, escalarA });
   }
 
+  async escalarTruco(): Promise<void> {
+    if (!this.mano) return;
+    const nombre = this.mano.nivelTruco === 1 ? 'Retruco' : 'Vale cuatro';
+    this.mostrarDialogo('J1', '¡' + nombre + '!');
+    await this.call('escalar-truco', { manoId: this.mano.id });
+  }
+
   async irseAlMazo(): Promise<void> {
     if (!this.mano) return;
     await this.call('irse-al-mazo', { manoId: this.mano.id });
@@ -253,6 +298,7 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
 
   async nuevaMano(): Promise<void> {
     if (!this.mano) return;
+    this.cancelarCountdown();
     await this.call('nueva-mano', { manoId: this.mano.id });
     this.gameOver = false;
   }
@@ -382,6 +428,20 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
       this.gameOver       = true;
       this.gameOverGanamos = mano.ganadorPartida === 'EquipoA';
     }
+
+    // Nueva mano automática: al terminar la mano (y si la partida sigue), arranca la
+    // cuenta regresiva de 3 s; también queda el botón "NUEVA MANO" para no esperar.
+    if (mano.ganadorMano && !mano.partidaTerminada) {
+      if (mano.ganadorMano !== this.prevGanadorMano) {
+        this.iniciarCountdown(() => {
+          if (this.mano?.ganadorMano && !this.mano?.partidaTerminada) this.nuevaMano();
+        });
+      }
+    } else {
+      this.cancelarCountdown();
+    }
+    this.prevGanadorMano = mano.ganadorMano ?? null;
+
     this.cdr.markForCheck();
   }
 
@@ -414,8 +474,8 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     }
     // ── Tu compañero te pregunta: ¿voy o pongo? (truco) ───────
     else if (mano.compaConsultaTruco) {
-      btns.push({ label: 'VOY (truco)', color: '#dd4422', enabled: true, action: () => this.responderConsultaTruco(true) });
-      btns.push({ label: 'PONGO carta', color: '#4488ff', enabled: true, action: () => this.responderConsultaTruco(false) });
+      btns.push({ label: 'VOY',   color: '#dd4422', enabled: true, action: () => this.responderConsultaTruco(true) });
+      btns.push({ label: 'PONGO', color: '#4488ff', enabled: true, action: () => this.responderConsultaTruco(false) });
     }
     // ── Responder envido (va primero) ─────────────────────────
     else if (mano.envidoPendienteRespuestaDe === 'J1' && mano.faseEnvido === 'pendiente_respuesta') {
@@ -432,7 +492,13 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     // ── Declarar tanto (va primero) ───────────────────────────
     else if (mano.envidoPendienteRespuestaDe === 'J1' && mano.faseEnvido === 'declarando_tantos') {
       btns.push({ label: `TENGO ${this.tantoInput}`, color: '#44ff44', enabled: true, action: () => this.declararTanto() });
-      btns.push({ label: 'SON BUENAS',               color: '#ffaa00', enabled: true, action: () => this.sonBuenas() });
+      // "Son buenas" solo tiene sentido si un rival YA cantó un tanto que no podés superar.
+      // Si sos el primero en cantar (el mano), no aparece.
+      const rivalDeclaro = (mano.tantosDeclarados?.['J2'] ?? null) !== null
+                        || (mano.tantosDeclarados?.['J4'] ?? null) !== null;
+      if (rivalDeclaro) {
+        btns.push({ label: 'SON BUENAS', color: '#ffaa00', enabled: true, action: () => this.sonBuenas() });
+      }
     }
     // ── Esperando que los rivales/compañero resuelvan el envido ─
     else if (envidoEnResolucion) {
@@ -466,6 +532,14 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
       }
       if (!mano.trucoCantado) {
         btns.push({ label: 'Truco', color: '#dd4422', enabled: esMiTurno, action: () => this.cantarTruco() });
+      } else if (
+        mano.trucoPendienteRespuestaDe == null &&
+        (mano.nivelTruco ?? 0) >= 1 && (mano.nivelTruco ?? 0) < 3 &&
+        mano.equipoCantorTruco !== 'EquipoA'
+      ) {
+        // Aceptaste el truco → tu equipo tiene la palabra y puede subir la apuesta.
+        const lbl = mano.nivelTruco === 1 ? 'Retruco' : 'Vale 4';
+        btns.push({ label: lbl, color: '#ffaa00', enabled: esMiTurno, action: () => this.escalarTruco() });
       }
       btns.push({ label: 'Ir al mazo', color: '#884422', enabled: esMiTurno, action: () => this.irseAlMazo() });
     }
@@ -481,7 +555,7 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     if (m.compaConsultaTruco) return 'Tu compañero pregunta: ¿voy o pongo?';
     if (m.manoTerminada) {
       const gan = m.ganadorMano === 'EquipoA' ? '¡Ganaron la mano!' : 'Perdieron la mano.';
-      return gan;
+      return this.countdown != null ? `${gan} Nueva mano en ${this.countdown}...` : gan;
     }
     if (m.trucoPendienteRespuestaDe === 'J1') return 'Respondé el Truco';
     if (m.envidoPendienteRespuestaDe === 'J1' && m.faseEnvido === 'pendiente_respuesta') return 'Respondé el Envido';
@@ -521,19 +595,27 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
 
   private buildTally(pts: number, color: string): any[] {
     const out: any[] = [];
-    if (pts <= 0) return out;
+    const capped = Math.min(pts, 30); // la partida es a 30
+    if (capped <= 0) return out;
+    // Mitad izquierda (las "malas"): puntos 1–15. Mitad derecha (las "buenas"): 16–30.
+    this.buildTallyMitad(out, Math.min(capped, 15), color, 6);
+    if (capped > 15) this.buildTallyMitad(out, capped - 15, color, 71);
+    return out;
+  }
+
+  private buildTallyMitad(out: any[], pts: number, color: string, startX: number): void {
+    if (pts <= 0) return;
     const full = Math.floor(pts / 5), rem = pts % 5;
-    const BS = 14, BGAP = 3, SL = 9, SGAP = 3;
-    let bx = 6;
+    const BS = 14, BGAP = 3, SL = 9, SGAP = 3, y = 19; // centrado vertical en el viewBox (alto 52)
+    let bx = startX;
     for (let i = 0; i < Math.min(full, 3); i++) {
-      this.addBox(out, bx, 4, BS, color);
+      this.addBox(out, bx, y, BS, color);
       bx += BS + BGAP;
     }
     if (rem > 0 && full < 3) {
       let sx = bx;
-      for (let i = 0; i < rem; i++) { out.push({ x1: sx, y1: 4 + SL, x2: sx + SL, y2: 4, color }); sx += SL + SGAP; }
+      for (let i = 0; i < rem; i++) { out.push({ x1: sx, y1: y + SL, x2: sx + SL, y2: y, color }); sx += SL + SGAP; }
     }
-    return out;
   }
 
   private addBox(out: any[], x: number, y: number, s: number, color: string): void {

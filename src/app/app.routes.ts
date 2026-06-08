@@ -16,6 +16,7 @@ import { TrucoMulti2v2Component } from '../game/truco-2v2/truco-2v2.component';
 import { TrucoSolo2v2Component } from '../game/truco-solo-2v2/truco-solo-2v2.component';
 import { SeleccionPersonaje } from './pages/seleccion-personaje/seleccion-personaje';
 import { PartidaSoloComponent } from './components/juego/partida-solo/partida-solo';
+import { UnirseQrComponent } from './pages/unirse-qr/unirse-qr';
 
 export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
@@ -37,5 +38,6 @@ export const routes: Routes = [
   { path: 'partidaSolo/configuracion', component: PartidaSoloComponent , data: { header: 'home' } },
   { path: 'jugar/solitario', component: TrucoSoloComponent },
   { path: 'jugar/solitario-2v2', component: TrucoSolo2v2Component },
+  { path: 'unirse', component: UnirseQrComponent, data: { header: 'home' } },
   { path: '**', redirectTo: '' },
 ];

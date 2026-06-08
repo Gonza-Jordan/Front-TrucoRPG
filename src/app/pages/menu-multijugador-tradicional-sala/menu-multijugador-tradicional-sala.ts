@@ -104,7 +104,8 @@ export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
   }
 
   private actualizarQr(codigo: string): void {
-    const joinUrl = `${window.location.origin}/unirse?code=${codigo}`;
+    // Incluimos el gameMode para que el deep-link sepa a qué tipo de sala unirse.
+    const joinUrl = `${window.location.origin}/unirse?code=${codigo}&mode=${this.gameMode}`;
     const encoded = encodeURIComponent(joinUrl);
     this.qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=c89030&bgcolor=0e0c08&data=${encoded}`;
   }

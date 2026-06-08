@@ -1,0 +1,29 @@
+<div class="qr-overlay" (click)="cerrar()">
+  <div class="qr-panel" (click)="$event.stopPropagation()">
+    <h2 class="qr-titulo">ESCANEAR QR</h2>
+    <div class="qr-sep"></div>
+
+    <div class="qr-camara" [class.oculto]="estado !== 'escaneando' && estado !== 'iniciando'">
+      <video #video class="qr-video" muted autoplay playsinline></video>
+      <div class="qr-marco"></div>
+      @if (estado === 'iniciando') {
+        <p class="qr-cargando">Abriendo cámara...</p>
+      }
+    </div>
+
+    @if (estado === 'escaneando') {
+      <p class="qr-ayuda">Apuntá la cámara al código QR de la sala.</p>
+    }
+
+    @if (estado === 'sin-soporte') {
+      <p class="qr-error">
+        Tu navegador no permite escanear QR. Ingresá el código de sala a mano.
+      </p>
+    }
+    @if (estado === 'sin-permiso' || estado === 'error') {
+      <p class="qr-error">{{ mensajeError }}</p>
+    }
+
+    <button type="button" class="qr-boton-cerrar" (click)="cerrar()">CERRAR</button>
+  </div>
+</div>

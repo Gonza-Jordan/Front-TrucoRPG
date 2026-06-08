@@ -38,7 +38,18 @@
       <button class="boton-unirse" (click)="confirmarUnirse()" [disabled]="cargando">
         {{ cargando ? 'Conectando...' : 'UNIRSE' }}
       </button>
+      <button class="boton-qr" (click)="abrirEscanerQr()" [disabled]="cargando">
+        <span class="boton-qr-icono">▣</span> CONECTAR CON QR
+      </button>
       <a class="boton-cancelar" (click)="cerrarModal()">CANCELAR</a>
     </div>
   </div>
+}
+
+<!-- Escáner de QR -->
+@if (escanerAbierto) {
+  <app-qr-scanner
+    (codigoLeido)="onCodigoQr($event)"
+    (cerrado)="cerrarEscanerQr()"
+  ></app-qr-scanner>
 }

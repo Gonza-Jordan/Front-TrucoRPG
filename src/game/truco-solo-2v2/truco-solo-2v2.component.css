@@ -1,5 +1,19 @@
 /* Estilos específicos del componente solo 2v2 que no están en los archivos compartidos */
 
+/* Indicador de "mano" de la ronda (quién abre y juega primero tras una parda) */
+.mano-badge {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 1px 5px;
+  font-family: var(--font-data);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #1a1206;
+  background: #c8a030;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
 .esperando-ia {
   font-family: var(--font-data);
   font-size: 14px;

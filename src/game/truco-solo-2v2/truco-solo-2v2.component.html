@@ -33,6 +33,7 @@
             <div class="player-tag">
               <span class="player-tag-role">COMPA</span>
               <span class="player-tag-name">{{ compa.nombre }}</span>
+              @if (esMano('J3')) { <span class="mano-badge">MANO</span> }
             </div>
           </div>
           @if (dialogos['J3']) {
@@ -56,6 +57,7 @@
           <div class="side-info">
             <img src="assets/2v2/gaucho_izquierda.png" class="avatar-side avatar-rival" alt="rival" />
             <span class="player-tag-name rival-tag">{{ rival1.nombre }}</span>
+            @if (esMano('J4')) { <span class="mano-badge">MANO</span> }
           </div>
           @if (dialogos['J4']) {
             <div class="dialogo-burbuja burbuja-left">{{ dialogos['J4']!.texto }}</div>
@@ -107,6 +109,7 @@
           <div class="side-info">
             <img src="assets/2v2/gaucho_derecha.png" class="avatar-side avatar-rival" alt="rival" />
             <span class="player-tag-name rival-tag">{{ rival2.nombre }}</span>
+            @if (esMano('J2')) { <span class="mano-badge">MANO</span> }
           </div>
           <div class="side-cards side-cards-right">
             @for (c of rival2.mano; track $index) {
@@ -127,6 +130,7 @@
         <div class="yo-info">
           <img src="assets/gaucho.png" class="avatar-yo" alt="yo" />
           <span class="yo-nombre">VOS</span>
+          @if (esMano('J1')) { <span class="mano-badge">MANO</span> }
           @if (dialogos['J1']) {
             <div class="dialogo-burbuja burbuja-bottom">{{ dialogos['J1']!.texto }}</div>
           }
