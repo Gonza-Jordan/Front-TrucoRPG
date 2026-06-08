@@ -26,6 +26,7 @@ export default class HistoriaBootScene extends Phaser.Scene {
         this.load.image('Piso 2','./assets/mapa-principal/Camino.png');
         this.load.image('Techos','./assets/mapa-principal/Techos.png');
         this.load.image('Vegetacion','./assets/mapa-principal/Vegetacion.png');
+        this.load.image('Pulperia','./assets/mapa-principal/Pulperia.png');
 
         
         this.load.plugin('rexvirtualjoystickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true);

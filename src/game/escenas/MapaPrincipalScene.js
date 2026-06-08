@@ -32,6 +32,7 @@ export default class MapaPrincipalScene extends BaseScene {
     const piedrasTileset = map.addTilesetImage('Piedras', 'Piedras');
     const techosTileset = map.addTilesetImage('Techos', 'Techos');
     const vegetacionTileset = map.addTilesetImage('Vegetacion', 'Vegetacion');
+    const pulperiaTileset = map.addTilesetImage('Pulperia', 'Pulperia');
 
     map.createLayer('Base', pisoTileset);
     map.createLayer('Pasto', [piedrasTileset, vegetacionTileset]);
@@ -39,9 +40,9 @@ export default class MapaPrincipalScene extends BaseScene {
     const arbolesLayer = map.createLayer('Arboles', [vegetacionTileset, arbol1Tileset]);
     const arboles2Layer = map.createLayer('Arboles 2', [arbol2Tileset]);
     const arboles3Layer = map.createLayer('Arboles 3', [arbol3Tileset, partesTileset]);
-    map.createLayer('Casas', [paredesTileset, techosTileset, fuegoTileset, partesTileset]);
+    map.createLayer('Casas', [paredesTileset, techosTileset, fuegoTileset, partesTileset,pulperiaTileset]);
     map.createLayer('Gallinitas', [gallinasTileset]);
-    map.createLayer('Objetos-Casa', [partesTileset, mateTileset, pavaTileset, fuegoTileset]);
+    map.createLayer('Objetos-Casa', [partesTileset, mateTileset, pavaTileset, fuegoTileset,pulperiaTileset]);
     map.createLayer('Gallinitas 2', [gallinasTileset]);
   
     arbolesLayer.setDepth(2);
