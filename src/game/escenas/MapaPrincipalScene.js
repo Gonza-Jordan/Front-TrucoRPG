@@ -1,5 +1,6 @@
 import BaseScene from './BaseScene.js';
 import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
+import Portal from '../objetos/Portal.js';
 
 export default class MapaPrincipalScene extends BaseScene {
   constructor() {
@@ -39,9 +40,21 @@ export default class MapaPrincipalScene extends BaseScene {
     const arbolesLayer = map.createLayer('Arboles', [vegetacionTileset, arbol1Tileset]);
     const arboles2Layer = map.createLayer('Arboles 2', [arbol2Tileset]);
     const arboles3Layer = map.createLayer('Arboles 3', [arbol3Tileset, partesTileset]);
-    map.createLayer('Casas', [paredesTileset, techosTileset, fuegoTileset, partesTileset,pulperiaTileset]);
-    map.createLayer('Objetos-Casa', [partesTileset, mateTileset, pavaTileset, fuegoTileset,pulperiaTileset]);
-  
+    map.createLayer('Casas', [
+      paredesTileset,
+      techosTileset,
+      fuegoTileset,
+      partesTileset,
+      pulperiaTileset,
+    ]);
+    map.createLayer('Objetos-Casa', [
+      partesTileset,
+      mateTileset,
+      pavaTileset,
+      fuegoTileset,
+      pulperiaTileset,
+    ]);
+
     arbolesLayer.setDepth(2);
     arboles2Layer.setDepth(2);
     arboles3Layer.setDepth(2);
@@ -65,10 +78,40 @@ export default class MapaPrincipalScene extends BaseScene {
 
     this.cameras.main.startFollow(this.JugadorPrincipal, true, 0.1, 0.1);
 
+    this.JugadorPrincipal.setScale(1.1);
+
     this.keys = this.input.keyboard.createCursorKeys();
+    this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+
+    this.portal = new Portal(
+      this,
+      464,
+      195,
+      'InteriorCasaScene',
+      'Mate',
+      { x: 621, y: 64 },
+    );
+
+    this.physics.add.overlap(this.JugadorPrincipal, this.portal.zone);
   }
 
   update() {
     this.JugadorPrincipal.update(this.keys, this.teclaE);
+    //Boludez para saber las coordenadas del personaje cuando se detiene, para facilitar la colocacion de objetos y portales
+    const seMueve =
+      this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
+
+    if (seMueve) {
+      this.estabaMoviendose = true;
+    } else if (this.estabaMoviendose) {
+      const xActual = Math.round(this.JugadorPrincipal.x);
+      const yActual = Math.round(this.JugadorPrincipal.y);
+
+      console.log(`📍 Personaje parado en coordenadas -> X: ${xActual}, Y: ${yActual}`);
+
+      this.estabaMoviendose = false;
+    }
+
+    this.portal.update(this.JugadorPrincipal, this.teclaE);
   }
 }

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import BaseScene from './escenas/BaseScene.js';
 import HistoriaBootScene from './escenas/HistoriaBootScene.js';
 import MapaPrincipalScene from './escenas/MapaPrincipalScene.js';
+import InteriorCasaScene from './escenas/InteriorCasaScene.js';
 
 export function initHistoria(parent = 'contenedor-juego') {
   const config = {
@@ -26,7 +27,7 @@ export function initHistoria(parent = 'contenedor-juego') {
       default: 'arcade',
       arcade: { debug: false },
     },
-    scene: [HistoriaBootScene, MapaPrincipalScene, BaseScene],
+    scene: [HistoriaBootScene, MapaPrincipalScene, BaseScene,InteriorCasaScene],
     parent,
   };
 

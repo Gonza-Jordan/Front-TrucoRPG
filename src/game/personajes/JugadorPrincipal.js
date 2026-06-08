@@ -8,7 +8,7 @@ export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
     escena.add.existing(this);
     escena.physics.add.existing(this);
 
-    this.setScale(1.1);
+    
 
     if (!escena.anims.exists(`${this.nombre}-quieto`)) {
       escena.anims.create({
