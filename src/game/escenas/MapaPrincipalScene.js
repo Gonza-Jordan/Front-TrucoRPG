@@ -24,7 +24,6 @@ export default class MapaPrincipalScene extends BaseScene {
     const arbol2Tileset = map.addTilesetImage('Arbol 2', 'Arbol 2');
     const arbol3Tileset = map.addTilesetImage('Arbol 3', 'Arbol 3');
     const fuegoTileset = map.addTilesetImage('Fuego', 'Fuego');
-    const gallinasTileset = map.addTilesetImage('Gallinas', 'Gallinas');
     const mateTileset = map.addTilesetImage('Mate', 'Mate');
     const paredesTileset = map.addTilesetImage('Paredes', 'Paredes');
     const partesTileset = map.addTilesetImage('Partes', 'Partes');
@@ -41,9 +40,7 @@ export default class MapaPrincipalScene extends BaseScene {
     const arboles2Layer = map.createLayer('Arboles 2', [arbol2Tileset]);
     const arboles3Layer = map.createLayer('Arboles 3', [arbol3Tileset, partesTileset]);
     map.createLayer('Casas', [paredesTileset, techosTileset, fuegoTileset, partesTileset,pulperiaTileset]);
-    map.createLayer('Gallinitas', [gallinasTileset]);
     map.createLayer('Objetos-Casa', [partesTileset, mateTileset, pavaTileset, fuegoTileset,pulperiaTileset]);
-    map.createLayer('Gallinitas 2', [gallinasTileset]);
   
     arbolesLayer.setDepth(2);
     arboles2Layer.setDepth(2);
@@ -61,6 +58,12 @@ export default class MapaPrincipalScene extends BaseScene {
     this.JugadorPrincipal.setCollideWorldBounds(true);
 
     this.physics.add.collider(this.JugadorPrincipal, colisionesLayer);
+
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+    this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+    this.cameras.main.startFollow(this.JugadorPrincipal, true, 0.1, 0.1);
 
     this.keys = this.input.keyboard.createCursorKeys();
   }
