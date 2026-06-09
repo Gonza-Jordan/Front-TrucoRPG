@@ -393,6 +393,14 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  /** Delay (ms) que tarda la máquina en jugar/cantar, configurable desde Configuración. */
+  private get delayMaquinaMs(): number {
+    const raw = localStorage.getItem('cfg_delay');
+    if (raw == null) return 1200; // default si nunca se configuró
+    const v = Number(raw);
+    return Number.isFinite(v) && v >= 0 ? v : 1200;
+  }
+
   private esperaAccionHumano(m: ManoTruco2v2): boolean {
     if (m.compaConsultaEnvido) return true;
     if (m.compaConsultaTruco) return true;
@@ -424,8 +432,8 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
 
         const firmaAntes = this.firmaEstado(m);
 
-        // Delay "pensando" antes de cada jugada de la máquina
-        await this.delay(1200);
+        // Delay "pensando" antes de cada jugada de la máquina (configurable)
+        await this.delay(this.delayMaquinaMs);
 
         let res: PasoResponse;
         try {

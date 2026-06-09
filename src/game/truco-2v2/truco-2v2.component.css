@@ -654,21 +654,50 @@
 }
 
 /* ═══ RESPONSIVE ═══ */
+/* Regla: las cartas de los rivales (.side-cards) y del compañero (.player-cards-top)
+   NUNCA se ocultan; se achican progresivamente para que entren en cualquier pantalla. */
 @media (max-width: 1200px) {
-  .side-info   { width: 76px; }
+  .side-info   { width: 72px; }
   .fan-img     { width: 84px; height: 122px; }
   .fan-wrap-2v2 { width: 270px; height: 134px; }
   .table-surface-2v2 { max-width: 520px; }
 }
 
 @media (max-width: 980px) {
-  .side-info    { width: 64px; padding: 5px; }
-  .avatar-side  { width: 34px; height: 34px; }
-  .side-cards   { display: none; }
-  .rival-tag    { font-size: 12px; }
-  .fan-img      { width: 74px; height: 108px; }
-  .fan-wrap-2v2 { width: 234px; }
-  .table-surface-2v2 { max-width: 440px; }
+  .side-info      { width: 60px; padding: 5px; }
+  .avatar-side    { width: 34px; height: 34px; }
+  .avatar-rival   { height: 50px; max-width: 60px; }
+  .rival-tag      { font-size: 11px; max-width: 60px; }
+  .side-cards     { gap: 2px; }
+  .card-back-side { width: 22px; height: 32px; }
+  .player-side    { gap: 5px; padding: 7px 5px; }
+  .fan-img        { width: 74px; height: 108px; }
+  .fan-wrap-2v2   { width: 234px; }
+  .table-surface-2v2 { max-width: 420px; }
+}
+
+@media (max-width: 680px) {
+  .row-middle     { gap: 4px; padding: 4px; }
+  .player-side    { gap: 3px; padding: 4px 3px; }
+  .side-info      { width: 46px; padding: 3px; gap: 3px; }
+  .avatar-side    { width: 28px; height: 28px; }
+  .avatar-rival   { height: 40px; max-width: 46px; }
+  .rival-tag      { font-size: 9px; max-width: 46px; letter-spacing: 0; }
+  .card-back-side { width: 17px; height: 25px; }
+  .fan-img        { width: 58px; height: 86px; }
+  .fan-wrap-2v2   { width: 184px; height: 96px; }
+  .table-surface-2v2 { max-width: 320px; }
+  .mano-badge     { font-size: 8px; padding: 0 3px; }
+}
+
+@media (max-width: 480px) {
+  .side-info      { width: 38px; padding: 2px; }
+  .avatar-rival   { height: 32px; max-width: 38px; }
+  .rival-tag      { font-size: 8px; max-width: 38px; }
+  .card-back-side { width: 14px; height: 21px; }
+  .fan-img        { width: 50px; height: 74px; }
+  .fan-wrap-2v2   { width: 156px; height: 82px; }
+  .table-surface-2v2 { max-width: 240px; }
 }
 
 @media (max-height: 680px) {
@@ -676,12 +705,23 @@
   .player-bottom { padding: 6px 16px; }
   .fan-img       { width: 78px; height: 114px; }
   .fan-wrap-2v2  { height: 124px; }
-  .card-back, .card-back-side { height: 44px; width: 30px; }
+  .card-back, .card-back-side { height: 40px; width: 28px; }
 }
 
 @media (max-height: 560px) {
-  .player-cards-top { display: none; }
-  .fan-img    { width: 66px; height: 96px; }
-  .fan-wrap-2v2 { height: 104px; }
-  .side-cards   { display: none; }
+  .player-cards-top { gap: 2px; }
+  .fan-img       { width: 64px; height: 94px; }
+  .fan-wrap-2v2  { height: 100px; }
+  .card-back     { height: 34px; width: 24px; }
+  .card-back-side { height: 30px; width: 21px; }
+}
+
+@media (max-height: 440px) {
+  .player-top    { padding: 2px 8px; }
+  .player-bottom { padding: 2px 8px; }
+  .fan-img       { width: 54px; height: 80px; }
+  .fan-wrap-2v2  { height: 84px; }
+  .card-back     { height: 28px; width: 20px; }
+  .card-back-side { height: 26px; width: 18px; }
+  .avatar-rival  { height: 34px; }
 }
