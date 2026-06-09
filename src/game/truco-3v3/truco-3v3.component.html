@@ -10,18 +10,20 @@
   <!-- ── ARENA 3v3 ──────────────────────────────────────────────── -->
   <main class="arena-3v3">
 
-    <!-- Rival de enfrente (arriba) -->
+    <!-- Rival de enfrente (arriba): cartas abajo -->
     <div class="seat seat-top">
-      <div class="player-cards-row">
-        @for (c of reversos(frente.cartasEnMano); track $index) {
-          <img class="card-back" src="assets/cards/back.PNG" alt="reverso" />
-        }
-      </div>
       <div class="seat-info" [class.equipo-nosotros]="frente.equipo === 'nosotros'"
            [class.equipo-ellos]="frente.equipo === 'ellos'">
         <img src="assets/2v2/gaucho_compañero.png" class="avatar-seat" alt="jugador" />
         <span class="seat-name">{{ frente.nombre }}</span>
-        <span class="seat-rol">{{ frente.rol }}</span>
+        <span class="seat-tag" [class.tag-compa]="frente.equipo === 'nosotros'" [class.tag-rival]="frente.equipo === 'ellos'">
+          {{ frente.equipo === 'nosotros' ? 'Compañero' : 'Rival' }}
+        </span>
+      </div>
+      <div class="player-cards-row">
+        @for (c of reversos(frente.cartasEnMano); track $index) {
+          <img class="card-back" src="assets/cards/back.PNG" alt="reverso" />
+        }
       </div>
     </div>
 
@@ -31,17 +33,19 @@
       <!-- Columna izquierda -->
       <div class="columna columna-izq">
         @for (j of izquierda; track j.rol) {
-          <div class="seat seat-side">
-            <div class="side-cards">
-              @for (c of reversos(j.cartasEnMano); track $index) {
-                <img class="card-back card-back-side" src="assets/cards/back.PNG" alt="reverso" />
-              }
-            </div>
+          <div class="seat seat-side seat-left">
             <div class="seat-info" [class.equipo-nosotros]="j.equipo === 'nosotros'"
                  [class.equipo-ellos]="j.equipo === 'ellos'">
               <img src="assets/2v2/gaucho_izquierda.png" class="avatar-seat" alt="jugador" />
               <span class="seat-name">{{ j.nombre }}</span>
-              <span class="seat-rol">{{ j.rol }}</span>
+              <span class="seat-tag" [class.tag-compa]="j.equipo === 'nosotros'" [class.tag-rival]="j.equipo === 'ellos'">
+                {{ j.equipo === 'nosotros' ? 'Compañero' : 'Rival' }}
+              </span>
+            </div>
+            <div class="side-cards">
+              @for (c of reversos(j.cartasEnMano); track $index) {
+                <img class="card-back card-back-side" src="assets/cards/back.PNG" alt="reverso" />
+              }
             </div>
           </div>
         }
@@ -60,17 +64,19 @@
       <!-- Columna derecha -->
       <div class="columna columna-der">
         @for (j of derecha; track j.rol) {
-          <div class="seat seat-side seat-side-right">
-            <div class="seat-info" [class.equipo-nosotros]="j.equipo === 'nosotros'"
-                 [class.equipo-ellos]="j.equipo === 'ellos'">
-              <img src="assets/2v2/gaucho_derecha.png" class="avatar-seat" alt="jugador" />
-              <span class="seat-name">{{ j.nombre }}</span>
-              <span class="seat-rol">{{ j.rol }}</span>
-            </div>
+          <div class="seat seat-side seat-right">
             <div class="side-cards side-cards-right">
               @for (c of reversos(j.cartasEnMano); track $index) {
                 <img class="card-back card-back-side" src="assets/cards/back.PNG" alt="reverso" />
               }
+            </div>
+            <div class="seat-info" [class.equipo-nosotros]="j.equipo === 'nosotros'"
+                 [class.equipo-ellos]="j.equipo === 'ellos'">
+              <img src="assets/2v2/gaucho_derecha.png" class="avatar-seat" alt="jugador" />
+              <span class="seat-name">{{ j.nombre }}</span>
+              <span class="seat-tag" [class.tag-compa]="j.equipo === 'nosotros'" [class.tag-rival]="j.equipo === 'ellos'">
+                {{ j.equipo === 'nosotros' ? 'Compañero' : 'Rival' }}
+              </span>
             </div>
           </div>
         }
@@ -82,7 +88,7 @@
     <div class="seat seat-bottom">
       <div class="yo-info">
         <img src="assets/gaucho.png" class="avatar-yo" alt="yo" />
-        <span class="yo-nombre">{{ yoNombre }} ({{ yoRol }})</span>
+        <span class="yo-nombre">{{ yoNombre }} ({{ miRol }})</span>
       </div>
       <div class="fan-wrap-3v3">
         @for (carta of misCartas; track $index) {
@@ -136,6 +142,11 @@
         </div>
       </div>
     </div>
+  }
+
+  <!-- ── TOAST ──────────────────────────────────────────────────── -->
+  @if (toastMsg) {
+    <div class="toast-2v2">{{ toastMsg }}</div>
   }
 
 </div>

@@ -140,7 +140,7 @@
               <img class="fan-img" [src]="cardImg(carta)" [alt]="carta.numero + ' ' + carta.palo" />
             </div>
           }
-          @if (misCartas.length === 0 && !estado?.manoTerminada) {
+          @if (misCartas.length === 0 && !estado.manoTerminada) {
             <div class="sin-cartas">Sin cartas</div>
           }
         </div>

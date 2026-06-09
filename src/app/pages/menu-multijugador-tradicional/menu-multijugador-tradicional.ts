@@ -17,7 +17,7 @@ export class MenuMultijugadorTradicional implements OnInit {
   codigoIngresado = '';
   errorUnirse = '';
   cargando = false;
-  gameMode: '1v1' | '2v2' = '1v1';
+  gameMode: '1v1' | '2v2' | '3v3' = '1v1';
 
   constructor(private sala: SalaService, private router: Router, private route: ActivatedRoute) {}
 

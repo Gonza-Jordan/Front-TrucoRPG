@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ConnectionStatusComponent } from '../../components/connection-status/connection-status';
@@ -25,20 +25,21 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
   miListo = false;
   errorMsg = '';
 
-  slotsSanMartin: Slot[] = [
-    { posicion: 0, ocupado: false, esYo: false },
-    { posicion: 0, ocupado: false, esYo: false },
-  ];
-  slotsBelgrano: Slot[] = [
-    { posicion: 0, ocupado: false, esYo: false },
-    { posicion: 0, ocupado: false, esYo: false },
-  ];
+  gameMode: '2v2' | '3v3' = '2v2';
+  get cupoPorEquipo(): number { return this.gameMode === '3v3' ? 3 : 2; }
+
+  slotsSanMartin: Slot[] = [];
+  slotsBelgrano: Slot[] = [];
 
   private subs: Subscription[] = [];
 
-  constructor(private sala: SalaService, private router: Router) {}
+  constructor(private sala: SalaService, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
+    this.gameMode = (this.route.snapshot.queryParamMap.get('gameMode') as any) === '3v3' ? '3v3' : '2v2';
+    this.slotsSanMartin = this.slotsVacios();
+    this.slotsBelgrano  = this.slotsVacios();
+
     // Si no hay conexión (acceso directo a la URL), volver al menú
     if (!this.sala.codigoSala$.value) {
       this.router.navigate(['/menu-multijugador-tipo']);
@@ -59,7 +60,7 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
       this.sala.miListo$.subscribe(v => (this.miListo = v)),
 
       this.sala.juegoIniciado$.subscribe(v => {
-        if (v) this.router.navigate(['/juego/2v2-multi']);
+        if (v) this.router.navigate([this.gameMode === '3v3' ? '/juego/3v3' : '/juego/2v2-multi']);
       }),
 
       this.sala.jugadorDesconectado$.subscribe(v => {
@@ -91,13 +92,14 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
     this.miEquipo = yo?.equipo ?? null;
   }
 
+  private slotsVacios(): Slot[] {
+    return Array.from({ length: this.cupoPorEquipo }, () => ({ posicion: 0, ocupado: false, esYo: false }));
+  }
+
   private construirSlots(jugadores: { posicion: number; equipo: string | null }[], miPosicion: number): Slot[] {
-    const slots: Slot[] = [
-      { posicion: 0, ocupado: false, esYo: false },
-      { posicion: 0, ocupado: false, esYo: false },
-    ];
+    const slots: Slot[] = this.slotsVacios();
     jugadores.forEach((j, idx) => {
-      if (idx < 2) {
+      if (idx < this.cupoPorEquipo) {
         slots[idx] = {
           posicion: j.posicion,
           ocupado: true,
@@ -115,7 +117,7 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
     const count = equipo === 'sanMartin'
       ? (this.estadoEquipos?.countSanMartin ?? 0)
       : (this.estadoEquipos?.countBelgrano ?? 0);
-    return count >= 2;
+    return count >= this.cupoPorEquipo;
   }
 
   async elegirEquipo(equipo: string): Promise<void> {
@@ -138,7 +140,7 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
   async comenzar(): Promise<void> {
     if (this.miListo) return;
     if (!this.estadoEquipos?.equiposListos) {
-      this.errorMsg = 'Los equipos deben estar completos (2 vs 2).';
+      this.errorMsg = `Los equipos deben estar completos (${this.cupoPorEquipo} vs ${this.cupoPorEquipo}).`;
       return;
     }
     if (!this.miEquipo) {
