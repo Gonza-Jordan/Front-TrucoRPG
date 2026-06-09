@@ -4,20 +4,54 @@ import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../auth/auth.service';
 
+export interface JugadorEquipo {
+  posicion: number;
+  equipo: 'sanMartin' | 'belgrano' | null;
+}
+
+export interface EstadoEquipos {
+  miPosicion: number;
+  jugadores: JugadorEquipo[];
+  equiposListos: boolean;
+  countSanMartin: number;
+  countBelgrano: number;
+}
+
+export interface LobbyActualizado {
+  jugadoresEnSala: number;
+  maxJugadores: number;
+}
+
+export interface LobbyListos {
+  listos: number;
+  requeridos: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SalaService {
   private hub: signalR.HubConnection;
 
-  codigoSala$ = new BehaviorSubject<string>('');
-  salaLista$ = new BehaviorSubject<boolean>(false);
-  miListo$ = new BehaviorSubject<boolean>(false);
-  juegoIniciado$ = new BehaviorSubject<boolean>(false);
+  // ── 1v1 observables ─────────────────────────────────────────
+  codigoSala$          = new BehaviorSubject<string>('');
+  salaLista$           = new BehaviorSubject<boolean>(false);
+  miListo$             = new BehaviorSubject<boolean>(false);
+  juegoIniciado$       = new BehaviorSubject<boolean>(false);
   jugadorDesconectado$ = new BehaviorSubject<boolean>(false);
-  trucoEstado$ = new BehaviorSubject<unknown>(null);
-  error$ = new BehaviorSubject<string>('');
+  trucoEstado$         = new BehaviorSubject<unknown>(null);
+  error$               = new BehaviorSubject<string>('');
+
+  // ── 2v2 observables ─────────────────────────────────────────
+  salaCompleta$      = new BehaviorSubject<boolean>(false);
+  lobbyActualizado$  = new BehaviorSubject<LobbyActualizado | null>(null);
+  estadoEquipos$     = new BehaviorSubject<EstadoEquipos | null>(null);
+  equiposListos$     = new BehaviorSubject<boolean>(false);
+  miPosicion$        = new BehaviorSubject<number>(0);
+  lobbyListos$       = new BehaviorSubject<LobbyListos | null>(null);
+  /** Estado del juego 2v2 multijugador (para TrucoMulti2v2Component) */
+  trucoEstado2v2$    = new BehaviorSubject<unknown>(null);
+  juegoIniciado2v2$  = new BehaviorSubject<boolean>(false);
 
   constructor(private auth: AuthService) {
-    // hubUrl es relativo ('/gamehub') — el proxy de Vite lo redirige al backend
     this.hub = new signalR.HubConnectionBuilder()
       .withUrl(environment.hubUrl, {
         accessTokenFactory: () => this.auth.obtenerToken() ?? '',
@@ -26,11 +60,11 @@ export class SalaService {
       .withAutomaticReconnect()
       .build();
 
+    // ── 1v1 events ─────────────────────────────────────────────
     this.hub.on('SalaLista', () => {
       this.salaLista$.next(true);
     });
 
-    // TrucoEstado: primera vez = inicio de juego; luego = actualizaciones de estado
     this.hub.on('TrucoEstado', (data: unknown) => {
       if (!this.juegoIniciado$.value) this.juegoIniciado$.next(true);
       this.trucoEstado$.next(data);
@@ -41,6 +75,33 @@ export class SalaService {
       this.miListo$.next(false);
       this.jugadorDesconectado$.next(true);
     });
+
+    // ── 2v2 events ─────────────────────────────────────────────
+    this.hub.on('SalaCompleta', () => {
+      this.salaCompleta$.next(true);
+    });
+
+    this.hub.on('LobbyActualizado', (data: LobbyActualizado) => {
+      this.lobbyActualizado$.next(data);
+    });
+
+    this.hub.on('EstadoEquipos', (data: EstadoEquipos) => {
+      this.miPosicion$.next(data.miPosicion);
+      this.estadoEquipos$.next(data);
+      this.equiposListos$.next(data.equiposListos);
+    });
+
+    this.hub.on('LobbyListos', (data: LobbyListos) => {
+      this.lobbyListos$.next(data);
+    });
+
+    // ── 2v2 game events ────────────────────────────────────────
+    this.hub.on('TrucoEstado2v2', (data: unknown) => {
+      if (!this.juegoIniciado2v2$.value) this.juegoIniciado2v2$.next(true);
+      // También dispara juegoIniciado$ para que la navegación funcione
+      if (!this.juegoIniciado$.value) this.juegoIniciado$.next(true);
+      this.trucoEstado2v2$.next(data);
+    });
   }
 
   async conectar(): Promise<void> {
@@ -48,8 +109,8 @@ export class SalaService {
     await this.hub.start();
   }
 
-  async crearSala(): Promise<string> {
-    const codigo = await this.hub.invoke<string>('CrearSala');
+  async crearSala(modo: '1v1' | '2v2' = '1v1'): Promise<string> {
+    const codigo = await this.hub.invoke<string>('CrearSala', modo);
     this.codigoSala$.next(codigo);
     return codigo;
   }
@@ -58,9 +119,12 @@ export class SalaService {
     const ok = await this.hub.invoke<boolean>('UnirseASala', codigo.toUpperCase().trim());
     if (ok) {
       this.codigoSala$.next(codigo.toUpperCase().trim());
-      // El backend emite SalaLista al grupo (incluye a este jugador)
     }
     return ok;
+  }
+
+  async elegirEquipo(equipo: 'sanMartin' | 'belgrano'): Promise<void> {
+    await this.hub.invoke('ElegirEquipo', equipo);
   }
 
   async listoParaJugar(): Promise<void> {
@@ -85,5 +149,14 @@ export class SalaService {
     this.jugadorDesconectado$.next(false);
     this.trucoEstado$.next(null);
     this.error$.next('');
+    // 2v2
+    this.salaCompleta$.next(false);
+    this.lobbyActualizado$.next(null);
+    this.estadoEquipos$.next(null);
+    this.equiposListos$.next(false);
+    this.miPosicion$.next(0);
+    this.lobbyListos$.next(null);
+    this.trucoEstado2v2$.next(null);
+    this.juegoIniciado2v2$.next(false);
   }
 }

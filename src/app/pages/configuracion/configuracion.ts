@@ -17,6 +17,8 @@ export class ConfiguracionComponent {
   volumen = Number(localStorage.getItem('cfg_volumen') ?? 70);
   musica  = localStorage.getItem('cfg_musica') !== 'false';
   pantallaCompleta = localStorage.getItem('cfg_pantalla') === 'true';
+  // Delay (en segundos) que tarda la máquina en jugar/cantar en el modo solo.
+  delaySegundos = (Number(localStorage.getItem('cfg_delay') ?? 1200)) / 1000;
 
   private audio = inject(AudioService);
 
@@ -32,6 +34,7 @@ export class ConfiguracionComponent {
 
   guardar() {
     localStorage.setItem('cfg_pantalla', String(this.pantallaCompleta));
+    localStorage.setItem('cfg_delay', String(Math.round(this.delaySegundos * 1000)));
     this.aplicarPantallaCompleta(this.pantallaCompleta);
     this.router.navigate(['/home']);
   }

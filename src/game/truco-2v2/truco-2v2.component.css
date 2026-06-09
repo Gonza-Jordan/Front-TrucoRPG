@@ -1,0 +1,727 @@
+/* ═══════════════════════════════════════════════════════════════════
+   TRUCO 2v2  —  layout completo (rebuild)
+   Hereda variables de truco-solo.component.css (:host con --green-felt, etc.)
+   Compartido por truco-2v2 (multi) y truco-solo-2v2.
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Arena principal ───────────────────────────────────────────── */
+.arena-2v2 {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;  /* compa | mesa | yo */
+  grid-template-columns: 1fr;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ═══ FILA SUPERIOR — COMPAÑERO ═══ */
+.player-top {
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid rgba(90, 64, 20, 0.35);
+  padding: 8px 12px;
+  gap: 12px;
+}
+
+.player-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+/* Gaucho compañero — retrato grande estilo solitario */
+.avatar-gaucho {
+  width: auto !important;
+  height: 92px !important;
+  max-width: 130px;
+  object-fit: contain;
+  border-radius: 0 !important;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.85)) brightness(1.05) !important;
+}
+
+.player-cards-top {
+  display: flex;
+  gap: 5px;
+}
+
+.card-back {
+  width: 34px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 3px;
+  box-shadow: 0 2px 6px #000a;
+}
+
+.player-portrait-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(200, 144, 48, 0.35);
+  padding: 4px 12px 4px 6px;
+  border-radius: 6px;
+}
+
+.avatar-top {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 4px;
+  image-rendering: pixelated;
+  filter: brightness(1.05);
+}
+
+.player-tag {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.player-tag-role {
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #c8a030;
+  text-transform: uppercase;
+}
+
+.player-tag-name {
+  font-family: var(--font-data);
+  font-size: 17px;
+  letter-spacing: 1px;
+  color: #f0e0b0;
+}
+
+/* ═══ FILA MEDIA — MESA CON RIVALES ═══ */
+.row-middle {
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  gap: 8px;
+  padding: 8px;
+  overflow: visible;
+}
+
+/* ── Zonas laterales rivales ───────────────────────────────────── */
+.player-side {
+  flex: 0 0 auto;
+  align-self: center;
+  position: relative;
+  display: flex;
+  flex-direction: row-reverse;  /* cartas del lado de adentro (hacia la mesa) */
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 8px;
+  background: rgba(6, 4, 2, 0.55);
+  border-radius: 8px;
+  border: 1px solid rgba(100, 60, 20, 0.4);
+}
+
+.side-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(20, 12, 4, 0.7);
+  border: 1px solid rgba(150, 80, 30, 0.5);
+  border-radius: 6px;
+  padding: 8px;
+  width: 84px;
+}
+
+.avatar-side {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  border-radius: 4px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8));
+}
+/* Rivales con su modelado propio (sin tinte) */
+.avatar-rival {
+  width: auto;
+  height: 70px;
+  max-width: 92px;
+}
+
+.rival-tag {
+  font-family: var(--font-data);
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #dd7060;
+  text-align: center;
+  max-width: 78px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Cartas rival — columna simple, reverso, sin recorte */
+.side-cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.card-back-side {
+  width: 28px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 3px;
+  box-shadow: 0 2px 6px #000c;
+  display: block;
+}
+
+/* ── Mesa ─────────────────────────────────────────────────────── */
+.table-wrap-2v2 {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.table-surface-2v2 {
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 5 / 4;
+  max-height: 100%;
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 45%,
+    #1d8a1d 0%,
+    #116011 58%,
+    #0a3d0a 100%
+  );
+  border: 4px solid #34883a;
+  border-radius: 14px;
+  box-shadow:
+    inset 0 0 50px rgba(0, 0, 0, 0.6),
+    inset 0 4px 14px rgba(255, 255, 255, 0.06),
+    0 10px 28px rgba(0, 0, 0, 0.75);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+/* ── Bazas ────────────────────────────────────────────────────── */
+.bazas-2v2 {
+  display: flex;
+  gap: clamp(4px, 1vw, 12px);
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.baza-col-2v2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+}
+
+.baza-mini {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.baza-top, .baza-bottom {
+  width: 48px;
+  height: 68px;
+}
+
+.baza-laterales {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.baza-left, .baza-right {
+  width: 68px;
+  height: 48px;
+}
+
+.baza-card {
+  width: 46px;
+  height: 66px;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.7);
+}
+
+.baza-card-rot {
+  transform: rotate(90deg);
+}
+
+.baza-ganador-badge {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 1px 6px;
+  border-radius: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.badge-nosotros { background: #1a4a22; color: #5adc7a; border: 1px solid #3a8a4a; }
+.badge-ellos    { background: #4a1a1a; color: #dc5a5a; border: 1px solid #8a3030; }
+.badge-parda    { background: #2a240e; color: #c8a030; border: 1px solid #5a4020; }
+
+.turno-badge-2v2 {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(14, 8, 2, 0.92);
+  border: 1px solid #7a4a18;
+  color: #c89030;
+  font-family: var(--font-data);
+  font-size: 15px;
+  letter-spacing: 1.5px;
+  padding: 5px 20px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 40;
+  max-width: 96%;
+  text-align: center;
+}
+
+/* ═══ FILA INFERIOR — YO ═══ */
+.player-bottom {
+  grid-row: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.35);
+  border-top: 1px solid rgba(90, 64, 20, 0.35);
+  overflow: visible;
+}
+
+.yo-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(10, 7, 2, 0.7);
+  border: 1px solid rgba(200, 144, 48, 0.45);
+  padding: 8px 12px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* ── Burbujas de diálogo (cantos / quiero / no quiero) ──────────── */
+.dialogo-burbuja {
+  position: absolute;
+  background: #fffff0;
+  border: 2px solid #2a2a2a;
+  border-radius: 9px;
+  padding: 4px 13px;
+  font-family: var(--font-data);
+  font-size: 19px;
+  letter-spacing: 0.5px;
+  color: #111;
+  white-space: nowrap;
+  z-index: 80;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+  animation: burbujaPop 0.16s ease-out;
+  pointer-events: none;
+}
+
+.burbuja-top    { top: calc(100% + 10px); left: 50%; transform: translateX(-50%); }
+.burbuja-bottom { bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); }
+.burbuja-left   { left: calc(100% + 10px); top: 50%; transform: translateY(-50%); }
+.burbuja-right  { right: calc(100% + 10px); top: 50%; transform: translateY(-50%); }
+
+@keyframes burbujaPop {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.avatar-yo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 4px;
+  image-rendering: pixelated;
+  filter: brightness(1.1) saturate(1.1);
+}
+
+.yo-nombre {
+  font-family: var(--font-data);
+  font-size: 15px;
+  letter-spacing: 2px;
+  color: #c8a030;
+}
+
+/* ── Abanico (mano del jugador) ───────────────────────────────── */
+.fan-wrap-2v2 {
+  position: relative;
+  width: 300px;
+  height: 150px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fan-card-2v2 {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform-origin: bottom center;
+  transform: translateX(calc(-50% + var(--xoff))) rotate(var(--ang));
+  cursor: pointer;
+  transition: transform 0.14s ease, filter 0.1s;
+  z-index: 1;
+}
+
+.fan-card-2v2:nth-child(2) { z-index: 2; }
+
+.fan-card-2v2:hover:not(.played) {
+  transform: translateX(calc(-50% + var(--xoff))) rotate(var(--ang)) translateY(-22px);
+  filter: brightness(1.2) drop-shadow(0 6px 12px rgba(200, 144, 48, 0.55));
+  z-index: 5;
+}
+
+.fan-card-2v2.played {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fan-img {
+  width: 96px;
+  height: 140px;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 0, 0, 0.3);
+  display: block;
+}
+
+/* ═══ TANTEADOR 2v2 ═══ */
+.scoreboard-2v2 {
+  background: rgba(10, 7, 2, 0.88);
+  border: 1px solid var(--divider);
+  padding: 8px 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.score-title-2v2 {
+  font-family: var(--font-data);
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #6a5025;
+  text-align: center;
+  border-bottom: 1px solid var(--divider);
+  padding-bottom: 4px;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+
+.score-equipo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+
+.score-label {
+  font-family: var(--font-data);
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.score-pts {
+  font-family: var(--font-data);
+  font-size: 22px;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.nosotros-label, .nosotros-pts { color: #c8a030; }
+.ellos-label,    .ellos-pts    { color: #d46010; }
+
+.score-sep-2v2 {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #5a3a10, transparent);
+  margin: 2px 0;
+}
+
+.tally-svg {
+  width: 100%;
+  height: 52px;
+  display: block;
+}
+
+/* ─── Estado partida ──────────────────────────────────────────── */
+.state-section {
+  background: rgba(8, 6, 2, 0.72);
+  border: 1px solid #221408;
+  padding: 5px 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.state-title {
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #7a6030;
+  border-bottom: 1px solid #2a1a08;
+  padding-bottom: 2px;
+  text-transform: uppercase;
+}
+
+.envido-title { color: #4488cc; border-color: #1a3a5a; }
+.truco-title  { color: #cc5533; border-color: #5a2a1a; }
+
+.state-text {
+  font-family: var(--font-data);
+  font-size: 13px;
+  color: #8a7858;
+  line-height: 1.35;
+}
+
+.back-btn {
+  margin-top: auto;
+  font-family: var(--font-data);
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: #7a6040;
+  background: #0e0a06;
+  border: 1px solid #2e1e0c;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: color 0.1s, background 0.1s, border-color 0.1s;
+  border-radius: 3px;
+}
+
+.back-btn:hover {
+  color: #c89030;
+  background: #181208;
+  border-color: #5a4020;
+}
+
+/* ─── Toast ───────────────────────────────────────────────────── */
+.toast-2v2 {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(14, 8, 2, 0.93);
+  border: 1px solid #8a5020;
+  color: #c89030;
+  font-family: var(--font-data);
+  font-size: 15px;
+  letter-spacing: 1.5px;
+  padding: 7px 22px;
+  border-radius: 4px;
+  z-index: 200;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 80%;
+  text-align: center;
+}
+
+/* ─── Overlays (confirm/game over) ───────────────────────────── */
+.confirm-overlay, .game-over-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+}
+
+.confirm-box {
+  background: #12100a;
+  border: 2px solid #5a4020;
+  padding: 26px 32px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 260px;
+}
+
+.confirm-title {
+  font-family: var(--font-data);
+  font-size: 17px;
+  letter-spacing: 2px;
+  color: #c89030;
+  text-align: center;
+}
+
+.confirm-sub {
+  font-family: var(--font-data);
+  font-size: 13px;
+  color: #7a6030;
+  text-align: center;
+}
+
+.confirm-btn-row { display: flex; gap: 12px; }
+
+.confirm-btn {
+  font-family: var(--font-data);
+  font-size: 14px;
+  letter-spacing: 1px;
+  padding: 7px 18px;
+  cursor: pointer;
+  border-radius: 3px;
+  border: 2px solid;
+}
+
+.confirm-btn-si  { background: #3a1010; border-color: #aa3030; color: #ff8080; }
+.confirm-btn-no  { background: #101a10; border-color: #308830; color: #80cc80; }
+.confirm-btn-si:hover { background: #5a1818; }
+.confirm-btn-no:hover { background: #183018; }
+
+/* ═══ MESA CENTRAL — jugadas por jugador (superpuestas) ═══ */
+.mesa-cruz {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.pila-medio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+}
+
+.pila-centro { width: 36px; height: 1px; }
+
+.pila {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Pilas verticales (compañero arriba / vos abajo) */
+.pila-top    { flex-direction: column; }
+.pila-top .mesa-card:not(:first-child)    { margin-top: -52px; }
+
+.pila-bottom { flex-direction: column-reverse; }   /* crece hacia el centro (arriba) */
+.pila-bottom .mesa-card:not(:first-child) { margin-bottom: -52px; }
+
+/* Pilas horizontales (rivales a los costados) */
+.pila-left  { flex-direction: row; }
+.pila-left .mesa-card:not(:first-child)  { margin-left: -34px; }
+
+.pila-right { flex-direction: row-reverse; }        /* crece hacia el centro (izquierda) */
+.pila-right .mesa-card:not(:first-child) { margin-right: -34px; }
+
+.mesa-card {
+  width: 68px;
+  height: 98px;
+  object-fit: contain;
+  border-radius: 5px;
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.75);
+  display: block;
+  position: relative;
+  z-index: var(--i, 0);   /* la 1ra carta jugada (i=0) queda abajo; la última, arriba */
+}
+
+/* ═══ RESPONSIVE ═══ */
+/* Regla: las cartas de los rivales (.side-cards) y del compañero (.player-cards-top)
+   NUNCA se ocultan; se achican progresivamente para que entren en cualquier pantalla. */
+@media (max-width: 1200px) {
+  .side-info   { width: 72px; }
+  .fan-img     { width: 84px; height: 122px; }
+  .fan-wrap-2v2 { width: 270px; height: 134px; }
+  .table-surface-2v2 { max-width: 520px; }
+}
+
+@media (max-width: 980px) {
+  .side-info      { width: 60px; padding: 5px; }
+  .avatar-side    { width: 34px; height: 34px; }
+  .avatar-rival   { height: 50px; max-width: 60px; }
+  .rival-tag      { font-size: 11px; max-width: 60px; }
+  .side-cards     { gap: 2px; }
+  .card-back-side { width: 22px; height: 32px; }
+  .player-side    { gap: 5px; padding: 7px 5px; }
+  .fan-img        { width: 74px; height: 108px; }
+  .fan-wrap-2v2   { width: 234px; }
+  .table-surface-2v2 { max-width: 420px; }
+}
+
+@media (max-width: 680px) {
+  .row-middle     { gap: 4px; padding: 4px; }
+  .player-side    { gap: 3px; padding: 4px 3px; }
+  .side-info      { width: 46px; padding: 3px; gap: 3px; }
+  .avatar-side    { width: 28px; height: 28px; }
+  .avatar-rival   { height: 40px; max-width: 46px; }
+  .rival-tag      { font-size: 9px; max-width: 46px; letter-spacing: 0; }
+  .card-back-side { width: 17px; height: 25px; }
+  .fan-img        { width: 58px; height: 86px; }
+  .fan-wrap-2v2   { width: 184px; height: 96px; }
+  .table-surface-2v2 { max-width: 320px; }
+  .mano-badge     { font-size: 8px; padding: 0 3px; }
+}
+
+@media (max-width: 480px) {
+  .side-info      { width: 38px; padding: 2px; }
+  .avatar-rival   { height: 32px; max-width: 38px; }
+  .rival-tag      { font-size: 8px; max-width: 38px; }
+  .card-back-side { width: 14px; height: 21px; }
+  .fan-img        { width: 50px; height: 74px; }
+  .fan-wrap-2v2   { width: 156px; height: 82px; }
+  .table-surface-2v2 { max-width: 240px; }
+}
+
+@media (max-height: 680px) {
+  .player-top    { padding: 5px 12px; }
+  .player-bottom { padding: 6px 16px; }
+  .fan-img       { width: 78px; height: 114px; }
+  .fan-wrap-2v2  { height: 124px; }
+  .card-back, .card-back-side { height: 40px; width: 28px; }
+}
+
+@media (max-height: 560px) {
+  .player-cards-top { gap: 2px; }
+  .fan-img       { width: 64px; height: 94px; }
+  .fan-wrap-2v2  { height: 100px; }
+  .card-back     { height: 34px; width: 24px; }
+  .card-back-side { height: 30px; width: 21px; }
+}
+
+@media (max-height: 440px) {
+  .player-top    { padding: 2px 8px; }
+  .player-bottom { padding: 2px 8px; }
+  .fan-img       { width: 54px; height: 80px; }
+  .fan-wrap-2v2  { height: 84px; }
+  .card-back     { height: 28px; width: 20px; }
+  .card-back-side { height: 26px; width: 18px; }
+  .avatar-rival  { height: 34px; }
+}

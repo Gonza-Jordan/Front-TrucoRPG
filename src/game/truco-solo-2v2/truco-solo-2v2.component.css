@@ -1,0 +1,107 @@
+/* Estilos específicos del componente solo 2v2 que no están en los archivos compartidos */
+
+/* Indicador de "mano" de la ronda (quién abre y juega primero tras una parda) */
+.mano-badge {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 1px 5px;
+  font-family: var(--font-data);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #1a1206;
+  background: #c8a030;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.esperando-ia {
+  font-family: var(--font-data);
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #4a3820;
+  text-align: center;
+  padding: 8px 4px;
+  border: 1px dashed #2a1a08;
+  animation: parpadeo 1.2s infinite;
+}
+
+@keyframes parpadeo {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.sin-cartas {
+  font-family: var(--font-data);
+  font-size: 14px;
+  color: #4a3820;
+  letter-spacing: 2px;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* ── Game Over ──────────────────────────────────────────────────── */
+.game-over-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+}
+
+.game-over-box {
+  background: #14100a;
+  border: 2px solid #5a4020;
+  padding: 36px 40px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  min-width: 300px;
+  animation: fadeIn 0.2s ease;
+}
+
+.go-title {
+  font-family: var(--font-data);
+  font-size: 28px;
+  letter-spacing: 3px;
+  text-align: center;
+}
+.go-win  { color: #c8a030; }
+.go-lose { color: #cc4444; }
+
+.go-subtitle {
+  font-family: var(--font-data);
+  font-size: 15px;
+  color: #7a6030;
+  text-align: center;
+  max-width: 280px;
+  line-height: 1.4;
+}
+
+.go-btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.go-btn {
+  font-family: var(--font-data);
+  font-size: 16px;
+  letter-spacing: 1px;
+  padding: 8px 20px;
+  cursor: pointer;
+  border: 2px solid;
+  border-radius: 3px;
+  transition: filter 0.1s;
+}
+.go-btn:hover { filter: brightness(1.2); }
+
+.go-btn-play { background: #1a3d22; border-color: #2a7a3a; color: #4adc6a; }
+.go-btn-exit { background: #3a1010; border-color: #7a3020; color: #dd7070; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}

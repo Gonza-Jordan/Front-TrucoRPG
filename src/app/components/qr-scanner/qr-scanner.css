@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
+.qr-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  animation: qrFadeIn 0.15s ease;
+}
+
+.qr-panel {
+  width: min(380px, 92vw);
+  padding: 28px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  background: rgba(14, 12, 8, 0.97);
+  border: 2px solid #5a4020;
+  outline: 1px solid rgba(200, 144, 48, 0.18);
+  outline-offset: 4px;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+}
+
+.qr-titulo {
+  margin: 0;
+  font-family: 'Jersey 10', monospace;
+  font-size: 1.3rem;
+  letter-spacing: 3px;
+  color: #c89030;
+}
+
+.qr-sep {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #5a4020, transparent);
+}
+
+.qr-camara {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #000;
+  border: 2px solid #5a4020;
+  overflow: hidden;
+}
+
+.qr-camara.oculto {
+  display: none;
+}
+
+.qr-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Marco guía para apuntar el QR */
+.qr-marco {
+  position: absolute;
+  inset: 18%;
+  border: 3px solid rgba(200, 144, 48, 0.9);
+  border-radius: 6px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  animation: qrPulso 1.6s infinite ease-in-out;
+}
+
+.qr-cargando {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #c89030;
+  font-family: 'Jersey 10', monospace;
+  letter-spacing: 1px;
+}
+
+.qr-ayuda {
+  margin: 0;
+  color: #c89030;
+  font-family: 'Jersey 10', monospace;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.qr-error {
+  margin: 0;
+  color: #e05050;
+  font-family: 'Jersey 10', monospace;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.qr-boton-cerrar {
+  width: 100%;
+  height: 50px;
+  background: #1e1508;
+  border: 2px solid #5a4020;
+  color: #c89030;
+  font-family: 'Jersey 10', monospace;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+
+.qr-boton-cerrar:hover {
+  background: #2e1f0e;
+  border-color: #8a6030;
+  color: #f0b050;
+}
+
+@keyframes qrFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes qrPulso {
+  0%, 100% { border-color: rgba(200, 144, 48, 0.9); }
+  50%      { border-color: rgba(240, 176, 80, 0.45); }
+}
