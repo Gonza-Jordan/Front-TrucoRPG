@@ -152,6 +152,7 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
   private dialogoTimers: Record<string, ReturnType<typeof setTimeout> | null> = { J1: null, J2: null, J3: null, J4: null };
   private maquinasCorriendo = false;
   private ultimaPista: string | null = null;
+  private trucoReanudadoKey: string | null = null;
 
   // ── Helpers para template ─────────────────────────────────────
   get yo():     Jugador2v2 | null  { return this.mano?.posicion1 ?? null; }
@@ -217,6 +218,65 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     if (this.countdownInterval) { clearInterval(this.countdownInterval); this.countdownInterval = null; }
     if (this.nuevaManoTimer)    { clearTimeout(this.nuevaManoTimer);     this.nuevaManoTimer = null; }
     this.countdown = null;
+  }
+
+  // ── Auto-jugar la última carta cuando la mano ya está ganada ──
+  private autoJugando = false;
+
+  private intentarAutoJugarSiManoGanada(mano: ManoTruco2v2): void {
+    if (this.autoJugando) return;
+    if (mano.turnoActual !== 'J1' || mano.manoTerminada || mano.ganadorMano || mano.partidaTerminada) return;
+    if (mano.trucoPendienteRespuestaDe || mano.envidoPendienteRespuestaDe) return;
+    if (mano.faseEnvido === 'pendiente_respuesta' || mano.faseEnvido === 'declarando_tantos') return;
+    if (!this.yo || this.yo.mano.length === 0) return;
+
+    const va = mano.vueltaActual;
+    if (!va) return;
+    const cj = va.cartasJugadas;
+    // Ambos rivales ya jugaron su carta en esta vuelta.
+    if (!cj['J2'] || !cj['J4']) return;
+    const mejorRival = Math.max(cj['J2'].valorTruco, cj['J4'].valorTruco);
+    // Mejor carta que ya tiró mi equipo en esta vuelta (el compañero; yo todavía no jugué).
+    const cartasEquipo = [cj['J1'], cj['J3']].filter(Boolean) as Carta2v2[];
+    const mejorEquipo = cartasEquipo.length ? Math.max(...cartasEquipo.map(c => c.valorTruco)) : -1;
+    if (mejorEquipo <= mejorRival) return; // mi equipo todavía no tiene ganada la vuelta
+
+    // ¿Ganar esta vuelta nos da la mano? (si no, mi carta todavía importa)
+    const proyectado = [...mano.vueltas.map(v => v.ganadorVuelta), 'EquipoA'];
+    if (this.resolverGanadorMano(proyectado, mano.equipoMano) !== 'EquipoA') return;
+
+    // Mano ya ganada → juego mi carta más baja automáticamente.
+    this.autoJugando = true;
+    const baja = [...this.yo.mano].sort((a, b) => a.valorTruco - b.valorTruco)[0];
+    setTimeout(async () => {
+      this.autoJugando = false;
+      if (this.mano?.turnoActual === 'J1' && !this.mano?.manoTerminada) {
+        await this.jugarCarta(baja);
+      }
+    }, 800);
+  }
+
+  /** Réplica de la resolución de ganador de mano del backend (para anticipar la mano ganada). */
+  private resolverGanadorMano(g: (string | null)[], equipoMano: string): string | null {
+    const g1 = g[0] ?? null, g2 = g[1] ?? null, g3 = g[2] ?? null;
+    if (g1 === 'EquipoA' || g1 === 'EquipoB') {
+      if (g2 === g1) return g1;
+      if (g2 === 'Parda') return g1;
+      if (g2 && g2 !== g1 && g2 !== 'Parda') {
+        if (g3 == null) return null;
+        if (g3 === 'Parda') return g1;
+        return g3;
+      }
+    }
+    if (g1 === 'Parda') {
+      if (g2 === 'EquipoA' || g2 === 'EquipoB') return g2;
+      if (g2 === 'Parda') {
+        if (g3 == null) return null;
+        if (g3 === 'Parda') return equipoMano;
+        return g3;
+      }
+    }
+    return null;
   }
 
   async cantarEnvido(tipo: string): Promise<void> {
@@ -442,6 +502,19 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     }
     this.prevGanadorMano = mano.ganadorMano ?? null;
 
+    // "¿Y el truco entonces?": si en la primera vuelta el envido fue "va primero" y ya
+    // se resolvió, pero todavía debés responder el truco, el rival re-pregunta.
+    if (mano.trucoPendienteRespuestaDe === 'J1' && mano.envidoResuelto && mano.vueltas.length === 0) {
+      const key = `${mano.numeroDeMano}-${mano.cantorTruco}`;
+      if (this.trucoReanudadoKey !== key) {
+        this.trucoReanudadoKey = key;
+        this.mostrarDialogo(mano.cantorTruco ?? 'J2', '¿Y el truco entonces?');
+      }
+    }
+
+    // Si la mano ya está ganada y solo falta tu carta (no cambia nada), se juega sola.
+    this.intentarAutoJugarSiManoGanada(mano);
+
     this.cdr.markForCheck();
   }
 
@@ -463,7 +536,15 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     const esMiTurno  = mano.turnoActual === 'J1';
     const manoEnd    = mano.manoTerminada || !!mano.ganadorMano || mano.partidaTerminada;
     const envidoDisponible = !mano.envidoCantado && !mano.envidoResuelto && mano.vueltas.length === 0
-      && (!mano.trucoCantado || mano.trucoPendienteRespuestaDe != null);
+      && (mano.posicion1?.jugadas?.length ?? 0) === 0  // el envido se canta ANTES de jugar tu carta
+      && (
+        !mano.trucoCantado
+        // "Envido va primero": solo contra el PRIMER truco cantado por el rival (nivel 1),
+        // todavía sin aceptar. Si el truco ya fue aceptado/escalado, la ventana se cerró.
+        || (mano.trucoPendienteRespuestaDe === 'J1'
+            && mano.nivelTruco === 1
+            && mano.equipoCantorTruco === 'EquipoB')
+      );
     const envidoEnResolucion = (mano.faseEnvido === 'pendiente_respuesta' || mano.faseEnvido === 'declarando_tantos')
       && mano.envidoPendienteRespuestaDe != null;
 
