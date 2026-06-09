@@ -1,0 +1,141 @@
+<div class="root">
+
+  <!-- ── PANEL IZQ — botones (placeholder) ─────────────────────── -->
+  <aside class="side-panel left-panel">
+    <div class="btn-list">
+      <div class="esperando-ia">Botones de juego próximamente...</div>
+    </div>
+  </aside>
+
+  <!-- ── ARENA 3v3 ──────────────────────────────────────────────── -->
+  <main class="arena-3v3">
+
+    <!-- Rival de enfrente (arriba) -->
+    <div class="seat seat-top">
+      <div class="player-cards-row">
+        @for (c of reversos(frente.cartasEnMano); track $index) {
+          <img class="card-back" src="assets/cards/back.PNG" alt="reverso" />
+        }
+      </div>
+      <div class="seat-info" [class.equipo-nosotros]="frente.equipo === 'nosotros'"
+           [class.equipo-ellos]="frente.equipo === 'ellos'">
+        <img src="assets/2v2/gaucho_compañero.png" class="avatar-seat" alt="jugador" />
+        <span class="seat-name">{{ frente.nombre }}</span>
+        <span class="seat-rol">{{ frente.rol }}</span>
+      </div>
+    </div>
+
+    <!-- Fila media: izquierda (x2) + mesa + derecha (x2) -->
+    <div class="row-middle-3v3">
+
+      <!-- Columna izquierda -->
+      <div class="columna columna-izq">
+        @for (j of izquierda; track j.rol) {
+          <div class="seat seat-side">
+            <div class="side-cards">
+              @for (c of reversos(j.cartasEnMano); track $index) {
+                <img class="card-back card-back-side" src="assets/cards/back.PNG" alt="reverso" />
+              }
+            </div>
+            <div class="seat-info" [class.equipo-nosotros]="j.equipo === 'nosotros'"
+                 [class.equipo-ellos]="j.equipo === 'ellos'">
+              <img src="assets/2v2/gaucho_izquierda.png" class="avatar-seat" alt="jugador" />
+              <span class="seat-name">{{ j.nombre }}</span>
+              <span class="seat-rol">{{ j.rol }}</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Mesa -->
+      <div class="table-wrap-3v3">
+        <div class="table-surface-3v3">
+          <div class="mesa-centro-3v3"></div>
+          @if (turnoBadge) {
+            <div class="turno-badge-3v3">{{ turnoBadge }}</div>
+          }
+        </div>
+      </div>
+
+      <!-- Columna derecha -->
+      <div class="columna columna-der">
+        @for (j of derecha; track j.rol) {
+          <div class="seat seat-side seat-side-right">
+            <div class="seat-info" [class.equipo-nosotros]="j.equipo === 'nosotros'"
+                 [class.equipo-ellos]="j.equipo === 'ellos'">
+              <img src="assets/2v2/gaucho_derecha.png" class="avatar-seat" alt="jugador" />
+              <span class="seat-name">{{ j.nombre }}</span>
+              <span class="seat-rol">{{ j.rol }}</span>
+            </div>
+            <div class="side-cards side-cards-right">
+              @for (c of reversos(j.cartasEnMano); track $index) {
+                <img class="card-back card-back-side" src="assets/cards/back.PNG" alt="reverso" />
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- Fila inferior: yo -->
+    <div class="seat seat-bottom">
+      <div class="yo-info">
+        <img src="assets/gaucho.png" class="avatar-yo" alt="yo" />
+        <span class="yo-nombre">{{ yoNombre }} ({{ yoRol }})</span>
+      </div>
+      <div class="fan-wrap-3v3">
+        @for (carta of misCartas; track $index) {
+          <div class="fan-card-3v3"
+               [style.--ang]="fanAngles[$index] + 'deg'"
+               [style.--xoff]="fanXOff[$index] + 'px'"
+               (click)="jugarCarta(carta)">
+            <img class="fan-img" [src]="cardImg(carta)" [alt]="carta.numero + ' ' + carta.palo" />
+          </div>
+        }
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── PANEL DER — tanteador ──────────────────────────────────── -->
+  <aside class="side-panel right-panel">
+    <div class="scoreboard-2v2">
+      <div class="score-title-2v2">TANTEADOR</div>
+      <div class="score-equipo nosotros-row">
+        <span class="score-label nosotros-label">NOSOTROS</span>
+        <span class="score-pts nosotros-pts">{{ puntosNosotros }}</span>
+      </div>
+      <div class="score-sep-2v2"></div>
+      <div class="score-equipo ellos-row">
+        <span class="score-label ellos-label">ELLOS</span>
+        <span class="score-pts ellos-pts">{{ puntosEllos }}</span>
+      </div>
+    </div>
+
+    <div class="state-section">
+      <div class="state-title envido-title">ENVIDO</div>
+      <div class="state-text">{{ estadoEnvido }}</div>
+    </div>
+    <div class="state-section">
+      <div class="state-title truco-title">TRUCO</div>
+      <div class="state-text">{{ estadoTruco }}</div>
+    </div>
+
+    <button class="back-btn" (click)="salirPartida()">← Volver</button>
+  </aside>
+
+  <!-- ── CONFIRM SALIR ──────────────────────────────────────────── -->
+  @if (mostrarConfirmSalir) {
+    <div class="confirm-overlay" (click)="cancelarSalir()">
+      <div class="confirm-box" (click)="$event.stopPropagation()">
+        <div class="confirm-title">¿Salir de la partida?</div>
+        <div class="confirm-btn-row">
+          <button class="confirm-btn confirm-btn-si" (click)="confirmarSalir()">Sí, salir</button>
+          <button class="confirm-btn confirm-btn-no" (click)="cancelarSalir()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

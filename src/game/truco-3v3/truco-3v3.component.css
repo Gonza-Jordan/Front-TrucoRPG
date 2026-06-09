@@ -1,0 +1,171 @@
+/* ── Arena 3v3: 1 enfrente, 2 izquierda, 2 derecha, yo abajo ───────────── */
+.arena-3v3 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 8px;
+  min-height: 0;
+  gap: 6px;
+}
+
+/* Fila central con las dos columnas laterales y la mesa */
+.row-middle-3v3 {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 0;
+}
+
+.columna {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 28px;
+  min-width: 120px;
+}
+.columna-der { align-items: flex-end; }
+
+/* ── Asientos ───────────────────────────────────────────────────────────── */
+.seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.seat-top    { margin-top: 4px; }
+.seat-bottom { margin-bottom: 4px; }
+
+.seat-side { flex-direction: column; align-items: center; }
+
+.seat-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 2px solid transparent;
+}
+.seat-info.equipo-nosotros { border-color: #c8a030; }
+.seat-info.equipo-ellos    { border-color: #d46010; }
+
+.avatar-seat {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.seat-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #f4e4c1;
+  letter-spacing: 0.5px;
+}
+.seat-rol {
+  font-size: 0.7rem;
+  color: #b9a988;
+}
+
+/* ── Cartas (reversos) ──────────────────────────────────────────────────── */
+.player-cards-row,
+.side-cards {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+}
+.side-cards { flex-direction: row; }
+
+.card-back {
+  width: 30px;
+  height: auto;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.card-back-side { width: 26px; }
+
+/* ── Mesa ───────────────────────────────────────────────────────────────── */
+.table-wrap-3v3 {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+.table-surface-3v3 {
+  position: relative;
+  width: clamp(220px, 32vw, 360px);
+  aspect-ratio: 1.35 / 1;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, #1f6b3a 0%, #154d2a 70%, #0f3a20 100%);
+  border: 8px solid #6b4423;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mesa-centro-3v3 {
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+}
+.turno-badge-3v3 {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: #f4e4c1;
+  font-size: 0.78rem;
+  padding: 3px 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* ── Mis cartas (abanico) ───────────────────────────────────────────────── */
+.fan-wrap-3v3 {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 110px;
+  position: relative;
+}
+.fan-card-3v3 {
+  cursor: pointer;
+  transform: translateX(var(--xoff, 0)) rotate(var(--ang, 0));
+  transition: transform 0.15s ease;
+  margin: 0 -6px;
+}
+.fan-card-3v3:hover {
+  transform: translateX(var(--xoff, 0)) rotate(var(--ang, 0)) translateY(-14px) scale(1.06);
+  z-index: 5;
+}
+.fan-img {
+  width: 78px;
+  height: auto;
+  border-radius: 5px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.55);
+}
+
+.yo-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.avatar-yo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.yo-nombre {
+  font-weight: 700;
+  color: #f4e4c1;
+  letter-spacing: 0.5px;
+}
