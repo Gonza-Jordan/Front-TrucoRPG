@@ -69,6 +69,8 @@ export interface ManoTruco3v3 {
   compaConsultaTruco: boolean;
   compaPista: string | null;
   compaConsultor: string | null;
+  // Orden del humano: este bot debe jugar su carta más alta en su próximo turno
+  ordenJugarMayor: string | null;
 }
 
 interface MesaJugadas { yo: Carta3v3[]; der: Carta3v3[][]; izq: Carta3v3[][]; frente: Carta3v3[]; }
@@ -104,9 +106,15 @@ export class TrucoSolo3v3Component implements OnInit, OnDestroy {
   btns: BtnAccion[] = [];
   mesa: MesaJugadas = { yo: [], der: [[], []], izq: [[], []], frente: [] };
   mostrarConfirmSalir = false;
+  mostrarAcciones = false;
   toastMsg = '';
   gameOver = false;
   gameOverGanamos = false;
+
+  readonly companerosAcciones = [
+    { id: 'J3', nombre: 'J3 · Compañero 1' },
+    { id: 'J5', nombre: 'J5 · Compañero 2' },
+  ];
 
   modoPicaPica = false; // se activa cuando un equipo llega a 5; ciclos de 3 duelos hasta que alguno llega a 25, luego solo redondas hasta 30
 
@@ -323,13 +331,13 @@ export class TrucoSolo3v3Component implements OnInit, OnDestroy {
     }
   }
 
-  private mostrarDialogo(jugador: string, texto: string): void {
+  private mostrarDialogo(jugador: string, texto: string, duracionMs = 2400): void {
     if (!texto) return;
     this.dialogos[jugador] = { texto };
     this.cdr.markForCheck();
     const prev = this.dialogoTimers[jugador];
     if (prev) clearTimeout(prev);
-    this.dialogoTimers[jugador] = setTimeout(() => { this.dialogos[jugador] = null; this.cdr.markForCheck(); }, 2400);
+    this.dialogoTimers[jugador] = setTimeout(() => { this.dialogos[jugador] = null; this.cdr.markForCheck(); }, duracionMs);
   }
 
   private seatDeRol(rol: string): string | null {
@@ -579,6 +587,71 @@ export class TrucoSolo3v3Component implements OnInit, OnDestroy {
   salirPartida():    void { this.mostrarConfirmSalir = true; }
   cancelarSalir():   void { this.mostrarConfirmSalir = false; }
   confirmarSalir():  void { this.mostrarConfirmSalir = false; this.router.navigate(['/home']); }
+
+  // ── Acciones ──────────────────────────────────────────────────
+  abrirAcciones():  void { this.mostrarAcciones = true;  this.cdr.markForCheck(); }
+  cerrarAcciones(): void { this.mostrarAcciones = false; this.cdr.markForCheck(); }
+
+  /** El jugador solo puede ordenar cuando no está terminada la mano y el compañero tiene cartas. */
+  puedeOrdenarJugar(jugadorId: string): boolean {
+    if (!this.mano || this.mano.manoTerminada || this.mano.partidaTerminada) return false;
+    const j = this.jugadorDe(jugadorId);
+    return (j?.mano?.length ?? 0) > 0;
+  }
+
+  async ordenarJugarMayor(jugadorId: string): Promise<void> {
+    this.cerrarAcciones();
+    if (!this.mano) return;
+    const frases = [
+      '¡Pongo la más alta!',
+      '¡Voy con todo!',
+      '¡La mejor que tengo!',
+      '¡Ahí va la mía!',
+      '¡Tomo el mando!',
+    ];
+    const txt = frases[Math.floor(Math.random() * frases.length)];
+    this.mostrarDialogo(jugadorId, txt);
+    // Registrar la orden en el backend; la máquina la ejecutará en su próximo turno.
+    try {
+      const res = await firstValueFrom(
+        this.http.post<ManoTruco3v3>(`${API}/ordenar-mayor`, { manoId: this.mano.id, jugadorId })
+      );
+      this.actualizarEstado(res);
+      await this.correrMaquinas();
+    } catch (e: any) {
+      this.showToast(e?.error?.error ?? e?.error?.title ?? 'Error al enviar la orden.');
+    }
+  }
+
+  consultarMano(jugadorId: string): void {
+    this.cerrarAcciones();
+    const jugador = this.jugadorDe(jugadorId);
+    if (!jugador) return;
+
+    const cartas = jugador.mano; // solo las que tiene en mano (no jugadas)
+    if (cartas.length === 0) {
+      this.mostrarDialogo(jugadorId, '¡Sin cartas ya!');
+      return;
+    }
+
+    // valorTruco: 13=1esp, 12=1basto, 11=7esp, 10=7oro, 9=3s, 8=2s, 7=1copa/oro…
+    const excelentes = cartas.filter(c => c.valorTruco >= 11).length; // anchos o 7esp
+    const buenas     = cartas.filter(c => c.valorTruco >= 8 && c.valorTruco < 11).length; // 2s, 3s, 7oro
+    const medias     = cartas.filter(c => c.valorTruco >= 4 && c.valorTruco < 8).length;
+
+    let respuesta: string;
+    if (excelentes >= 2)                        respuesta = '¡Tengo dos anchos!';
+    else if (excelentes === 1 && buenas >= 1)   respuesta = '¡Ancho y algo más!';
+    else if (excelentes === 1)                  respuesta = 'Tengo un ancho';
+    else if (buenas >= 2)                       respuesta = '¡Dos buenas!';
+    else if (buenas === 1 && medias >= 1)       respuesta = 'Una buena y del medio';
+    else if (buenas === 1)                      respuesta = 'Tengo una buena';
+    else if (medias >= 2)                       respuesta = 'Dos del medio...';
+    else if (medias === 1)                      respuesta = 'Una del medio, nada más';
+    else                                        respuesta = 'Poco y nada...';
+
+    this.mostrarDialogo(jugadorId, respuesta, 3600);
+  }
 
   private showToast(msg: string): void {
     this.toastMsg = msg;

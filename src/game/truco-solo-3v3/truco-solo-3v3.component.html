@@ -17,6 +17,9 @@
         <div class="esperando-ia">Esperando a los otros jugadores...</div>
       }
     </div>
+
+    <!-- Botón Acciones al pie del panel -->
+    <button class="acciones-btn" (click)="abrirAcciones()">⚔ Acciones</button>
   </aside>
 
   <!-- ── ARENA 3v3 ──────────────────────────────────────────────── -->
@@ -216,6 +219,32 @@
           <button class="confirm-btn confirm-btn-si" (click)="confirmarSalir()">Sí, salir</button>
           <button class="confirm-btn confirm-btn-no" (click)="cancelarSalir()">Cancelar</button>
         </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── MODAL ACCIONES ──────────────────────────────────────────── -->
+  @if (mostrarAcciones) {
+    <div class="acciones-overlay" (click)="cerrarAcciones()">
+      <div class="acciones-dialog" (click)="$event.stopPropagation()">
+        <div class="acciones-title">⚔ Órdenes a compañeros</div>
+        <div class="acciones-grid">
+          @for (comp of companerosAcciones; track comp.id) {
+            <div class="acciones-jugador">
+              <div class="acciones-nombre">{{ comp.nombre }}</div>
+              <button class="accion-item accion-jugar"
+                      [disabled]="!puedeOrdenarJugar(comp.id)"
+                      (click)="ordenarJugarMayor(comp.id)">
+                🃏 Jugá tu mayor
+              </button>
+              <button class="accion-item accion-consulta"
+                      (click)="consultarMano(comp.id)">
+                🔍 ¿Qué tenés?
+              </button>
+            </div>
+          }
+        </div>
+        <button class="acciones-cerrar" (click)="cerrarAcciones()">Cerrar</button>
       </div>
     </div>
   }

@@ -306,7 +306,140 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-/* ── Responsive ─────────────────────────────────────────────────────────── */
+/* ── Botón Acciones ─────────────────────────────────────────────────────── */
+.acciones-btn {
+  margin-top: auto;
+  font-family: var(--font-data, 'VT323', monospace);
+  font-size: 17px;
+  letter-spacing: 1px;
+  color: #e8c860;
+  background: #1a1408;
+  border: 1px solid #6b4a18;
+  padding: 7px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: center;
+  transition: background 0.12s, border-color 0.12s, transform 0.08s;
+  width: 100%;
+}
+.acciones-btn:hover {
+  background: #2a1e0c;
+  border-color: #c8a030;
+}
+.acciones-btn:active { transform: scale(0.97); }
+
+/* ── Modal overlay ───────────────────────────────────────────────────────── */
+.acciones-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.68);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  z-index: 400;
+  padding: 0 0 12px 12px;
+}
+
+.acciones-dialog {
+  background: #12100a;
+  border: 2px solid #6b4423;
+  border-radius: 10px;
+  padding: 14px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 260px;
+  max-width: 380px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+  animation: accionesIn 0.16s ease-out;
+}
+
+@keyframes accionesIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.acciones-title {
+  font-family: var(--font-data, 'VT323', monospace);
+  font-size: 20px;
+  letter-spacing: 1.5px;
+  color: #e8c860;
+  border-bottom: 1px solid #3a2810;
+  padding-bottom: 6px;
+  text-align: center;
+}
+
+.acciones-grid {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+
+.acciones-jugador {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  align-items: stretch;
+  flex: 1;
+}
+
+.acciones-nombre {
+  font-family: var(--font-data, 'VT323', monospace);
+  font-size: 16px;
+  color: #c8a030;
+  letter-spacing: 1px;
+  text-align: center;
+  border-bottom: 1px solid #2a1a08;
+  padding-bottom: 4px;
+}
+
+.accion-item {
+  font-family: var(--font-data, 'VT323', monospace);
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  padding: 7px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.1s, transform 0.08s;
+  border: 1px solid;
+}
+.accion-item:active { transform: scale(0.96); }
+.accion-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.accion-jugar {
+  background: #1a2a12;
+  border-color: #4a8a28;
+  color: #88dd44;
+}
+.accion-jugar:not(:disabled):hover { background: #223614; }
+
+.accion-consulta {
+  background: #12202a;
+  border-color: #2a6a9a;
+  color: #55aadd;
+}
+.accion-consulta:hover { background: #162838; }
+
+.acciones-cerrar {
+  font-family: var(--font-data, 'VT323', monospace);
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #7a6040;
+  background: #0e0a06;
+  border: 1px solid #2e1e0c;
+  padding: 5px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: center;
+  transition: color 0.1s, border-color 0.1s;
+}
+.acciones-cerrar:hover { color: #c89030; border-color: #5a4020; }
+
+/* ── Responsive width ───────────────────────────────────────────────────── */
 @media (max-width: 1000px) {
   .row-middle-3v3 { gap: 6px; }
   .seat-side { gap: 5px; }
@@ -316,4 +449,77 @@
   .columna { min-width: 70px; gap: 12px; }
   .table-surface-3v3 { aspect-ratio: 1.1 / 1; border-radius: 10px; }
   .seat-tag { font-size: 0.56rem; }
+}
+
+/* ── Responsive height — mobile landscape (≤ 520px alto) ───────────────── */
+@media (max-height: 520px) {
+  .arena-3v3 {
+    padding: 3px clamp(3px, 0.6vw, 8px);
+    gap: clamp(3px, 0.7vh, 8px);
+  }
+  .row-middle-3v3 { gap: clamp(4px, 0.8vw, 10px); }
+  .seat-top    { margin-top: 0; }
+  .seat-bottom { margin-bottom: 0; gap: clamp(8px, 1.2vw, 16px); }
+  .seat-info {
+    padding: 3px 5px;
+    border-radius: 7px;
+    border-width: 1px;
+  }
+  .avatar-seat {
+    width: clamp(26px, 3vw, 40px);
+    height: clamp(26px, 3vw, 40px);
+  }
+  .avatar-yo {
+    width: clamp(32px, 4vw, 50px);
+    height: clamp(32px, 4vw, 50px);
+  }
+  .seat-name { font-size: clamp(0.62rem, 0.9vw, 0.78rem); }
+  .seat-tag  { font-size: clamp(0.5rem, 0.72vw, 0.62rem); }
+  .yo-nombre { font-size: clamp(0.68rem, 1vw, 0.84rem); }
+  .card-back      { width: clamp(20px, 2.2vw, 30px); }
+  .card-back-side { width: clamp(18px, 2vw, 27px); }
+  .mesa-card      { width: clamp(26px, 2.8vw, 40px); }
+  .table-surface-3v3 {
+    width: clamp(200px, 38vw, 520px);
+    border-width: clamp(4px, 0.7vw, 8px);
+  }
+  .columna { min-width: clamp(60px, 7vw, 90px); gap: clamp(6px, 1vh, 12px); }
+  .fan-wrap-3v3 {
+    height: clamp(58px, 9vh, 84px);
+    padding-right: clamp(12px, 1.6vw, 20px);
+  }
+  .fan-img { width: clamp(42px, 4.6vw, 62px); }
+  .pila-top    .mesa-card:not(:first-child) { margin-top:    -26px; }
+  .pila-bottom .mesa-card:not(:first-child) { margin-bottom: -26px; }
+  .pila-left   .mesa-card:not(:first-child) { margin-left:   -18px; }
+  .pila-right  .mesa-card:not(:first-child) { margin-right:  -18px; }
+  .turno-badge-panel { font-size: 0.72rem; padding: 4px 7px; }
+}
+
+/* ── Responsive height — muy bajo (≤ 410px) ────────────────────────────── */
+@media (max-height: 410px) {
+  .arena-3v3 { padding: 2px 3px; gap: 2px; }
+  .row-middle-3v3 { gap: 3px; }
+  .seat-info { padding: 2px 4px; border-radius: 5px; }
+  .avatar-seat { width: 22px; height: 22px; }
+  .avatar-yo   { width: 28px; height: 28px; }
+  .seat-tag    { display: none; }
+  .seat-name   { font-size: 0.58rem; }
+  .card-back      { width: 18px; }
+  .card-back-side { width: 16px; }
+  .mesa-card      { width: 22px; }
+  .table-surface-3v3 {
+    width: clamp(180px, 34vw, 420px);
+    border-width: 4px;
+  }
+  .columna { min-width: 52px; gap: 4px; }
+  .fan-wrap-3v3 { height: 52px; padding-right: 10px; }
+  .fan-img { width: 36px; }
+  .fan-card-3v3:hover {
+    transform: translateX(var(--xoff, 0)) rotate(var(--ang, 0)) translateY(-8px) scale(1.05);
+  }
+  .pila-top    .mesa-card:not(:first-child) { margin-top:    -20px; }
+  .pila-bottom .mesa-card:not(:first-child) { margin-bottom: -20px; }
+  .pila-left   .mesa-card:not(:first-child) { margin-left:   -14px; }
+  .pila-right  .mesa-card:not(:first-child) { margin-right:  -14px; }
 }
