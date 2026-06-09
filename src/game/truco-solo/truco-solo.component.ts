@@ -158,6 +158,12 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     return !!this.heroe && this.heroe.id === 0 && this.modoSeleccionCarta;
   }
 
+  // ── Modo práctica ─────────────────────────────────────────────────────────
+  escenarioPractica: number | null = null;
+  cartasBrillan: boolean[] = [false, false, false];
+  btnsBrillan:   boolean[] = [];
+  tutorialMsg    = '';
+
   // ── UI ───────────────────────────────────────────────────────────────────
   btns: Btn[] = [];
   slots: Slot[] = [{ pending: false }, { pending: false }, { pending: false }];
@@ -209,6 +215,11 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     if (heroeIdStr !== null) {
       const id = parseInt(heroeIdStr, 10);
       this.heroe = HEROES.find(h => h.id === id) ?? null;
+    }
+
+    const escStr = localStorage.getItem('practicaEscenario');
+    if (escStr !== null) {
+      this.escenarioPractica = parseInt(escStr, 10);
     }
 
     const body: Record<string, unknown> = { modo: this.heroe ? 1 : 0 };
@@ -355,6 +366,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   confirmarSalir(): void {
     this.mostrarConfirmSalir = false;
+    localStorage.removeItem('practicaEscenario');
     window.dispatchEvent(new CustomEvent('truco-solo:end'));
     this.router.navigate(['/home']);
   }
@@ -432,6 +444,80 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.buildBtns(m, esMiTurno, pendEnv, pendTru);
+
+    if (this.escenarioPractica !== null) {
+      this.actualizarTutorial(m);
+    }
+  }
+
+  // ── Tutorial práctica ──────────────────────────────────────────────────────
+  private actualizarTutorial(m: ManoState): void {
+    this.cartasBrillan = [false, false, false];
+    this.btnsBrillan   = new Array(this.btns.length).fill(false);
+    this.tutorialMsg   = '';
+
+    if (m.ganadorPartida || m.partidaTerminada) return;
+
+    const cartas        = m.humano?.mano ?? [];
+    const manoTerminada = !!m.ganadorMano;
+    const envidoPosible = !m.envidoCantado && !m.trucoResuelto
+      && (m.bazas?.length ?? 0) === 0 && !manoTerminada
+      && !m.envidoPendienteRespuestaHumano && !m.trucoPendienteRespuestaHumano;
+
+    // 1. Siempre: marcar la carta más fuerte
+    if (cartas.length > 0 && !manoTerminada) {
+      const maxValor = Math.max(...cartas.map(c => c.valorTruco));
+      const idx = cartas.findIndex(c => c.valorTruco === maxValor);
+      if (idx >= 0) this.cartasBrillan[idx] = true;
+    }
+
+    // 2. Cuando el envido es posible: marcar botones y armar mensaje
+    if (envidoPosible && cartas.length > 0) {
+      const pts       = this.calcularPuntosEnvido(cartas);
+      const vasAbajo  = (m.puntosHumano ?? 0) < (m.puntosMaquina ?? 0);
+      const casiGanas = (m.puntosHumano ?? 0) >= 24;
+
+      if (pts >= 25) {
+        const idxEnv = this.btns.findIndex(b => b.label === 'Envido');
+        if (idxEnv >= 0) this.btnsBrillan[idxEnv] = true;
+        if (pts >= 29) {
+          const idxReal = this.btns.findIndex(b => b.label === 'Real Envido');
+          if (idxReal >= 0) this.btnsBrillan[idxReal] = true;
+        }
+        this.tutorialMsg = `¡Tenés ${pts} pts de envido! Es un buen momento para cantarlo.`;
+      } else if (casiGanas) {
+        const idxFalta = this.btns.findIndex(b => b.label === 'Falta Envido');
+        if (idxFalta >= 0) this.btnsBrillan[idxFalta] = true;
+        this.tutorialMsg = `Tenés ${pts} pts, pero estás cerca de ganar. Un Falta Envido ganado cierra la partida.`;
+      } else if (vasAbajo) {
+        const idxFalta = this.btns.findIndex(b => b.label === 'Falta Envido');
+        if (idxFalta >= 0) this.btnsBrillan[idxFalta] = true;
+        this.tutorialMsg = `Vas perdiendo con ${pts} pts de envido. El Falta Envido puede asustar al rival y ayudarte a remontar.`;
+      } else {
+        this.tutorialMsg = `Tenés ${pts} pts de envido. No es el mejor momento para cantarlo.`;
+      }
+    } else if (!manoTerminada && cartas.length > 0) {
+      this.tutorialMsg = 'La carta que brilla es tu más fuerte. Guardala para la ronda que más importa.';
+    }
+  }
+
+  private envidoValorCarta(numero: number): number {
+    return numero <= 7 ? numero : 0;
+  }
+
+  private calcularPuntosEnvido(cartas: Carta[]): number {
+    const grupos: Record<string, number[]> = {};
+    for (const c of cartas) {
+      if (!grupos[c.palo]) grupos[c.palo] = [];
+      grupos[c.palo].push(this.envidoValorCarta(c.numero));
+    }
+    let max = 0;
+    for (const vals of Object.values(grupos)) {
+      const sorted = [...vals].sort((a, b) => b - a);
+      const pts = sorted.length >= 2 ? sorted[0] + sorted[1] + 20 : sorted[0];
+      if (pts > max) max = pts;
+    }
+    return max;
   }
 
   // ── Burbuja ───────────────────────────────────────────────────────────────

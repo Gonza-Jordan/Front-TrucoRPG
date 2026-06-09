@@ -13,6 +13,7 @@ import { TrucoMultiComponent } from '../game/truco-multi/truco-multi.component';
 import { SeleccionPersonaje } from './pages/seleccion-personaje/seleccion-personaje';
 import { PartidaSoloComponent } from './components/juego/partida-solo/partida-solo';
 import { Historia } from './components/juego/historia/historia';
+import { PracticaComponent } from './pages/practica/practica';
 
 export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
@@ -29,6 +30,7 @@ export const routes: Routes = [
   { path: 'menu-multijugador-tradicional-sala', component: MenuMultijugadorTradicionalSala, data: { header: 'home' } },
   { path: 'seleccion-personaje', component: SeleccionPersonaje, data: { header: 'home' } },
   { path: 'partidaSolo/configuracion', component: PartidaSoloComponent , data: { header: 'home' } },
+  { path: 'practica', component: PracticaComponent, data: { header: 'home' } },
   { path: 'jugar/solitario', component: TrucoSoloComponent },
   { path: 'historia', component: Historia, data: { header: 'home' } },
   { path: '**', redirectTo: '' },

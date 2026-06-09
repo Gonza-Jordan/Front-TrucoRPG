@@ -1,0 +1,203 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    overflow: hidden;
+    font-family: 'Jersey 20';
+    background: url('/assets/home.png') center center / cover no-repeat;
+    color: #ffffff;
+}
+
+.menu-logo {
+    width: 160px;
+    image-rendering: pixelated;
+    margin-bottom: -55px;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.9));
+}
+
+.menu-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(500px, 90vw);
+    animation: flotar 2.5s infinite ease-in-out;
+}
+
+.contenedor-menu {
+    width: 100%;
+    padding: 72px 24px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    background: rgba(14, 12, 8, 0.94);
+    border: 2px solid #5a4020;
+    outline: 1px solid rgba(200, 144, 48, 0.18);
+    outline-offset: 4px;
+    box-shadow:
+        0 0 40px rgba(0, 0, 0, 0.8),
+        inset 0 0 24px rgba(0, 0, 0, 0.4);
+}
+
+.menu-sep {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #5a4020, transparent);
+    margin: 2px 0;
+}
+
+.practica-titulo {
+    font-family: 'Jersey 10', monospace;
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    color: #c89030;
+    text-align: center;
+}
+
+.practica-desc {
+    font-family: 'VT323', monospace;
+    font-size: 1rem;
+    color: #8a7050;
+    text-align: center;
+    line-height: 1.5;
+    padding: 0 8px;
+}
+
+.jugar-btn {
+    width: 100%;
+    height: 64px;
+    font-family: 'Jersey 10', monospace;
+    font-size: 1.3rem;
+    letter-spacing: 3px;
+    color: #f0b050;
+    background: #2e1f0e;
+    border: 2px solid #8a6030;
+    cursor: pointer;
+    transition: background-color 0.1s, box-shadow 0.1s;
+    box-shadow: 0 0 10px rgba(200, 144, 48, 0.2);
+}
+
+.jugar-btn:hover {
+    background: #3e2a14;
+    box-shadow: 0 0 18px rgba(200, 144, 48, 0.4);
+}
+
+.jugar-btn:active {
+    background: #1a0e04;
+}
+
+.escenario-btn {
+    width: 100%;
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    font-family: 'Jersey 10', monospace;
+    letter-spacing: 1px;
+    color: #c89030;
+    background: #1e1508;
+    border: 2px solid #5a4020;
+    cursor: pointer;
+    transition: background-color 0.1s, color 0.1s, border-color 0.1s, box-shadow 0.1s;
+    text-align: left;
+}
+
+.escenario-btn:hover {
+    background: #2e1f0e;
+    color: #f0b050;
+    border-color: #8a6030;
+    box-shadow: 0 0 10px rgba(200, 144, 48, 0.25);
+}
+
+.escenario-btn:active {
+    background: #140e04;
+    color: #a07020;
+}
+
+.esc-icono {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.esc-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.esc-titulo {
+    font-size: 1rem;
+    letter-spacing: 1.5px;
+}
+
+.esc-desc {
+    font-family: 'VT323', monospace;
+    font-size: 0.95rem;
+    color: #8a7050;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+}
+
+.contenedor-menu a {
+    width: 100%;
+    height: 54px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    font-family: 'Jersey 10', monospace;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    color: #c89030;
+    background: #1e1508;
+    border: 2px solid #5a4020;
+    cursor: pointer;
+    transition: background-color 0.1s, color 0.1s, border-color 0.1s, box-shadow 0.1s;
+}
+
+.contenedor-menu a:hover {
+    background: #2e1f0e;
+    color: #f0b050;
+    border-color: #8a6030;
+    box-shadow: 0 0 10px rgba(200, 144, 48, 0.25);
+}
+
+@keyframes flotar {
+    0%   { transform: translateY(0px); }
+    50%  { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+}
+
+@media (max-width: 768px) {
+    .menu-logo { width: 130px; margin-bottom: -42px; }
+    .menu-wrapper { width: min(420px, 90vw); }
+    .contenedor-menu { padding: 56px 16px 44px; gap: 10px; }
+    .escenario-btn { min-height: 60px; padding: 10px 12px; }
+    .esc-icono { font-size: 1.6rem; }
+    .esc-titulo { font-size: 0.9rem; }
+}
+
+@media (max-width: 480px) {
+    main { padding: 0.8rem; }
+    .menu-logo { width: 110px; margin-bottom: -36px; }
+    .menu-wrapper { width: min(320px, 95vw); }
+    .contenedor-menu { padding: 48px 12px 36px; gap: 8px; }
+    .escenario-btn { min-height: 54px; gap: 10px; }
+    .esc-icono { font-size: 1.4rem; }
+    .esc-titulo { font-size: 0.85rem; }
+    .esc-desc { font-size: 0.85rem; }
+}
