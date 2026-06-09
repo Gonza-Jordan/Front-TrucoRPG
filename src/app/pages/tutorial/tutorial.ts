@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { Reglas } from '../../interfaces/reglas';
+import { TutorialService } from "../../services/tutorial.service";
+import { Cartas } from '../../interfaces/cartas';
 
 @Component({
   selector: 'app-tutorial',
@@ -8,30 +11,53 @@ import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
   templateUrl: './tutorial.html',
   styleUrl: './tutorial.css',
 })
-export class Tutorial {
+export class Tutorial implements OnInit {
 
-  pasoActual: number = 0;
+constructor(private tutorialService: TutorialService) {}
 
-  pasos = [
-    {
-      titulo: 'Reglas del truco',
-      contenido: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Repellendus illo consectetur iusto, eveniet vel, incidunt similique in assumenda inventore amet magnam. Illum repellendus inventore voluptates deleniti, nisi dicta distinctio nesciunt.'
-    },
-    {
-      titulo: 'Valores de las cartas',
-      contenido: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Repellendus illo consectetur iusto, eveniet vel, incidunt similique in assumenda inventore amet magnam. Illum repellendus inventore voluptates deleniti, nisi dicta distinctio nesciunt.'
-    }
-  ];
+  pasoActual = 0;
+  
+  reglas : Reglas[] = [];
+  cartas : Cartas[] = [];
+
+  ngOnInit(): void {
+    this.cargarReglas();
+  }
+
+  cargarReglas(): void {
+    this.tutorialService.obtenerReglas().subscribe({
+      next: (reglas) =>{
+        this.reglas = reglas;
+
+      },
+      error: (error) => {
+        console.error('Error al cargar las reglas del truco:', error);
+      }
+    });
+  }
+
+  cargarCartas(): void {
+    this.tutorialService.obtenerCartas().subscribe({
+      next: (cartas) =>{
+        this.cartas = cartas;},
+      error: (error) => {
+        console.error('Error al cargar las cartas del truco:', error);
+      } 
+    });
+  }
+
 
   siguiente():void{
-    if(this.pasoActual < this.pasos.length - 1){
-      this.pasoActual++;
+    if(this.pasoActual === 0){
+      this.pasoActual = 1;
+      this.cargarCartas();
     }
   }
 
   anterior():void{
-    if(this.pasoActual > 0){
-      this.pasoActual--;
+    if(this.pasoActual === 1){
+      this.pasoActual = 0;
+      this.cargarReglas();
     } 
   }
 

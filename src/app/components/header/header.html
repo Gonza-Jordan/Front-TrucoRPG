@@ -11,7 +11,7 @@
       <img src="/TyM-horizontal.png" alt="Truco y maña - Logotipo" class="logo-nombre" />
     </a>
   }
-  @if (headerType() === 'registro' || headerType() === 'login' || headerType() === 'configuracion' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala' || headerType() === 'tutorial') {
+  @if (headerType() === 'registro' || headerType() === 'login' || headerType() === 'configuracion' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala' || headerType() === 'tutorial' || headerType() === 'reglas-truco' || headerType() === 'valores-carta') {
     <a routerLink="home">
       <img src="/icon-2-sin-borde.png" alt="Truco y maña - Logo" class="logo" />
       <img src="/TyM-horizontal.png" alt="Truco y maña - Logotipo" class="logo-nombre" />
@@ -24,7 +24,7 @@
         <li><app-boton enlace="login">Iniciar Sesión</app-boton></li>
         <li><app-boton enlace="registro">Registrarse</app-boton></li>
       }
-      @if (headerType() === 'home' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala' || headerType() === 'tutorial') {
+      @if (headerType() === 'home' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala' || headerType() === 'tutorial'|| headerType() === 'reglas-truco' || headerType() === 'valores-carta') {
         <li><app-boton enlace="">Cerrar Sesión</app-boton></li>
       }
     </ul>

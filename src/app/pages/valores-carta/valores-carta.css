@@ -1,6 +1,3 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
-
 :host {
     display: flex;
     flex-direction: column;
@@ -9,21 +6,11 @@
     overflow: hidden;
 }
 
-/* ── Wrapper logo + panel ────────────────────────────────────── */
-.menu-logo {
-    width: 160px;
-    image-rendering: pixelated;
-    margin-bottom: -55px;
-    position: relative;
-    z-index: 1;
-    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.9));
-}
-
 .menu-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: min(430px, 90vw);
+    width: min(830px, 90vw);
     animation: flotar 2.5s infinite ease-in-out;
 }
 .titulo {
@@ -32,9 +19,32 @@
   color: #e8aa40;
   text-align: center;
   letter-spacing: 3px;
-  margin: 0 0 8px;
 }
-
+.subtitulo{
+    font-family: 'Jersey 10', monospace;
+    font-size: 1.8rem;
+    color: #e8aa40;
+    margin-bottom: 10px;
+}
+.contenedor-menu {
+    position: relative;
+  }
+.icono-flecha {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .izquierda {
+    left: 20px;
+  }
+  
+  .derecha {
+    right: 20px;
+  }
 /* ── Panel ───────────────────────────────────────────────────── */
 .contenedor-menu {
     width: 100%;
@@ -51,16 +61,6 @@
         0 0 40px rgba(0, 0, 0, 0.8),
         inset 0 0 24px rgba(0, 0, 0, 0.4);
 }
-
-/* ── Separador ───────────────────────────────────────────────── */
-.menu-sep {
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(to right, transparent, #5a4020, transparent);
-    margin: 2px 0;
-}
-
-/* ── Botones ─────────────────────────────────────────────────── */
 .contenedor-menu a {
     width: 100%;
     height: 60px;
@@ -78,7 +78,6 @@
     cursor: pointer;
     transition: background 0.1s, color 0.1s, border-color 0.1s, box-shadow 0.1s;
 }
-
 .contenedor-menu a:hover:not(.inactivo) {
     background: #2e1f0e;
     color: #f0b050;
@@ -91,39 +90,32 @@
     color: #a07020;
 }
 
-/* Multijugador — acento azul */
-.contenedor-menu a.btn-multi {
-    color: #55aadd;
-    border-color: #2a5a7a;
-    background: #0e1820;
-}
+.contenedor-cartas{
+    display: grid;
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+    gap: 20px;
+    margin: 0px 30px;
+    font-size: 1.05rem;
+    letter-spacing: 2px;
+    color: #c89030;
 
-.contenedor-menu a.btn-multi:hover {
-    background: #162030;
-    color: #88ccff;
-    border-color: #4a8aaa;
-    box-shadow: 0 0 10px rgba(85, 170, 221, 0.25);
 }
-
-/* Configuración — acento gris */
-.contenedor-menu a.btn-config {
-    color: #8a8070;
-    border-color: #3a3020;
-    background: #181410;
+.carta{
+    padding: 5px;
+    width: 100%;
 }
-
-.contenedor-menu a.btn-config:hover {
-    background: #221c14;
-    color: #aaa090;
-    border-color: #5a5040;
-    box-shadow: 0 0 10px rgba(138, 128, 112, 0.2);
+/* ── Separador ───────────────────────────────────────────────── */
+.menu-sep {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #5a4020, transparent);
+    margin: 2px 0;
 }
-
-/* Inactivos */
-.contenedor-menu a.inactivo {
+.deshabilitada {
     opacity: 0.3;
-    cursor: default;
-}
+    pointer-events: none;
+  }
+
 
 @media (max-width: 768px) {
     .menu-logo { width: 130px; margin-bottom: -42px; }

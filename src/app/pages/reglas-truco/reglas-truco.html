@@ -1,0 +1,30 @@
+<app-page-wrapper>
+    <div class="menu-wrapper">
+        <div class="contenedor-menu">
+            <h1 class="titulo">Reglas del truco </h1>
+            <div class="menu-sep"></div> 
+                <span class="icono-flecha izquierda" (click)="anterior()">
+                  ❮
+                </span>
+                 @if (reglas.length > 0) {
+                   <h1 class="titulo">{{ reglas[pasoActual].categoria }}</h1>   
+                <div class="detalle">     
+                   @for (detalle of reglas[pasoActual].detalle; track detalle.titulo) {
+                    <div class="detalle-regla">
+                      <h3 class="subtitulo">{{ detalle.titulo }}</h3> 
+                      <p>{{ detalle.descripcion }}</p>   
+                        @if (detalle.puntos > 0) {
+                        <p>Puntos: {{ detalle.puntos }}</p>
+                         }
+                    </div>
+                   } 
+                </div>
+                }                      
+                <span class="icono-flecha derecha" (click)="siguiente()">
+                  ❯
+                </span>
+            <div class="menu-sep"></div>
+            <a routerLink="/tutorial"><span>VOLVER</span></a>
+        </div>
+    </div>
+</app-page-wrapper>

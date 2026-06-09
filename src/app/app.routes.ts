@@ -13,6 +13,8 @@ import { TrucoMultiComponent } from '../game/truco-multi/truco-multi.component';
 import { SeleccionPersonaje } from './pages/seleccion-personaje/seleccion-personaje';
 import { PartidaSoloComponent } from './components/juego/partida-solo/partida-solo';
 import { Tutorial } from './pages/tutorial/tutorial';
+import { ReglasTruco } from './pages/reglas-truco/reglas-truco';
+import { ValoresCarta } from './pages/valores-carta/valores-carta';
 
 export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
@@ -20,7 +22,9 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent, data: { header: 'login' } },
   { path: 'home', component: Home, data: { header: 'home' } },
   { path: 'configuracion', component: ConfiguracionComponent, data: { header: 'configuracion' } },
-  {path: 'tutorial', component: Tutorial, data: { header: 'tutorial' }},
+  { path: 'tutorial', component: Tutorial, data: { header: 'tutorial' }},
+  { path: 'reglas-truco', component: ReglasTruco, data: { header: 'reglas-truco' }},
+  { path: 'valores-carta', component: ValoresCarta, data: { header: 'valores-carta' }},
 
   { path: 'maquina', component: TrucoSoloComponent },
   { path: 'juego/multi', component: TrucoMultiComponent },
