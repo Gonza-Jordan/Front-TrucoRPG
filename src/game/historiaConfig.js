@@ -35,9 +35,9 @@ export function initHistoria(parent = 'contenedor-juego') {
 
 
     //para que no se rompan los assets con zoom
-    antialias: false,
-    pixelArt: true,
-    
+    //antialias: false,
+    //pixelArt: true,
+
   };
 
   return new Phaser.Game(config);

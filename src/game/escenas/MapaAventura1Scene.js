@@ -45,7 +45,7 @@ export default class MapaAventura1Scene extends BaseScene {
     //capas arboles
     const arbolesLayer = map.createLayer('Arboles', [arbol1Tileset, arbol2Tileset, vegetacionTileset]);
     const arboles2Layer = map.createLayer('Arboles2', [arbol1Tileset, arbol2Tileset, vegetacionTileset]);
-    const arboles3Layer = map.createLayer('Arboles 3', [arbol1Tileset]);
+    const arboles3Layer = map.createLayer('Arboles 3', [arbol1Tileset, arbol2Tileset]);
 
     arbolesLayer.setDepth(2);
     arboles2Layer.setDepth(2);
@@ -80,8 +80,8 @@ export default class MapaAventura1Scene extends BaseScene {
     this.cameras.main.startFollow(this.JugadorPrincipal, true, 0.1, 0.1);
 
     //prueba para escalar el mapa
-    this.cameras.main.setZoom(1.23);
-    this.cameras.main.roundPixels = true;
+    //this.cameras.main.setZoom(1.23);
+    //this.cameras.main.roundPixels = true;
 
     this.JugadorPrincipal.setScale(1.1);
 

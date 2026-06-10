@@ -115,7 +115,7 @@ export default class MapaPrincipalScene extends BaseScene {
       300,
       'MapaAventura1',
       'CartelOponentes',
-      { x: 85, y: 470 },
+      { x: 35, y: 552 },
     );
   }
 
