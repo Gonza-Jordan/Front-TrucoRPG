@@ -11,6 +11,7 @@ import HeroSelectScene from './escenas/HeroSelectScene.js';
 import TrucoMultiScene from './escenas/TrucoMultiScene.js';
 import TrucoSoloScene from './escenas/TrucoSoloScene.js';
 
+
 export function initGame(parent = 'contenedor-juego', modo = 'maquina') {
   const config = {
     type: Phaser.AUTO,
