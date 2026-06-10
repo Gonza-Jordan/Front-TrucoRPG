@@ -73,6 +73,7 @@ export default class MapaPrincipalScene extends BaseScene {
       this.startX,
       this.startY,
       this.playerKey,
+      this.pasos,
     ).setDepth(1);
     this.JugadorPrincipal.setCollideWorldBounds(true);
 
@@ -89,25 +90,14 @@ export default class MapaPrincipalScene extends BaseScene {
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-    this.portalACasa = new Portal(
-      this,
-      464,
-      195,
-      'InteriorCasaScene',
-      false,
-      { x: 621, y: 64 },
-    );
+    this.portalACasa = new Portal(this, 464, 195, 'InteriorCasaScene', false, { x: 621, y: 64 });
 
     this.physics.add.overlap(this.JugadorPrincipal, this.portalACasa.zone);
 
-    this.portalAPulperia = new Portal(
-      this,
-      1603,
-      163,
-      'InteriorPulperiaScene',
-      false,
-      { x: 621, y: 64 },
-    );
+    this.portalAPulperia = new Portal(this, 1603, 163, 'InteriorPulperiaScene', false, {
+      x: 621,
+      y: 64,
+    });
 
     this.physics.add.overlap(this.JugadorPrincipal, this.portalAPulperia.zone);
 
@@ -132,9 +122,7 @@ export default class MapaPrincipalScene extends BaseScene {
     } else if (this.estabaMoviendose) {
       const xActual = Math.round(this.JugadorPrincipal.x);
       const yActual = Math.round(this.JugadorPrincipal.y);
-
       console.log(`📍 Personaje parado en coordenadas -> X: ${xActual}, Y: ${yActual}`);
-
       this.estabaMoviendose = false;
     }
 
