@@ -79,6 +79,10 @@ export default class MapaAventura1Scene extends BaseScene {
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.startFollow(this.JugadorPrincipal, true, 0.1, 0.1);
 
+    //prueba para escalar el mapa
+    this.cameras.main.setZoom(1.23);
+    this.cameras.main.roundPixels = true;
+
     this.JugadorPrincipal.setScale(1.1);
 
     //controles

@@ -32,6 +32,12 @@ export function initHistoria(parent = 'contenedor-juego') {
     },
     scene: [HistoriaBootScene, MapaPrincipalScene, BaseScene, InteriorCasaScene, InteriorPulperiaScene, MapaAventura1Scene],
     parent,
+
+
+    //para que no se rompan los assets con zoom
+    antialias: false,
+    pixelArt: true,
+    
   };
 
   return new Phaser.Game(config);
