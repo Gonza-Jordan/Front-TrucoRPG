@@ -1,0 +1,45 @@
+{
+    "activeFile": "",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "Arboles.tsx": {
+            "scaleInDock": 0.5,
+            "scaleInEditor": 3
+        },
+        "Paredes.tsx": {
+            "scaleInDock": 0.5,
+            "scaleInEditor": 3
+        },
+        "Suelo.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 3
+        },
+        "suelo2.tsx": {
+            "scaleInDock": 2,
+            "scaleInEditor": 3
+        },
+        "test1.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 91,
+                "y": 234
+            }
+        }
+    },
+    "openFiles": [
+    ],
+    "project": "",
+    "recentFiles": [
+        "suelo2.tsx",
+        "Arboles.tsx",
+        "Paredes.tsx",
+        "Suelo.tsx",
+        "test1.tmx"
+    ]
+}

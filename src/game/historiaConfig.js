@@ -4,6 +4,7 @@ import HistoriaBootScene from './escenas/HistoriaBootScene.js';
 import MapaPrincipalScene from './escenas/MapaPrincipalScene.js';
 import InteriorCasaScene from './escenas/InteriorCasaScene.js';
 import InteriorPulperiaScene from './escenas/InteriorPulperiaScene.js';
+import MapaAventura1Scene from './escenas/MapaAventura1Scene.js';
 
 
 export function initHistoria(parent = 'contenedor-juego') {
@@ -14,7 +15,7 @@ export function initHistoria(parent = 'contenedor-juego') {
         const esTactil =
           navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
         if (esTactil && screen.orientation?.lock) {
-          screen.orientation.lock('landscape').catch(() => {});
+          screen.orientation.lock('landscape').catch(() => { });
         }
       },
     },
@@ -29,7 +30,7 @@ export function initHistoria(parent = 'contenedor-juego') {
       default: 'arcade',
       arcade: { debug: false },
     },
-    scene: [HistoriaBootScene, MapaPrincipalScene, BaseScene,InteriorCasaScene,InteriorPulperiaScene],
+    scene: [HistoriaBootScene, MapaPrincipalScene, BaseScene, InteriorCasaScene, InteriorPulperiaScene, MapaAventura1Scene],
     parent,
   };
 
