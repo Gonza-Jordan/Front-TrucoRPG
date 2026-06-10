@@ -4,7 +4,7 @@ import Portal from '../objetos/Portal.js';
 
 export default class MapaAventura1Scene extends BaseScene {
   constructor() {
-    super('MapaAventura1'); // ✅ coincide con BootScene y con el portal
+    super('MapaAventura1');
   }
 
   init(data) {
@@ -15,11 +15,8 @@ export default class MapaAventura1Scene extends BaseScene {
 
 
   create() {
-    console.log('1 - entrando a create');
     this.botonPantallaCompleta();
-    console.log('2 - después de botonPantallaCompleta');
     this.crearControlesMobile();
-    console.log('3 - después de crearControlesMobile');
 
     // CREACION DEL MAPA
 
@@ -37,31 +34,36 @@ export default class MapaAventura1Scene extends BaseScene {
     const paredesMontañaTileset = map.addTilesetImage('ParedesMontaña', 'ParedesMontaña');
     const paredesCuevaTileset = map.addTilesetImage('ParedesCueva', 'ParedesCueva');
 
-    // Capas de fondo
+    //capas principales
     map.createLayer('Base', sueloTileset);
     map.createLayer('Agua', aguaTileset);
-    map.createLayer('Montañas', paredesMontañaTileset);
+    map.createLayer('Montañas', [sueloTileset, paredesCuevaTileset, paredesMontañaTileset]);
     map.createLayer('Camino', sueloTileset);
     map.createLayer('Pasto/Vegetacion', [vegetacionTileset, piedrasTileset]);
     map.createLayer('Piedras', piedrasTileset);
 
-    // Capas con depth elevado (se renderizan sobre el jugador)
-    const arbolesLayer = map.createLayer('Arboles', [arbol1Tileset, vegetacionTileset]);
-    const arboles2Layer = map.createLayer('Arboles2', [arbol2Tileset]);
+    //capas arboles
+    const arbolesLayer = map.createLayer('Arboles', [arbol1Tileset, arbol2Tileset, vegetacionTileset]);
+    const arboles2Layer = map.createLayer('Arboles2', [arbol2Tileset, vegetacionTileset]);
     const arboles3Layer = map.createLayer('Arboles 3', [arbol1Tileset]);
 
     arbolesLayer.setDepth(2);
     arboles2Layer.setDepth(2);
     arboles3Layer.setDepth(2);
 
-    // Objetos decorativos
+    //obj
     map.createLayer('Objetos', [fogataTileset, paredesCuevaTileset]);
 
-    // Capa de colisiones
+    //colisiones
     const colisionesLayer = map.createLayer('Colisiones', sueloTileset);
     colisionesLayer.setCollisionByExclusion([-1]);
 
-    // Jugador
+    console.log(vegetacionTileset);
+    console.log(arbol1Tileset);
+    console.log(arbol2Tileset);
+
+
+    //player
     this.JugadorPrincipal = new JugadorPrincipal(
       this,
       this.startX,
@@ -72,14 +74,14 @@ export default class MapaAventura1Scene extends BaseScene {
 
     this.physics.add.collider(this.JugadorPrincipal, colisionesLayer);
 
-    // Cámara y mundo
+    //cam
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.startFollow(this.JugadorPrincipal, true, 0.1, 0.1);
 
     this.JugadorPrincipal.setScale(1.1);
 
-    // Controles teclado
+    //controles
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
