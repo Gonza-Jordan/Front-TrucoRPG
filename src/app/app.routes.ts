@@ -22,6 +22,7 @@ import { ValoresCarta } from './pages/valores-carta/valores-carta';
 import { Historia } from './components/juego/historia/historia';
 import { PracticaComponent } from './pages/practica/practica';
 import { UnirseQrComponent } from './pages/unirse-qr/unirse-qr';
+import { SeleccionPersonajeHistoria } from './pages/seleccion-personaje-historia/seleccion-personaje-historia';
 
 export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
@@ -49,5 +50,6 @@ export const routes: Routes = [
   { path: 'historia', component: Historia, data: { header: 'home' } },
   { path: 'jugar/solitario-2v2', component: TrucoSolo2v2Component },
   { path: 'unirse', component: UnirseQrComponent, data: { header: 'home' } },
+  { path: 'seleccion-personaje-historia', component: SeleccionPersonajeHistoria, data: { header: 'home' } },
   { path: '**', redirectTo: '' },
 ];
