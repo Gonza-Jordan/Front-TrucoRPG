@@ -13,6 +13,9 @@ export default class MapaAventura1Scene extends BaseScene {
     this.startY = data.y || 470;
   }
 
+  preload() {
+    this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
+  }
 
   create() {
     this.botonPantallaCompleta();
@@ -43,8 +46,16 @@ export default class MapaAventura1Scene extends BaseScene {
     map.createLayer('Piedras', piedrasTileset);
 
     //capas arboles
-    const arbolesLayer = map.createLayer('Arboles', [arbol1Tileset, arbol2Tileset, vegetacionTileset]);
-    const arboles2Layer = map.createLayer('Arboles2', [arbol1Tileset, arbol2Tileset, vegetacionTileset]);
+    const arbolesLayer = map.createLayer('Arboles', [
+      arbol1Tileset,
+      arbol2Tileset,
+      vegetacionTileset,
+    ]);
+    const arboles2Layer = map.createLayer('Arboles2', [
+      arbol1Tileset,
+      arbol2Tileset,
+      vegetacionTileset,
+    ]);
     const arboles3Layer = map.createLayer('Arboles 3', [arbol1Tileset, arbol2Tileset]);
 
     arbolesLayer.setDepth(2);
@@ -61,7 +72,6 @@ export default class MapaAventura1Scene extends BaseScene {
     console.log(vegetacionTileset);
     console.log(arbol1Tileset);
     console.log(arbol2Tileset);
-
 
     //player
     this.JugadorPrincipal = new JugadorPrincipal(
@@ -104,8 +114,7 @@ export default class MapaAventura1Scene extends BaseScene {
     this.JugadorPrincipal.update(this.keys, this.teclaE);
 
     const seMueve =
-      this.JugadorPrincipal.body.velocity.x !== 0 ||
-      this.JugadorPrincipal.body.velocity.y !== 0;
+      this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
 
     if (seMueve) {
       this.estabaMoviendose = true;

@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+
 export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
   constructor(escena, x, y, nombre) {
     super(escena, x, y, nombre);
@@ -8,7 +9,10 @@ export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
     escena.add.existing(this);
     escena.physics.add.existing(this);
 
-    
+    this.sonidoPasos = escena.sound.add('pasos', {
+      loop: true,
+      volume: 0.5
+    });
 
     if (!escena.anims.exists(`${this.nombre}-quieto`)) {
       escena.anims.create({
@@ -56,11 +60,8 @@ export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
     let joyStick = this.scene.joyStick;
 
     let moverIzquierda = keys.left.isDown || joyStick?.left;
-
     let moverDerecha = keys.right.isDown || joyStick?.right;
-
     let moverArriba = keys.up.isDown || joyStick?.up;
-
     let moverAbajo = keys.down.isDown || joyStick?.down;
 
     if (moverIzquierda) this.setVelocityX(-velocidad);
@@ -70,6 +71,20 @@ export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
 
     if (this.body.velocity.x !== 0 || this.body.velocity.y !== 0) {
       this.body.velocity.normalize().scale(velocidad);
+    }
+
+    const seEstaMoviendo = moverIzquierda || moverDerecha || moverArriba || moverAbajo;
+
+    if (seEstaMoviendo) {
+      if (!this.sonidoPasos.isPlaying) {
+        this.sonidoPasos.play();
+      } else if (this.sonidoPasos.isPaused) {
+        this.sonidoPasos.resume();
+      }
+    } else {
+      if (this.sonidoPasos.isPlaying) {
+        this.sonidoPasos.pause();
+      }
     }
 
     if (moverIzquierda) {

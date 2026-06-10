@@ -15,6 +15,8 @@ export default class MapaPrincipalScene extends BaseScene {
 
   preload(){
      this.load.image('CartelOponentes','./assets/mapa-principal/CartelOponentes.png');
+     
+     this.load.audio('pasos', './assets/musica/sonidos/paso.ogg'); 
   }
 
   create() {
@@ -121,7 +123,7 @@ export default class MapaPrincipalScene extends BaseScene {
 
   update() {
     this.JugadorPrincipal.update(this.keys, this.teclaE);
-    //Boludez para saber las coordenadas del personaje cuando se detiene, para facilitar la colocacion de objetos y portales
+    
     const seMueve =
       this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
 
