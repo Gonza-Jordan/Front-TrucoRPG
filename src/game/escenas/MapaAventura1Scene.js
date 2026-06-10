@@ -44,7 +44,7 @@ export default class MapaAventura1Scene extends BaseScene {
 
     //capas arboles
     const arbolesLayer = map.createLayer('Arboles', [arbol1Tileset, arbol2Tileset, vegetacionTileset]);
-    const arboles2Layer = map.createLayer('Arboles2', [arbol2Tileset, vegetacionTileset]);
+    const arboles2Layer = map.createLayer('Arboles2', [arbol1Tileset, arbol2Tileset, vegetacionTileset]);
     const arboles3Layer = map.createLayer('Arboles 3', [arbol1Tileset]);
 
     arbolesLayer.setDepth(2);
