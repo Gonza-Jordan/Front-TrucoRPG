@@ -13,8 +13,14 @@ export default class MapaPrincipalScene extends BaseScene {
     this.startY = data.y || 470;
   }
 
-  preload(){
-     this.load.image('CartelOponentes','./assets/mapa-principal/CartelOponentes.png');
+  preload() {
+    this.load.image('CartelOponentes', './assets/mapa-principal/CartelOponentes.png');
+    this.pasos = this.load.audio('pasos', './assets/musica/Sonidos/pasos.ogg');
+
+    this.load.audio('paso_1', './assets/musica/Sonidos/paso1.ogg');
+    this.load.audio('paso_2', './assets/musica/Sonidos/paso2.ogg');
+    this.load.audio('paso_3', './assets/musica/Sonidos/paso3.ogg');
+    this.load.audio('paso_4', './assets/musica/Sonidos/paso4.ogg');
   }
 
   create() {
@@ -71,6 +77,7 @@ export default class MapaPrincipalScene extends BaseScene {
       this.startX,
       this.startY,
       this.playerKey,
+      this.pasos,
     ).setDepth(1);
     this.JugadorPrincipal.setCollideWorldBounds(true);
 
@@ -87,41 +94,26 @@ export default class MapaPrincipalScene extends BaseScene {
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-    this.portalACasa = new Portal(
-      this,
-      464,
-      195,
-      'InteriorCasaScene',
-      false,
-      { x: 621, y: 64 },
-    );
+    this.portalACasa = new Portal(this, 464, 195, 'InteriorCasaScene', false, { x: 621, y: 64 });
 
     this.physics.add.overlap(this.JugadorPrincipal, this.portalACasa.zone);
 
-    this.portalAPulperia = new Portal(
-      this,
-      1603,
-      163,
-      'InteriorPulperiaScene',
-      false,
-      { x: 621, y: 64 },
-    );
+    this.portalAPulperia = new Portal(this, 1603, 163, 'InteriorPulperiaScene', false, {
+      x: 621,
+      y: 64,
+    });
 
     this.physics.add.overlap(this.JugadorPrincipal, this.portalAPulperia.zone);
 
-    this.portalAOponentes = new Portal(
-      this,
-      1917,
-      300,
-      'MapaOponentesScene',
-      'CartelOponentes',
-      { x: 85, y: 470 },
-    );
+    this.portalAOponentes = new Portal(this, 1917, 300, 'MapaOponentesScene', 'CartelOponentes', {
+      x: 85,
+      y: 470,
+    });
   }
 
-  update() {
-    this.JugadorPrincipal.update(this.keys, this.teclaE);
-    //Boludez para saber las coordenadas del personaje cuando se detiene, para facilitar la colocacion de objetos y portales
+  update(time, delta) {
+    this.JugadorPrincipal.update(this.keys, time);
+
     const seMueve =
       this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
 
@@ -130,9 +122,7 @@ export default class MapaPrincipalScene extends BaseScene {
     } else if (this.estabaMoviendose) {
       const xActual = Math.round(this.JugadorPrincipal.x);
       const yActual = Math.round(this.JugadorPrincipal.y);
-
       console.log(`📍 Personaje parado en coordenadas -> X: ${xActual}, Y: ${yActual}`);
-
       this.estabaMoviendose = false;
     }
 
