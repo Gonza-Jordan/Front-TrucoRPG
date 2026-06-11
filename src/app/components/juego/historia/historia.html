@@ -5,7 +5,8 @@
 }
 
 @if (vistaActual === 'en-juego') {
-  <div class="contenedor-juego-wrapper">
+  <div id="contenedor-juego-completo" class="contenedor-juego-wrapper">
     <div id="historia-container"></div>
+    <app-historia-overlay-manager></app-historia-overlay-manager>
   </div>
 }

@@ -2,11 +2,12 @@ import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeleccionPersonajeHistoria } from '../../../pages/seleccion-personaje-historia/seleccion-personaje-historia';
 import { HistoriaService } from '../../../services/historia/historia-service';
+import { HistoriaOverlayManagerComponent } from '../../historia-overlay-manager-component/historia-overlay-manager-component/historia-overlay-manager-component';
 
 @Component({
   selector: 'app-historia',
   standalone: true,
-  imports: [CommonModule, SeleccionPersonajeHistoria],
+  imports: [CommonModule, SeleccionPersonajeHistoria, HistoriaOverlayManagerComponent],
   templateUrl: './historia.html',
   styleUrl: './historia.css',
 })

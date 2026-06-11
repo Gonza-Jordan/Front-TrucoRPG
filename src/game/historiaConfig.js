@@ -24,7 +24,7 @@ export function initHistoria(parent = 'contenedor-juego') {
       autoCenter: Phaser.Scale.CENTER_BOTH,
       width: 1280,
       height: 720,
-      fullscreenTarget: parent,
+      fullscreenTarget: 'contenedor-juego-completo',
     },
     physics: {
       default: 'arcade',

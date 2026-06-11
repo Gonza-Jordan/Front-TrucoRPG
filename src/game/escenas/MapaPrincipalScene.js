@@ -13,10 +13,9 @@ export default class MapaPrincipalScene extends BaseScene {
     this.startY = data.y || 470;
   }
 
-  preload(){
-     this.load.image('CartelOponentes','./assets/mapa-principal/CartelOponentes.png');
-     
-     this.load.audio('pasos', './assets/musica/sonidos/paso.ogg'); 
+  preload() {
+    this.load.image('CartelOponentes', './assets/mapa-principal/CartelOponentes.png');
+    this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
   }
 
   create() {
@@ -80,9 +79,7 @@ export default class MapaPrincipalScene extends BaseScene {
     this.physics.add.collider(this.JugadorPrincipal, colisionesLayer);
 
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-
     this.cameras.main.startFollow(this.JugadorPrincipal, true, 0.1, 0.1);
 
     this.JugadorPrincipal.setScale(1.1);
@@ -90,30 +87,26 @@ export default class MapaPrincipalScene extends BaseScene {
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-    this.portalACasa = new Portal(this, 464, 195, 'InteriorCasaScene', false, { x: 621, y: 64 });
-
+    this.portalACasa = new Portal(this, 464, 195, 'InteriorCasaScene', false, { x: 627, y: 640 });
     this.physics.add.overlap(this.JugadorPrincipal, this.portalACasa.zone);
 
     this.portalAPulperia = new Portal(this, 1603, 163, 'InteriorPulperiaScene', false, {
       x: 621,
       y: 64,
     });
-
     this.physics.add.overlap(this.JugadorPrincipal, this.portalAPulperia.zone);
 
-    this.portalAOponentes = new Portal(
-      this,
-      1917,
-      300,
-      'MapaAventura1',
-      'CartelOponentes',
-      { x: 35, y: 552 },
-    );
+    this.portalAOponentes = new Portal(this, 1917, 300, 'MapaAventura1', 'CartelOponentes', {
+      x: 35,
+      y: 552,
+    });
+
+  
   }
 
   update() {
     this.JugadorPrincipal.update(this.keys, this.teclaE);
-    
+
     const seMueve =
       this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
 
@@ -129,5 +122,6 @@ export default class MapaPrincipalScene extends BaseScene {
     this.portalACasa.update(this.JugadorPrincipal, this.teclaE);
     this.portalAPulperia.update(this.JugadorPrincipal, this.teclaE);
     this.portalAOponentes.update(this.JugadorPrincipal, this.teclaE);
+
   }
 }
