@@ -2,8 +2,8 @@
     <div class="menu-wrapper">
         <div class="contenedor-menu">
             <h1 class="titulo">Valores de Cartas</h1>
-            <div class="menu-sep"></div> 
-            <span class="icono-flecha izquierda"  [class.deshabilitada]="indiceInicio === 0" (click)="anterior()">
+            <div class="menu-sep"></div>
+            <span class="icono-flecha izquierda" [class.deshabilitada]="indiceInicio === 0" (click)="anterior()">
               ❮
             </span>
             <div class="contenedor-cartas">
@@ -11,18 +11,12 @@
                     carta of cartas.slice(indiceInicio, indiceInicio + cantPagina);
                     track $index
                   ) {
-                      <div class="carta">                
-                      <div class="carta-header">
-                        {{ carta.palo }}
-                      </div>                
-                      <div class="carta-body">
-                        <p><strong>Número:</strong> {{ carta.numero }}</p>
-                        <p><strong>Valor Truco:</strong> {{ carta.valorTruco }}</p>
-                      </div>                
-                    </div>                
-                  }                   
+                    <div class="carta">
+                      <img class="carta-img" [src]="cardImg(carta)" [alt]="carta.numero + ' de ' + carta.palo" />
+                    </div>
+                  }
             </div>
-            <span class="icono-flecha derecha"  [class.deshabilitada]="indiceInicio + cantPagina >= cartas.length" (click)="siguiente()">
+            <span class="icono-flecha derecha" [class.deshabilitada]="indiceInicio + cantPagina >= cartas.length" (click)="siguiente()">
                 ❯
             </span>
           <div class="menu-sep"></div>
