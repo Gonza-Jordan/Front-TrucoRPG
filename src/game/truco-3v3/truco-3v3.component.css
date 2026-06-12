@@ -215,9 +215,31 @@
 }
 
 .yo-info {
+  position: relative; /* ancla de la burbuja de diálogo propia */
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/* Asiento que no participa del duelo Pica-Pica (mira desde afuera) */
+.seat-inactivo { opacity: 0.45; filter: grayscale(0.5); }
+
+/* Banner Pica-Pica sobre la mesa */
+.pica-banner {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 14px;
+  font-weight: 800;
+  font-size: clamp(0.72rem, 1vw, 0.86rem);
+  letter-spacing: 0.5px;
+  color: #1a120a;
+  background: linear-gradient(180deg, #e8c860, #c8a030);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+  z-index: 5;
 }
 .avatar-yo {
   width: clamp(48px, 5.5vw, 74px);

@@ -146,3 +146,20 @@ select:focus {
   color: #b0a080;
   border-color: #5a5040;
 }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+.titulo { font-size: clamp(1.6rem, 5vmin, 2.4rem); }
+.fila   { flex-wrap: wrap; gap: 10px; }
+input[type="range"] { width: clamp(120px, 40%, 180px); }
+
+@media (max-width: 480px), (max-height: 560px) {
+  .sep  { margin-bottom: 16px; }
+  .fila { padding: 10px 12px; margin-bottom: 9px; }
+  .label { font-size: 1rem; }
+  .acciones { margin-top: 16px; gap: 10px; }
+  .btn-guardar, .btn-cancelar { padding: 11px; font-size: 1rem; }
+}
+
+@media (max-width: 380px) {
+  .acciones { flex-direction: column; }
+}

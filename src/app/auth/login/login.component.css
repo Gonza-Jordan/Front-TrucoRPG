@@ -117,3 +117,14 @@ input::placeholder {
   color: #f0b050;
   text-decoration: underline;
 }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+.titulo { font-size: clamp(1.6rem, 5vmin, 2.4rem); }
+
+@media (max-width: 480px), (max-height: 560px) {
+  .sep   { margin-bottom: 16px; }
+  .campo { margin-bottom: 12px; }
+  input  { padding: 9px 12px; font-size: 0.95rem; }
+  .btn-submit { padding: 11px; font-size: 1.05rem; }
+  .registro-link { margin-top: 14px; }
+}

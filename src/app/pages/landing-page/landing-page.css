@@ -194,3 +194,51 @@ background: linear-gradient(
         transform: rotate(-25deg);
     }
 }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+/* Tipografía y espaciados fluidos (aplican en todas las resoluciones) */
+main { padding: clamp(1rem, 4vmin, 3rem); }
+
+.contenedor-landing { gap: clamp(1.5rem, 5vmin, 4rem); }
+
+.seccion-1,
+.seccion-2,
+.seccion-3 { padding: clamp(1.5rem, 5vmin, 4rem) clamp(1rem, 3vmin, 2rem); }
+
+.titulo-landing { font-size: clamp(1.7rem, 5vw, 3rem); }
+.texto-landing  { font-size: clamp(1.15rem, 3.2vw, 2rem); }
+
+.seccion-1 a {
+    width: min(28rem, 92%);
+    height: auto;
+    min-height: 3.2rem;
+    padding: 0.6rem 1rem;
+    font-size: clamp(1.2rem, 3.5vw, 2rem);
+    text-align: center;
+}
+
+.imagen-seccion-2 { width: clamp(5.5rem, 14vw, 10rem); }
+
+.personajes { flex-wrap: wrap; row-gap: 1.5rem; }
+.personajes img { width: clamp(5.5rem, 19vw, 10rem); }
+
+/* Pantallas angostas: la sección 2 pasa a columna */
+@media (max-width: 700px) {
+    .seccion-2 {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    .seccion-2 .texto-landing { text-align: center; }
+    .contenedor-landing { width: min(1000px, 96%); }
+}
+
+/* Muy angosto: personajes en grilla 2x2 */
+@media (max-width: 460px) {
+    .personajes {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        justify-items: center;
+        gap: 1.2rem;
+    }
+}
