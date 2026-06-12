@@ -44,8 +44,8 @@ export default class MapaAventura2Scene extends BaseScene {
 
 
         //colisiones
-        // const colisionesLayer = map.createLayer('Colisiones', sueloTileset);
-        //colisionesLayer.setCollisionByExclusion([-1]);
+        const colisionesLayer = map.createLayer('Colisiones', cuevaTileset);
+        colisionesLayer.setCollisionByExclusion([-1]);
 
 
         //player
@@ -57,7 +57,7 @@ export default class MapaAventura2Scene extends BaseScene {
         ).setDepth(1);
         this.JugadorPrincipal.setCollideWorldBounds(true);
 
-        //  this.physics.add.collider(this.JugadorPrincipal, colisionesLayer);
+        this.physics.add.collider(this.JugadorPrincipal, colisionesLayer);
 
         //cam
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
