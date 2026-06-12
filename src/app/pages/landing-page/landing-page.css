@@ -22,12 +22,16 @@ main {
             #000000);
 }
 
+p {
+    color: #c89030;
+}
+
 .contenedor-landing {
     width: min(1000px, 90%);
     height: auto;
     display: flex;
     flex-direction: column;
-    gap: 4rem;
+    gap: 2rem;
 
     background: rgba(119, 66, 31, 0.45);
     border: 2px solid #5a4020;
@@ -59,7 +63,9 @@ main {
     height: auto;
 
     display: flex;
+    flex-direction: column;
     align-items: center;
+    gap: 2rem;
 
     justify-content: space-evenly;
     align-items: center;
@@ -80,6 +86,7 @@ main {
 
     justify-content: center;
     align-items: center;
+    gap: 2rem;
 
     padding: 4rem 2rem;
     box-sizing: border-box;
@@ -122,8 +129,40 @@ main {
     text-align: left;
 }
 
-.seccion-3 .texto-landing {
+.modos-juego {
     width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.modo-juego {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 12rem;
+}
+
+.imagen-modo {
+    width: 8rem;
+    height: 8rem;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+}
+
+.circulo-icono {
+    width: 9rem;
+    height: 9rem;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 50%;
+    border: 2px solid #000;
 }
 
 .imagen-hero-landing {
@@ -132,23 +171,21 @@ main {
     animation: flotar 2.5s infinite ease-in-out;
 }
 
-.imagen-seccion-2 {
-    width: 10rem;
-    height: auto;
-    animation: balanceo 6s infinite ease-in-out;
-}
-
-.personajes {
+.desarrolladores {
     width: 100%;
     display: flex;
+    justify-content: space-evenly;
     align-items: center;
-    justify-content: space-around;
     gap: 1rem;
+    flex-wrap: wrap;
 }
 
-.personajes img {
-    width: 10rem;
-    height: auto;
+.foto-desarrollador {
+    width: 8rem;
+    height: 8rem;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #000;
 }
 
 .titulo-landing {
@@ -160,8 +197,88 @@ main {
 
 .texto-landing {
     font-family: 'Jersey 20';
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: #c89030;
+}
+
+.habilidades {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.tarjeta {
+    width: 12rem;
+    height: 16rem;
+    perspective: 1000px;
+}
+
+.interior-tarjeta {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.tarjeta:hover .interior-tarjeta {
+    transform: rotateY(180deg);
+}
+
+.cara {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    box-sizing: border-box;
+    border: 4px solid #000;
+    outline: 4px solid #f4eedb;
+    outline-offset: -8px;
+    border-radius: 15px;
+    background: #f4eedb;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 2px #000, 8px 8px 0 rgba(0, 0, 0, 0.45);
+
+        display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.frente {
+    z-index: 2;
+    position: relative;
+    height: 100%;
+    padding: 0.8em;
+    box-sizing: border-box;
+
+}
+
+.atras {
+    transform: rotateY(180deg);
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+
+.texto-carta {
+    font-size: 2rem;
+    color: #111;
+    text-align: center;
+}
+
+.texto-carta-atras {
+    font-size: 1.2rem;
+    color: #111;
+    text-align: center;
+}
+
+.imagen-personaje {
+    width: 8rem;
+    height: auto;
 }
 
 @keyframes flotar {
@@ -175,19 +292,5 @@ main {
 
     100% {
         transform: translateY(0px);
-    }
-}
-
-@keyframes balanceo {
-    0% {
-        transform: rotate(-25deg);
-    }
-
-    50% {
-        transform: rotate(25deg);
-    }
-
-    100% {
-        transform: rotate(-25deg);
     }
 }
