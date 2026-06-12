@@ -15,6 +15,8 @@ export default class MapaPrincipalScene extends BaseScene {
 
   preload(){
      this.load.image('CartelOponentes','./assets/mapa-principal/CartelOponentes.png');
+     
+     this.load.audio('pasos', './assets/musica/sonidos/paso.ogg'); 
   }
 
   create() {
@@ -71,6 +73,7 @@ export default class MapaPrincipalScene extends BaseScene {
       this.startX,
       this.startY,
       this.playerKey,
+      this.pasos,
     ).setDepth(1);
     this.JugadorPrincipal.setCollideWorldBounds(true);
 
@@ -87,25 +90,14 @@ export default class MapaPrincipalScene extends BaseScene {
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-    this.portalACasa = new Portal(
-      this,
-      464,
-      195,
-      'InteriorCasaScene',
-      false,
-      { x: 621, y: 64 },
-    );
+    this.portalACasa = new Portal(this, 464, 195, 'InteriorCasaScene', false, { x: 621, y: 64 });
 
     this.physics.add.overlap(this.JugadorPrincipal, this.portalACasa.zone);
 
-    this.portalAPulperia = new Portal(
-      this,
-      1603,
-      163,
-      'InteriorPulperiaScene',
-      false,
-      { x: 621, y: 64 },
-    );
+    this.portalAPulperia = new Portal(this, 1603, 163, 'InteriorPulperiaScene', false, {
+      x: 621,
+      y: 64,
+    });
 
     this.physics.add.overlap(this.JugadorPrincipal, this.portalAPulperia.zone);
 
@@ -113,15 +105,15 @@ export default class MapaPrincipalScene extends BaseScene {
       this,
       1917,
       300,
-      'MapaOponentesScene',
+      'MapaAventura1',
       'CartelOponentes',
-      { x: 85, y: 470 },
+      { x: 35, y: 552 },
     );
   }
 
   update() {
     this.JugadorPrincipal.update(this.keys, this.teclaE);
-    //Boludez para saber las coordenadas del personaje cuando se detiene, para facilitar la colocacion de objetos y portales
+    
     const seMueve =
       this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
 
@@ -130,9 +122,7 @@ export default class MapaPrincipalScene extends BaseScene {
     } else if (this.estabaMoviendose) {
       const xActual = Math.round(this.JugadorPrincipal.x);
       const yActual = Math.round(this.JugadorPrincipal.y);
-
       console.log(`📍 Personaje parado en coordenadas -> X: ${xActual}, Y: ${yActual}`);
-
       this.estabaMoviendose = false;
     }
 

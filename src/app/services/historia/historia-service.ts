@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { initHistoria } from '../../../game/historiaConfig.js';
+import { personajePorId } from '../../../game/data/personaje.js';
 
 @Injectable({
   providedIn: 'root'
@@ -7,6 +8,7 @@ import { initHistoria } from '../../../game/historiaConfig.js';
 export class HistoriaService {
   private juegoInstance: any = null;
   private heroeIdSeleccionado: number | null = null;
+  private habilidadSeleccionada: string | null = null; 
 
   constructor() {}
 
@@ -14,14 +16,18 @@ export class HistoriaService {
     this.heroeIdSeleccionado = id;
   }
 
+  setHabilidadSeleccionada(habilidad: string): void {
+    this.habilidadSeleccionada = habilidad;
+  }
+
   obtenerSpriteKey(): string {
-    const mapeo: { [key: number]: string } = {
-      0: 'nene-hacha',
-      1: 'nena-hacha',
-      2: 'nene-arco',
-      3: 'nena-arco',
-    };
-    return mapeo[this.heroeIdSeleccionado ?? 0];
+    if (this.heroeIdSeleccionado !== null) {
+      const heroe = personajePorId(this.heroeIdSeleccionado);
+      if (heroe && heroe.spriteKey) {
+        return heroe.spriteKey;
+      }
+    }
+    return 'nene-hacha';
   }
 
   iniciarJuego(contenedorId: string): void {
@@ -33,6 +39,7 @@ export class HistoriaService {
 
     const spriteKey = this.obtenerSpriteKey();
     this.juegoInstance.registry.set('playerSprite', spriteKey);
+    this.juegoInstance.registry.set('playerAbility', this.habilidadSeleccionada ?? 'Ninguna');
   }
 
   destruirJuego(): void {
