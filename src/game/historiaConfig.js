@@ -5,6 +5,7 @@ import MapaPrincipalScene from './escenas/MapaPrincipalScene.js';
 import InteriorCasaScene from './escenas/InteriorCasaScene.js';
 import InteriorPulperiaScene from './escenas/InteriorPulperiaScene.js';
 import MapaAventura1Scene from './escenas/MapaAventura1Scene.js';
+import MapaAventura2Scene from './escenas/MapaAventura2Scene.js';
 
 
 export function initHistoria(parent = 'contenedor-juego') {
@@ -30,7 +31,7 @@ export function initHistoria(parent = 'contenedor-juego') {
       default: 'arcade',
       arcade: { debug: false },
     },
-    scene: [HistoriaBootScene, MapaPrincipalScene, BaseScene, InteriorCasaScene, InteriorPulperiaScene, MapaAventura1Scene],
+    scene: [HistoriaBootScene, MapaPrincipalScene, BaseScene, InteriorCasaScene, InteriorPulperiaScene, MapaAventura1Scene, MapaAventura2Scene],
     parent,
 
 
