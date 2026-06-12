@@ -109,6 +109,7 @@ p {
     border: 2px solid #5a4020;
     cursor: pointer;
     transition: background 0.1s, color 0.1s, border-color 0.1s, box-shadow 0.1s;
+    box-shadow: 8px 8px 0 #000;
 }
 
 .seccion-1 a:hover:not(.inactivo) {
@@ -186,6 +187,7 @@ p {
     object-fit: cover;
     border-radius: 50%;
     border: 2px solid #000;
+    box-shadow: 4px 4px 0 #000;
 }
 
 .titulo-landing {
@@ -193,6 +195,13 @@ p {
     font-size: 3rem;
     color: #c89030;
 
+    text-shadow:
+        1px 1px 0 #000,
+        2px 2px 0 #000,
+        3px 3px 0 #000,
+        4px 4px 0 #000,
+        5px 5px 0 #000,
+        6px 6px 0 #000;
 }
 
 .texto-landing {
@@ -242,11 +251,10 @@ p {
     overflow: hidden;
     box-shadow: inset 0 0 0 2px #000, 8px 8px 0 rgba(0, 0, 0, 0.45);
 
-        display: flex;
+    display: flex;
     justify-content: center;
     align-items: center;
 }
-
 
 .frente {
     z-index: 2;
@@ -263,6 +271,61 @@ p {
     box-sizing: border-box;
 }
 
+.marco-carta {
+    position: absolute;
+    inset: 12px;
+
+    border: 2px solid #7a7a7a;
+    border-radius: 4px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.indice {
+    position: absolute;
+
+    font-family: 'Jersey 20';
+    font-size: 1.4rem;
+    color: #111;
+}
+
+.superior {
+    top: 1.5rem;
+    left: 1.5rem;
+}
+
+.inferior {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    transform: rotate(180deg);
+}
+
+.frente::before,
+.frente::after {
+    content: "";
+
+    position: absolute;
+
+    width: 16px;
+    height: 16px;
+
+    border-top: 2px solid #666;
+    border-left: 2px solid #666;
+}
+
+.frente::before {
+    top: 18px;
+    left: 18px;
+}
+
+.frente::after {
+    bottom: 18px;
+    right: 18px;
+    transform: rotate(180deg);
+}
 
 .texto-carta {
     font-size: 2rem;
