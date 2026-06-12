@@ -7,7 +7,6 @@ import InteriorPulperiaScene from './escenas/InteriorPulperiaScene.js';
 import MapaAventura1Scene from './escenas/MapaAventura1Scene.js';
 import MapaAventura2Scene from './escenas/MapaAventura2Scene.js';
 
-
 export function initHistoria(parent = 'contenedor-juego') {
   const config = {
     type: Phaser.AUTO,
@@ -16,7 +15,7 @@ export function initHistoria(parent = 'contenedor-juego') {
         const esTactil =
           navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
         if (esTactil && screen.orientation?.lock) {
-          screen.orientation.lock('landscape').catch(() => { });
+          screen.orientation.lock('landscape').catch(() => {});
         }
       },
     },
@@ -26,19 +25,22 @@ export function initHistoria(parent = 'contenedor-juego') {
       width: 1280,
       height: 720,
       fullscreenTarget: 'contenedor-juego-completo',
+      autoRound: true,
     },
     physics: {
       default: 'arcade',
       arcade: { debug: false },
     },
-    scene: [HistoriaBootScene, MapaPrincipalScene, BaseScene, InteriorCasaScene, InteriorPulperiaScene, MapaAventura1Scene, MapaAventura2Scene],
+    scene: [
+      HistoriaBootScene,
+      MapaPrincipalScene,
+      BaseScene,
+      InteriorCasaScene,
+      InteriorPulperiaScene,
+      MapaAventura1Scene,
+      MapaAventura2Scene,
+    ],
     parent,
-
-
-    //para que no se rompan los assets con zoom
-    //antialias: false,
-    //pixelArt: true,
-
   };
 
   return new Phaser.Game(config);
