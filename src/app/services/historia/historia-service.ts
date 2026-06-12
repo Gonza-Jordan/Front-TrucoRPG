@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { initHistoria } from '../../../game/historiaConfig.js';
 import { personajePorId } from '../../../game/data/personaje.js';
+import { claseHeroePorHabilidadId } from '../../../game/data/habilidades.js';
 
 @Injectable({
   providedIn: 'root'
@@ -38,8 +39,25 @@ export class HistoriaService {
     this.juegoInstance = initHistoria(contenedorId);
 
     const spriteKey = this.obtenerSpriteKey();
+    const claseHeroe = this.habilidadSeleccionada
+      ? claseHeroePorHabilidadId(this.habilidadSeleccionada)
+      : null;
+
     this.juegoInstance.registry.set('playerSprite', spriteKey);
     this.juegoInstance.registry.set('playerAbility', this.habilidadSeleccionada ?? 'Ninguna');
+    this.juegoInstance.registry.set('claseHeroe', claseHeroe);
+  }
+
+  obtenerJuego(): any {
+    return this.juegoInstance;
+  }
+
+  pausarEscena(key: string): void {
+    this.juegoInstance?.scene.pause(key);
+  }
+
+  reanudarEscena(key: string): void {
+    this.juegoInstance?.scene.resume(key);
   }
 
   destruirJuego(): void {

@@ -1,6 +1,12 @@
+import Phaser from 'phaser';
 import BaseScene from './BaseScene.js';
 import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
+import Npc from '../personajes/Npc.js';
 import Portal from '../objetos/Portal.js';
+const RIVAL_NAHUELITO_NIVEL = 1;
+
+const JEFE1_X = 816;
+const JEFE1_Y = 368;
 
 export default class MapaAventura1Scene extends BaseScene {
   constructor() {
@@ -8,9 +14,10 @@ export default class MapaAventura1Scene extends BaseScene {
   }
 
   init(data) {
-    this.playerKey = data.playerSprite || 'nene-hacha';
-    this.startX = data.x || 85;
-    this.startY = data.y || 470;
+    this.playerKey = data.playerSprite || this.registry.get('playerSprite') || 'nene-hacha';
+    this.startX = data.x ?? 85;
+    this.startY = data.y ?? 470;
+    this.claseHeroe = data.claseHeroe ?? this.registry.get('claseHeroe') ?? null;
   }
 
   preload() {
@@ -20,6 +27,7 @@ export default class MapaAventura1Scene extends BaseScene {
   create() {
     this.botonPantallaCompleta();
     this.crearControlesMobile();
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
 
     // CREACION DEL MAPA
 
@@ -118,6 +126,47 @@ export default class MapaAventura1Scene extends BaseScene {
       { x: 1078, y: 611 },
     );
     this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura2.zone);
+
+    this.jefe1 = new Npc(this, JEFE1_X, JEFE1_Y, 'troll').setDepth(0);
+
+    this.zonaJefe1 = this.add.zone(this.jefe1.x, this.jefe1.y, this.jefe1.width, this.jefe1.height);
+    this.physics.add.existing(this.zonaJefe1);
+    this.zonaJefe1.body.setAllowGravity(false);
+    this.zonaJefe1.body.moves = false;
+
+    const mensajeJefe1 = this.esTactil
+      ? '¡Tocá "Interactuar" para desafiar al Nahuelito!'
+      : '¡Presioná E para desafiar al Nahuelito!';
+    this.mensajeJefe1 = this.add
+      .text(this.jefe1.x, this.jefe1.y - this.jefe1.height / 2 - 20, mensajeJefe1, {
+        fontFamily: '"Jersey 10"',
+        fontSize: '18px',
+        color: '#000',
+        backgroundColor: '#fff',
+        padding: { x: 10, y: 5 },
+      })
+      .setOrigin(0.5)
+      .setVisible(false)
+      .setDepth(10);
+    this.estaEnZonaJefe1 = false;
+    this.physics.add.overlap(
+      this.JugadorPrincipal,
+      this.zonaJefe1,
+      () => {
+        this.estaEnZonaJefe1 = true;
+      },
+      null,
+      this,
+    );
+  }
+
+  iniciarPeleaNahuelito() {
+    if (this.claseHeroe !== null) {
+      localStorage.setItem('heroeId', String(this.claseHeroe));
+    }
+    localStorage.setItem('rivalNivel', String(RIVAL_NAHUELITO_NIVEL));
+    localStorage.setItem('historiaPartida', '1');
+    window.dispatchEvent(new CustomEvent('truco-solo:start'));
   }
 
   update() {
@@ -136,5 +185,15 @@ export default class MapaAventura1Scene extends BaseScene {
     }
 
     this.portalMapaAventura2.update(this.JugadorPrincipal, this.teclaE);
+
+    this.mensajeJefe1.setVisible(this.estaEnZonaJefe1);
+
+    const interactuar = Phaser.Input.Keyboard.JustDown(this.teclaE) || this.botonInteractuarPresionado;
+    this.botonInteractuarPresionado = false;
+    if (this.estaEnZonaJefe1 && interactuar) {
+      this.iniciarPeleaNahuelito();
+    }
+
+    this.estaEnZonaJefe1 = false;
   }
 }

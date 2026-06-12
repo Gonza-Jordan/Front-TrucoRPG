@@ -28,3 +28,14 @@ export const HABILIDADES = [
 export function habilidadPorId(id) {
     return HABILIDADES.find(h => h.id === id) ?? null;
 }
+
+const CLASE_HEROE_POR_HABILIDAD = {
+    manipulador: 0,
+    timbero: 1,
+    fanfarron: 2,
+    mentiroso: 3,
+};
+
+export function claseHeroePorHabilidadId(id) {
+    return CLASE_HEROE_POR_HABILIDAD[id] ?? null;
+}

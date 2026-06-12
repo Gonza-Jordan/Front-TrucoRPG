@@ -22,6 +22,7 @@ export type TipoEnvido = 'Envido' | 'EnvidoEnvido' | 'Real Envido' | 'RealEnvido
 export interface Carta {
   numero: number;
   palo: Palo;
+  paloVisual?: Palo;
   valorTruco: number;
   valorEnvido: number;
 }
@@ -40,6 +41,13 @@ export interface VistaHabilidades {
   nombreHeroe?: string;
   ultimoMensajeHabilidad?: string;
   cartaReveladaRival?: { numero: number; palo: string; valorTruco: number };
+}
+
+export interface VistaHabilidadesRival {
+  habilidadesActivasEnPartida: boolean;
+  salpicaduraActiva: boolean;
+  salpicaduraBloqueando: boolean;
+  ultimoMensajeHabilidad?: string;
 }
 
 export interface ManoState {
@@ -68,8 +76,11 @@ export interface ManoState {
   trucoPendienteRespuestaHumano?:  boolean;
   cartaMaquinaEnMesa?: Carta;
   numeroDeMano?: number;
-  configuracion?: { modo: number; heroeDelHumano?: number };
+  configuracion?: { modo: number; heroeDelHumano?: number; rivalDeLaMaquina?: number; rivalNivel?: number };
   vistaHabilidadesHumano?: VistaHabilidades;
+  vistaHabilidadesRival?: VistaHabilidadesRival;
+  salpicaduraActiva?: boolean;
+  salpicaduraBloqueando?: boolean;
 }
 
 export interface Btn {
@@ -95,6 +106,17 @@ export interface Heroe {
   descripcion: string;
 }
 
+export interface Rival {
+  id: string;
+  nivel: number;
+  nombre: string;
+  descripcion: string;
+  nombreHabilidad: string;
+  descripcionHabilidad: string;
+  tipoRival: number;
+  tipoHabilidad: number;
+}
+
 const HEROES: Heroe[] = [
   { id: 0, nombre: 'Manipulador', color: '#aa66ff', descripcion: 'Cada 3 manos: reemplazá 1 carta por otra del mazo (nunca de menor valor).' },
   { id: 1, nombre: 'Timbero',     color: '#ffaa44', descripcion: 'Antes de jugar: apostá. Si ganás la mano, duplicás puntos; si perdés, rival +2.' },
@@ -106,8 +128,10 @@ const HEROES: Heroe[] = [
 
 const PALO_SYM: Record<Palo, string> = { Oro: '★', Espada: '†', Copa: '♦', Basto: '♣' };
 const API = '/api/truco';
+const API_HISTORIA = '/api/historia';
 const FAN_ANGLES = [-16, 0, 16];
 const FAN_X      = [-84, 0, 84];
+const SALPICADURA_REVEAL_SEG = 5;
 
 // ── Componente ───────────────────────────────────────────────────────────────
 
@@ -133,6 +157,8 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── Héroe ─────────────────────────────────────────────────────────────────
   heroe: Heroe | null = null;
 
+  rival: Rival | null = null;
+
   // Índice de la carta seleccionada para el Manipulador (claseHeroe === 0)
   habilidadCartaIdx: number | null = null;
 
@@ -145,6 +171,18 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   get vista(): VistaHabilidades | undefined {
     return this.mano?.vistaHabilidadesHumano;
   }
+
+  get vistaRival(): VistaHabilidadesRival | undefined {
+    return this.mano?.vistaHabilidadesRival;
+  }
+
+  get accionesBloqueadasPorSalpicadura(): boolean {
+    return this.salpicaduraRevelando || !!this.vistaRival?.salpicaduraBloqueando;
+  }
+
+  salpicaduraRevelando = false;
+  salpicaduraSegundos = 0;
+  private salpicaduraCartasOriginales: Carta[] = [];
 
   // Habilidad disponible = el backend dice que está lista y no fue usada esta mano
   get habilidadDisponible(): boolean {
@@ -201,6 +239,11 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   countdown: number | null = null;
   private bubbleTimer: ReturnType<typeof setTimeout> | null = null;
   private toastTimer:  ReturnType<typeof setTimeout> | null = null;
+  private rivalNivel: number | null = null;
+  private salpicaduraManoId: string | null = null;
+  private salpicaduraTimer: ReturnType<typeof setTimeout> | null = null;
+  private salpicaduraInterval: ReturnType<typeof setInterval> | null = null;
+
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngAfterViewInit(): void {
     const video = this.gauchoVideo?.nativeElement;
@@ -217,21 +260,46 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       this.heroe = HEROES.find(h => h.id === id) ?? null;
     }
 
+    const rivalNivelStr = localStorage.getItem('rivalNivel');
+    if (rivalNivelStr !== null) {
+      this.rivalNivel = parseInt(rivalNivelStr, 10);
+      this.cargarRival(this.rivalNivel);
+    }
+
     const escStr = localStorage.getItem('practicaEscenario');
     if (escStr !== null) {
       this.escenarioPractica = parseInt(escStr, 10);
       localStorage.removeItem('practicaEscenario');
     }
 
-    const body: Record<string, unknown> = { modo: this.heroe ? 1 : 0 };
+    this.call('nueva-partida', this.construirBodyPartida());
+  }
+
+  private cargarRival(nivel: number): void {
+    this.http.get<Rival>(`${API_HISTORIA}/rivales/${nivel}`).subscribe({
+      next: (rival) => {
+        this.rival = rival;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.showToast('No se pudo cargar los datos del rival.');
+      },
+    });
+  }
+
+  private construirBodyPartida(): Record<string, unknown> {
+    const esHistoria = this.heroe !== null || this.rivalNivel !== null;
+    const body: Record<string, unknown> = { modo: esHistoria ? 1 : 0 };
     if (this.heroe) body['claseHeroe'] = this.heroe.id;
-    this.call('nueva-partida', body);
+    if (this.rivalNivel !== null) body['rivalNivel'] = this.rivalNivel;
+    return body;
   }
 
   ngOnDestroy(): void {
     if (this.bubbleTimer) clearTimeout(this.bubbleTimer);
     if (this.toastTimer)  clearTimeout(this.toastTimer);
     this.cancelarCountdown();
+    this.cancelarSalpicaduraTimer();
   }
 
   // ── Template helpers ──────────────────────────────────────────────────────
@@ -248,6 +316,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── API ───────────────────────────────────────────────────────────────────
   async call(endpoint: string, body: object): Promise<void> {
     if (this.loading) return;
+    if (endpoint !== 'confirmar-salpicadura' && this.accionesBloqueadasPorSalpicadura) return;
     this.loading = true;
     try {
       const data = await firstValueFrom(
@@ -267,21 +336,20 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Acumula los eventos de habilidad en el log
   private updateEventosHabilidad(m: ManoState): void {
-    const v = m.vistaHabilidadesHumano;
-    if (!v?.habilidadesActivasEnPartida) return;
-
     const lineas: string[] = [];
+    const v = m.vistaHabilidadesHumano;
 
-    if (v.activaDisponible && !v.activaUsadaEnEstaMano)
-      lineas.push('⚡ Activa disponible');
+    if (v?.habilidadesActivasEnPartida) {
+      if (v.activaDisponible && !v.activaUsadaEnEstaMano)
+        lineas.push('⚡ Activa disponible');
 
-    if (v.cartaReveladaRival)
-      lineas.push(`👁 Rival revelado: ${v.cartaReveladaRival.numero} de ${v.cartaReveladaRival.palo}`);
+      if (v.cartaReveladaRival)
+        lineas.push(`👁 Rival revelado: ${v.cartaReveladaRival.numero} de ${v.cartaReveladaRival.palo}`);
 
-    if (v.ultimoMensajeHabilidad)
-      lineas.push(`▶ ${v.ultimoMensajeHabilidad}`);
+      if (v.ultimoMensajeHabilidad)
+        lineas.push(`▶ ${v.ultimoMensajeHabilidad}`);
+    }
 
-    // Solo actualizar si hay algo nuevo que mostrar
     if (lineas.length > 0) {
       this.eventosHabilidad = lineas;
     }
@@ -289,6 +357,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Jugar carta ───────────────────────────────────────────────────────────
   jugarCarta(i: number): void {
+    if (this.accionesBloqueadasPorSalpicadura) return;
     const c = this.misCarts[i]?.carta;
     if (!c || !this.mano) return;
 
@@ -315,7 +384,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Usar habilidad ────────────────────────────────────────────────────────
   usarHabilidad(): void {
-    if (!this.mano || !this.habilidadDisponible) return;
+    if (!this.mano || !this.habilidadDisponible || this.accionesBloqueadasPorSalpicadura) return;
 
     // Manipulador: activar modo selección (si ya está activo, ignorar)
     if (this.heroe?.id === 0) {
@@ -354,9 +423,10 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     this.eventosHabilidad = [];
     this.habilidadCartaIdx = null;
     this.modoSeleccionCarta = false;
-    const body: Record<string, unknown> = { modo: this.heroe ? 1 : 0 };
-    if (this.heroe) body['claseHeroe'] = this.heroe.id;
-    this.call('nueva-partida', body);
+    this.salpicaduraManoId = null;
+    this.salpicaduraCartasOriginales = [];
+    this.cancelarSalpicaduraTimer();
+    this.call('nueva-partida', this.construirBodyPartida());
   }
 
   mostrarConfirmSalir = false;
@@ -368,8 +438,15 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   confirmarSalir(): void {
     this.mostrarConfirmSalir = false;
     localStorage.removeItem('practicaEscenario');
+    const esHistoria = localStorage.getItem('historiaPartida') === '1';
+    if (esHistoria) {
+      localStorage.removeItem('historiaPartida');
+      localStorage.removeItem('rivalNivel');
+    }
     window.dispatchEvent(new CustomEvent('truco-solo:end'));
-    this.router.navigate(['/home']);
+    if (!esHistoria) {
+      this.router.navigate(['/home']);
+    }
   }
 
   cancelarSalir(): void {
@@ -409,9 +486,13 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     const esMiTurno = (m.turnoActual === 'Humano' || !!m.cartaMaquinaEnMesa)
                       && !m.ganadorMano && !m.ganadorPartida && !pendEnv && !pendTru;
 
-    this.turnoBadge = esMiTurno
-      ? 'Tu turno — jugá una carta o cantá'
-      : (pendEnv || pendTru) ? 'Respondé el canto de la máquina' : '';
+    if (this.accionesBloqueadasPorSalpicadura) {
+      this.turnoBadge = 'Salpicadura: mirá tus cartas originales...';
+    } else {
+      this.turnoBadge = esMiTurno
+        ? 'Tu turno — jugá una carta o cantá'
+        : (pendEnv || pendTru) ? 'Respondé el canto de la máquina' : '';
+    }
 
     this.updateBubble(m, pendTru, pendEnv);
     this.prevEstadoTruco    = m.estadoTruco  ?? '';
@@ -434,9 +515,14 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       };
     });
 
-    // Preservar estado de selección del Manipulador al actualizar cartas
+    this.manejarSalpicadura(m);
+
+    const manoVisible = this.accionesBloqueadasPorSalpicadura && this.salpicaduraCartasOriginales.length > 0
+      ? this.salpicaduraCartasOriginales
+      : (m.humano?.mano ?? []);
+
     this.misCarts = [0, 1, 2].map(i => {
-      const carta = m.humano?.mano?.[i] ?? null;
+      const carta = manoVisible[i] ?? null;
       return {
         carta,
         visible: !!carta && !m.ganadorMano,
@@ -449,6 +535,60 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.escenarioPractica !== null) {
       this.actualizarTutorial(m);
     }
+  }
+
+  private cancelarSalpicaduraTimer(): void {
+    if (this.salpicaduraTimer) {
+      clearTimeout(this.salpicaduraTimer);
+      this.salpicaduraTimer = null;
+    }
+    if (this.salpicaduraInterval) {
+      clearInterval(this.salpicaduraInterval);
+      this.salpicaduraInterval = null;
+    }
+    this.salpicaduraRevelando = false;
+    this.salpicaduraSegundos = 0;
+  }
+
+  private manejarSalpicadura(m: ManoState): void {
+    const bloqueando = !!m.vistaHabilidadesRival?.salpicaduraBloqueando;
+    if (!bloqueando) {
+      if (!this.salpicaduraTimer) {
+        this.salpicaduraRevelando = false;
+        this.salpicaduraSegundos = 0;
+        this.salpicaduraCartasOriginales = [];
+      }
+      return;
+    }
+
+    if (this.salpicaduraManoId === m.id) return;
+
+    if (this.salpicaduraTimer) clearTimeout(this.salpicaduraTimer);
+    if (this.salpicaduraInterval) clearInterval(this.salpicaduraInterval);
+
+    this.salpicaduraManoId = m.id;
+    this.salpicaduraCartasOriginales = [...(m.humano?.mano ?? [])];
+    this.salpicaduraRevelando = true;
+    this.salpicaduraSegundos = SALPICADURA_REVEAL_SEG;
+
+    this.salpicaduraInterval = setInterval(() => {
+      this.salpicaduraSegundos = Math.max(0, this.salpicaduraSegundos - 1);
+      this.cdr.markForCheck();
+    }, 1000);
+
+    this.salpicaduraTimer = setTimeout(() => {
+      this.salpicaduraTimer = null;
+      if (this.salpicaduraInterval) clearInterval(this.salpicaduraInterval);
+      this.salpicaduraInterval = null;
+      this.salpicaduraRevelando = false;
+      this.salpicaduraSegundos = 0;
+      this.cdr.markForCheck();
+      if (this.mano?.id === m.id) {
+        this.call('confirmar-salpicadura', { manoId: m.id });
+      }
+    }, SALPICADURA_REVEAL_SEG * 1000);
+
+    this.cdr.markForCheck();
   }
 
   // ── Tutorial práctica ──────────────────────────────────────────────────────
@@ -695,7 +835,11 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
         raw.push(['Ir al mazo', '#556677', () => this.call('irse-al-mazo', { manoId: m.id })]);
     }
 
-    this.btns = raw.map(([label, color, action]) => ({ label, color, action, enabled: !!action }));
+    const bloqueado = this.accionesBloqueadasPorSalpicadura;
+    this.btns = raw.map(([label, color, action]) => ({
+      label, color, action,
+      enabled: !!action && !bloqueado,
+    }));
   }
 
   // ── Tanteador SVG ─────────────────────────────────────────────────────────

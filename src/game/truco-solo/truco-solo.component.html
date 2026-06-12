@@ -14,6 +14,16 @@
       </button>
       }
     </div>
+
+    @if (rival) {
+    <div class="rival-panel-left">
+      <div class="rival-nombre-panel">⚔ {{ rival.nombre }}</div>
+      <div class="heroe-desc">{{ rival.descripcionHabilidad }}</div>
+      @if (vistaRival?.ultimoMensajeHabilidad) {
+      <div class="heroe-desc rival-log-msg">{{ vistaRival?.ultimoMensajeHabilidad }}</div>
+      }
+    </div>
+    }
   </aside>
 
   <!-- ── ÁREA DE JUEGO CENTRAL ───────────────────────────────────────────── -->
@@ -21,9 +31,12 @@
 
     <div class="rival-zone">
       <div class="rival-portrait">
-        <img src="assets/gaucho.png" alt="rival" class="rival-img" />
+        <img [src]="rival ? 'assets/sprites/troll.png' : 'assets/gaucho.png'" alt="rival" class="rival-img"
+          [class.rival-troll]="!!rival" />
       </div>
-      <!-- <div class="rival-label">{{ rivalLabel }}</div> -->
+      @if (rival) {
+      <div class="rival-nombre">{{ rival.nombre }}</div>
+      }
       @if (bubbleText) {
       <div class="bubble">
         <span class="bubble-tail"></span>
@@ -204,6 +217,15 @@
 
   @if (countdown !== null) {
   <div class="nueva-mano-countdown">Nueva mano en {{ countdown }}</div>
+  }
+
+  @if (salpicaduraRevelando) {
+  <div class="salpicadura-overlay">
+    <div class="salpicadura-box">
+      <div class="salpicadura-titulo">¡{{ rival?.nombre ?? 'Nahuelito' }} usa Salpicadura!</div>
+      <div class="salpicadura-sub">Mirá tus cartas originales... {{ salpicaduraSegundos || 1 }}s</div>
+    </div>
+  </div>
   }
 
   <!-- Toast -->

@@ -6,6 +6,9 @@
 
 @if (vistaActual === 'en-juego') {
   <div class="contenedor-juego-wrapper">
-    <div id="historia-container"></div>
+    <div id="historia-container" [style.display]="mostrarTrucoSolo ? 'none' : 'block'"></div>
+    @if (mostrarTrucoSolo) {
+      <app-truco-solo></app-truco-solo>
+    }
   </div>
 }

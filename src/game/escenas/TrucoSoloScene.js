@@ -21,6 +21,9 @@ export default class TrucoSoloScene extends BaseScene {
         this.playerSprite = data.playerSprite || 'nene-hacha';
         this.modoJuego = data.modoJuego ?? 0;
         this.claseHeroe = data.claseHeroe ?? null;
+        this.escenaRetorno = data.escenaRetorno ?? null;
+        this.retornoX = data.retornoX ?? null;
+        this.retornoY = data.retornoY ?? null;
         this.mano = null;
         this._btnObjs = [];
         // Estado previo para detectar respuesta de la máquina
@@ -47,6 +50,20 @@ export default class TrucoSoloScene extends BaseScene {
         if (this.modoJuego === 1 && this.claseHeroe !== null)
             body.claseHeroe = this.claseHeroe;
         return body;
+    }
+
+    _volverAlMapa() {
+        const escena = this.escenaRetorno || 'GameScene';
+        const data = { playerSprite: this.playerSprite };
+        if (escena === 'GameScene') {
+            data.multijugador = false;
+            data.modoJuego = this.modoJuego;
+            data.claseHeroe = this.claseHeroe;
+        } else {
+            data.x = this.retornoX;
+            data.y = this.retornoY;
+        }
+        this.scene.start(escena, data);
     }
 
     // ─── LAYOUT ──────────────────────────────────────────────────
@@ -142,12 +159,7 @@ export default class TrucoSoloScene extends BaseScene {
         this.add.text(xC, 674, 'Volver', { fontFamily: FONT, fontSize: '16px', fill: '#aa6633' }).setOrigin(0.5).setDepth(4);
         bk.on('pointerover', () => bk.setFillStyle(0x332818));
         bk.on('pointerout',  () => bk.setFillStyle(0x221810));
-        bk.on('pointerdown', () => this.scene.start('GameScene', {
-            playerSprite: this.playerSprite,
-            multijugador: false,
-            modoJuego: this.modoJuego,
-            claseHeroe: this.claseHeroe,
-        }));
+        bk.on('pointerdown', () => this._volverAlMapa());
     }
 
     /** Recorta texto del panel derecho para que no invada otras secciones. */
@@ -451,7 +463,7 @@ export default class TrucoSoloScene extends BaseScene {
             .setOrigin(0.5).setDepth(d + 2).setVisible(false);
         this._goBtn2Bg.on('pointerover', () => this._goBtn2Bg.setFillStyle(0x662828));
         this._goBtn2Bg.on('pointerout',  () => this._goBtn2Bg.setFillStyle(0x4a1a1a));
-        this._goBtn2Bg.on('pointerdown', () => this.scene.start('GameScene', { playerSprite: this.playerSprite }));
+        this._goBtn2Bg.on('pointerdown', () => this._volverAlMapa());
     }
 
     _showGameOver(humanWon) {
