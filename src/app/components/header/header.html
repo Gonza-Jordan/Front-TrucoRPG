@@ -25,7 +25,7 @@
         <li><app-boton enlace="registro">Registrarse</app-boton></li>
       }
       @if (headerType() === 'home' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala' || headerType() === 'tutorial'|| headerType() === 'reglas-truco' || headerType() === 'valores-carta') {
-        <li><app-boton enlace="">Cerrar Sesión</app-boton></li>
+        <li><app-boton [accion]="cerrarSesion.bind(this)">Cerrar Sesión</app-boton></li>
       }
     </ul>
   </nav>
