@@ -10,10 +10,17 @@ export class Boton {
   @Input() enlace: string = '';
   @Input() tipo: 'button' | 'submit' = 'button';
   @Input() disabled: boolean = false;
+  @Input() accion: () => void = () => {};
 
   private router = inject(Router);
 
   onClick() {
-    if (this.enlace) this.router.navigate([this.enlace]);
-  }
+    if (this.enlace){
+      this.router.navigate([this.enlace]);
+   }
+
+    if (this.accion) {
+      this.accion();
+   }
+ }
 }

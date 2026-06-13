@@ -34,4 +34,8 @@ export class Header {
     this.headerType.set(data['header'] || 'default');
   }
 
+  cerrarSesion() {
+  localStorage.removeItem('token');
+  this.router.navigate(['/']);
+  }
 }
