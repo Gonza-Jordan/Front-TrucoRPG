@@ -22,7 +22,6 @@ export type TipoEnvido = 'Envido' | 'EnvidoEnvido' | 'Real Envido' | 'RealEnvido
 export interface Carta {
   numero: number;
   palo: Palo;
-  paloVisual?: Palo;
   valorTruco: number;
   valorEnvido: number;
 }
