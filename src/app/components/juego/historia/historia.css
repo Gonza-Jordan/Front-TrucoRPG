@@ -18,3 +18,26 @@ main {
     background: url('/assets/home.png') center center / cover no-repeat;
     color:#ffffff;
 }
+
+.contenedor-juego-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%; 
+  overflow: hidden;
+}
+
+#historia-container {
+  width: 100%;
+  height: 100%;
+  background-color: #20170a;
+}
+
+#historia-container canvas{
+  margin: 0% !important;
+}
+
+@media (max-width: 767px) {
+    main {
+        padding: 0;
+    }
+}

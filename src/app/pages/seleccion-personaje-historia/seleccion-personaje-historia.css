@@ -347,7 +347,7 @@ main {
 
 .titulo-seccion-mobile { font-size: 1.2rem; color: #c89030; margin: 10px 0 5px 0; }
 
-.carrusel-skins-mobile { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+.carrusel-skins-mobile { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; min-height: 40px; }
 
 .item-skin-mobile {
   padding: 8px 16px;
@@ -426,7 +426,7 @@ main {
   .bloque-seleccion.mazo-habilidades-container.de-costado-a-costado { padding: 1em; }
   .zona-mazo-interactiva { flex-direction: column; gap: 1.2em; }
   .acciones-confirmar { flex-direction: column; width: 100%; }
-  .acciones-confirmar button { max-width: 100%; width: 100%; height: 42px; }
+  .acciones-confirmar button { max-width: 100%; width: 100%; height: 55px; }
 }
 
 @media (max-height: 600px) {
@@ -438,5 +438,5 @@ main {
   .mazo-deck { width: 90px; height: 130px; }
   .slot-carta-revelada { width: 110px; height: 150px; }
   .titulo-seccion { margin-bottom: 0.5em; font-size: 1.2em; }
-  .acciones-confirmar button { height: 36px; font-size: 0.9rem; }
+  .acciones-confirmar button { height: 45px; font-size: 0.9rem; }
 }

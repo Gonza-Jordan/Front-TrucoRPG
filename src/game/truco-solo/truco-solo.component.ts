@@ -220,6 +220,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     const escStr = localStorage.getItem('practicaEscenario');
     if (escStr !== null) {
       this.escenarioPractica = parseInt(escStr, 10);
+      localStorage.removeItem('practicaEscenario');
     }
 
     const body: Record<string, unknown> = { modo: this.heroe ? 1 : 0 };

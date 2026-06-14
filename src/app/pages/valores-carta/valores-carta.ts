@@ -18,6 +18,17 @@ export class ValoresCarta implements OnInit {
   indiceInicio = 0;
   cantPagina = 8;
 
+  private readonly mapaNumeros: Record<number, number> = {
+    1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 10: 8, 11: 9, 12: 10
+  };
+  private readonly offsetPalo: Record<string, number> = {
+    Oro: 0, Copa: 10, Espada: 20, Basto: 30
+  };
+
+  cardImg(carta: Cartas): string {
+    return `assets/cards/${this.offsetPalo[carta.palo] + this.mapaNumeros[carta.numero]}.PNG`;
+  }
+
   ngOnInit(): void {
     this.cargarCartas();
   }

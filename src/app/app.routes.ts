@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './auth-guard';
 import { GameComponent } from './game/game.component';
 import { RegistroComponent } from './auth/registro/registro.component';
 import { LoginComponent } from './auth/login/login.component';
@@ -28,6 +29,11 @@ export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
   { path: 'registro', component: RegistroComponent, data: { header: 'registro' } },
   { path: 'login', component: LoginComponent, data: { header: 'login' } },
+
+  {
+    path: '',
+    canActivate: [authGuard],
+    children: [
   { path: 'home', component: Home, data: { header: 'home' } },
   { path: 'configuracion', component: ConfiguracionComponent, data: { header: 'configuracion' } },
   { path: 'tutorial', component: Tutorial, data: { header: 'tutorial' }},
@@ -51,5 +57,7 @@ export const routes: Routes = [
   { path: 'jugar/solitario-2v2', component: TrucoSolo2v2Component },
   { path: 'unirse', component: UnirseQrComponent, data: { header: 'home' } },
   { path: 'seleccion-personaje-historia', component: SeleccionPersonajeHistoria, data: { header: 'home' } },
+      ]
+    },
   { path: '**', redirectTo: '' },
 ];
