@@ -3,6 +3,7 @@ import { GameComponent } from './game/game.component';
 import { RegistroComponent } from './auth/registro/registro.component';
 import { LoginComponent } from './auth/login/login.component';
 import { Home } from './pages/home/home';
+import { Camara } from './pages/camara/camara';
 import { LandingPage } from './pages/landing-page/landing-page';
 import { ConfiguracionComponent } from './pages/configuracion/configuracion';
 import { MenuMultijugador } from './pages/menu-multijugador/menu-multijugador';
@@ -29,6 +30,7 @@ export const routes: Routes = [
   { path: 'registro', component: RegistroComponent, data: { header: 'registro' } },
   { path: 'login', component: LoginComponent, data: { header: 'login' } },
   { path: 'home', component: Home, data: { header: 'home' } },
+  { path: 'camara', component: Camara, data: { header: 'camara' } },
   { path: 'configuracion', component: ConfiguracionComponent, data: { header: 'configuracion' } },
   { path: 'tutorial', component: Tutorial, data: { header: 'tutorial' }},
   { path: 'reglas-truco', component: ReglasTruco, data: { header: 'reglas-truco' }},

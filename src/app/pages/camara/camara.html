@@ -1,0 +1,31 @@
+<main class="camera-page">
+  <div class="camera-topbar">
+    <a routerLink="/home" class="back-button">← Volver</a>
+    <h1>Señas y cámara</h1>
+  </div>
+
+  <section class="camera-panel">
+
+    <div class="camera-header">
+      <div>
+        <h2>Detección de expresiones</h2>
+        <p class="subtitle">Prueba la cámara y verifica la traducción de señales.</p>
+      </div>
+      <button type="button" (click)="toggleCamera()">
+        {{ cameraOn ? 'Detener cámara' : 'Iniciar cámara' }}
+      </button>
+    </div>
+
+    <div class="camera-inner">
+      <div class="camera-preview">
+        <video #videoElement autoplay playsinline muted></video>
+        <canvas #canvasElement></canvas>
+      </div>
+      <div class="camera-info">
+        <p><strong>Estado:</strong> {{ cameraStatus }}</p>
+        <p><strong>Expresión detectada:</strong> {{ expressionLabel }}</p>
+        <p><strong>Traducción:</strong> {{ expressionTranslation }}</p>
+      </div>
+    </div>
+  </section>
+</main>
