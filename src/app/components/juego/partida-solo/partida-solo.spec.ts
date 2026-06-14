@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { PartidaSolo } from './partida-solo';
+import { PartidaSoloComponent } from './partida-solo';
 
 describe('PartidaSolo', () => {
-  let component: PartidaSolo;
-  let fixture: ComponentFixture<PartidaSolo>;
+  let component: PartidaSoloComponent;
+  let fixture: ComponentFixture<PartidaSoloComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PartidaSolo]
+      imports: [PartidaSoloComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PartidaSolo);
+    fixture = TestBed.createComponent(PartidaSoloComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
