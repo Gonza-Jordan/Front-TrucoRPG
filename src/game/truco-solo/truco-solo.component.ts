@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 // ── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -105,7 +106,7 @@ const HEROES: Heroe[] = [
 // ── Constantes ───────────────────────────────────────────────────────────────
 
 const PALO_SYM: Record<Palo, string> = { Oro: '★', Espada: '†', Copa: '♦', Basto: '♣' };
-const API = '/api/truco';
+const API = `${environment.apiUrl}/api/Truco`;
 const FAN_ANGLES = [-16, 0, 16];
 const FAN_X      = [-84, 0, 84];
 
