@@ -41,9 +41,8 @@ export function initHistoria(parent = 'contenedor-juego') {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
       width: 1280,
-      height: 720,
-      fullscreenTarget: 'contenedor-juego-completo',
-      autoRound: true,
+      height: 708,
+      fullscreenTarget: parent,
     },
     physics: {
       default: 'arcade',

@@ -24,7 +24,8 @@ export default class Portal {
     this.zone.body.setAllowGravity(false);
     this.zone.body.moves = false;
 
-    this.textoE = escena.add.text(x, y - 50, 'E', {
+    this.textoE = escena.add
+      .text(x, y - 50, 'E', {
         fontFamily: '"Jersey 10"',
         fontSize: '18px',
         color: '#ffffff',
@@ -32,14 +33,14 @@ export default class Portal {
         backgroundColor: '#573a04',
         stroke: '#000000',
         strokeThickness: 3,
-        padding: { x: 8, y: 4 }
-    })
-    .setOrigin(0.5) 
-    .setDepth(10)  
-    .setVisible(false);
+        padding: { x: 8, y: 4 },
+      })
+      .setOrigin(0.5)
+      .setDepth(10)
+      .setVisible(false);
   }
 
-  update(jugador, teclaE) {
+  update(jugador, teclaE, botonMobilePresionado = false) {
     const enZona = this.escena.physics.overlap(jugador, this.zone);
 
     if (enZona && !this.cercaDelPortal) {
@@ -49,9 +50,11 @@ export default class Portal {
 
     if (enZona) {
       this.textoE.x = jugador.x;
-      this.textoE.y = jugador.y - 45; 
+      this.textoE.y = jugador.y - 45;
 
-      if (Phaser.Input.Keyboard.JustDown(teclaE)) {
+      const quiereInteractuar = Phaser.Input.Keyboard.JustDown(teclaE) || botonMobilePresionado;
+
+      if (quiereInteractuar) {
         jugador.setVelocity(0);
 
         this.escena.cameras.main.fadeOut(1000, 0, 0, 0, (camera, progress) => {

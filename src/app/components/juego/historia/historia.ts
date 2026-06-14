@@ -1,5 +1,5 @@
-import { Component, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, Inject } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common'; // Importamos DOCUMENT
 import { SeleccionPersonajeHistoria } from '../../../pages/seleccion-personaje-historia/seleccion-personaje-historia';
 import { HistoriaService } from '../../../services/historia/historia-service';
 import { HistoriaOverlayManagerComponent } from '../../historia-overlay-manager-component/historia-overlay-manager-component/historia-overlay-manager-component';
@@ -16,29 +16,27 @@ import { Footer } from '../../footer/footer';
 export class Historia implements OnDestroy {
   vistaActual: 'seleccion-heroe' | 'en-juego' = 'seleccion-heroe';
 
-  constructor(private historiaService: HistoriaService) {}
+  constructor(
+    private historiaService: HistoriaService,
+    @Inject(DOCUMENT) private document: Document,
+  ) {}
 
   alConfirmarHeroe(evento: { heroeId: number; habilidad: string }): void {
     this.historiaService.setHeroeSeleccionado(evento.heroeId);
-
     this.historiaService.setHabilidadSeleccionada(evento.habilidad);
 
     this.vistaActual = 'en-juego';
 
-    try {
-      document.body.classList.add('historia-mode');
-    } catch (e) {
-    }
+    this.document.body.classList.add('modo-phaser-mobile');
 
     setTimeout(() => {
       this.historiaService.iniciarJuego('historia-container');
+      window.dispatchEvent(new Event('resize'));
     }, 0);
   }
 
   ngOnDestroy(): void {
     this.historiaService.destruirJuego();
-    try {
-      document.body.classList.remove('historia-mode');
-    } catch (e) {}
+    this.document.body.classList.remove('modo-phaser-mobile');
   }
 }
