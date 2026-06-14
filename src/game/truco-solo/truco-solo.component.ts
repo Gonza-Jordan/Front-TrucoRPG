@@ -74,6 +74,7 @@ export interface ManoState {
   envidoPendienteRespuestaHumano?: boolean;
   trucoPendienteRespuestaHumano?:  boolean;
   cartaMaquinaEnMesa?: Carta;
+  cartaHumanoEnMesa?: Carta;
   numeroDeMano?: number;
   configuracion?: { modo: number; heroeDelHumano?: number; rivalDeLaMaquina?: number; rivalNivel?: number };
   vistaHabilidadesHumano?: VistaHabilidades;
@@ -242,6 +243,8 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   private salpicaduraManoId: string | null = null;
   private salpicaduraTimer: ReturnType<typeof setTimeout> | null = null;
   private salpicaduraInterval: ReturnType<typeof setInterval> | null = null;
+  private victoriaHistoriaRegistrada = false;
+  private maquinaCorriendo = false;
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngAfterViewInit(): void {
@@ -313,8 +316,92 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ── API ───────────────────────────────────────────────────────────────────
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /** Delay (ms) antes de cada jugada de la máquina — configurable en Configuración. */
+  private get delayMaquinaMs(): number {
+    const raw = localStorage.getItem('cfg_delay');
+    if (raw == null) return 1200;
+    const v = Number(raw);
+    return Number.isFinite(v) && v >= 0 ? v : 1200;
+  }
+
+  private esPartidaHistoria(m?: ManoState | null): boolean {
+    return (m?.configuracion?.modo ?? (this.rivalNivel !== null || this.heroe !== null ? 1 : 0)) === 1;
+  }
+
+  private esperaAccionHumano(m: ManoState): boolean {
+    if (m.salpicaduraBloqueando) return true;
+    if (m.envidoPendienteRespuestaHumano || m.trucoPendienteRespuestaHumano) return true;
+    if (m.cartaMaquinaEnMesa) return true;
+    if (m.cartaHumanoEnMesa) return false;
+    return m.turnoActual === 'Humano';
+  }
+
+  private firmaEstadoMaquina(m: ManoState): string {
+    return [
+      m.turnoActual,
+      m.bazas?.length,
+      m.cartaMaquinaEnMesa?.numero,
+      m.cartaHumanoEnMesa?.numero,
+      m.envidoPendienteRespuestaHumano,
+      m.trucoPendienteRespuestaHumano,
+      m.ganadorMano,
+    ].join('|');
+  }
+
+  private async correrMaquinas(): Promise<void> {
+    if (!this.esPartidaHistoria(this.mano) || this.maquinaCorriendo) return;
+    this.maquinaCorriendo = true;
+    try {
+      let sinProgreso = 0;
+      while (this.mano) {
+        const m = this.mano;
+        if (m.ganadorPartida || m.ganadorMano) break;
+        if (this.accionesBloqueadasPorSalpicadura) break;
+        if (this.esperaAccionHumano(m)) break;
+
+        const firmaAntes = this.firmaEstadoMaquina(m);
+        this.rivalLabel = 'Pensando...';
+        this.cdr.markForCheck();
+
+        await this.delay(this.delayMaquinaMs);
+
+        try {
+          const res = await firstValueFrom(
+            this.http.post<{ mano: ManoState; evento?: { tipo: string; texto: string } }>(
+              `${API}/avanzar-maquina`,
+              { manoId: m.id },
+            ),
+          );
+          this.mano = res.mano;
+          if (res.evento?.texto) {
+            this.bubbleText = res.evento.texto;
+          }
+          this.updateEventosHabilidad(res.mano);
+          this.updateUI(res.mano);
+          if (!res.evento) break;
+
+          if (this.firmaEstadoMaquina(res.mano) === firmaAntes) {
+            if (++sinProgreso >= 2) break;
+          } else {
+            sinProgreso = 0;
+          }
+        } catch {
+          this.showToast('Error de conexión al avanzar la máquina.');
+          break;
+        }
+      }
+    } finally {
+      this.maquinaCorriendo = false;
+      this.cdr.markForCheck();
+    }
+  }
+
   async call(endpoint: string, body: object): Promise<void> {
-    if (this.loading) return;
+    if (this.loading || this.maquinaCorriendo) return;
     if (endpoint !== 'confirmar-salpicadura' && this.accionesBloqueadasPorSalpicadura) return;
     this.loading = true;
     try {
@@ -324,6 +411,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       this.mano = data;
       this.updateEventosHabilidad(data);
       this.updateUI(data);
+      await this.correrMaquinas();
     } catch (err: any) {
       const msg = (typeof err?.error === 'string' ? err.error : null) ?? err?.error?.message ?? err?.message ?? String(err);
       this.showToast(`Error en ${endpoint}: ${msg}`);
@@ -356,7 +444,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Jugar carta ───────────────────────────────────────────────────────────
   jugarCarta(i: number): void {
-    if (this.accionesBloqueadasPorSalpicadura) return;
+    if (this.maquinaCorriendo || this.accionesBloqueadasPorSalpicadura) return;
     const c = this.misCarts[i]?.carta;
     if (!c || !this.mano) return;
 
@@ -383,7 +471,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Usar habilidad ────────────────────────────────────────────────────────
   usarHabilidad(): void {
-    if (!this.mano || !this.habilidadDisponible || this.accionesBloqueadasPorSalpicadura) return;
+    if (this.maquinaCorriendo || !this.mano || !this.habilidadDisponible || this.accionesBloqueadasPorSalpicadura) return;
 
     // Manipulador: activar modo selección (si ya está activo, ignorar)
     if (this.heroe?.id === 0) {
@@ -419,6 +507,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   nuevaPartida(): void {
     this.gameOver = false;
+    this.victoriaHistoriaRegistrada = false;
     this.eventosHabilidad = [];
     this.habilidadCartaIdx = null;
     this.modoSeleccionCarta = false;
@@ -452,6 +541,23 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mostrarConfirmSalir = false;
   }
 
+  private registrarVictoriaHistoria(m: ManoState): void {
+    if (this.victoriaHistoriaRegistrada || this.rivalNivel === null) return;
+    this.victoriaHistoriaRegistrada = true;
+
+    const diferencia = Math.max(0, m.puntosHumano - m.puntosMaquina);
+    this.http.post(`${API_HISTORIA}/registrar-victoria`, {
+      rivalNivel: this.rivalNivel,
+      diferenciaPuntos: diferencia,
+    }).subscribe({
+      next: () => window.dispatchEvent(new Event('historia:progreso-actualizado')),
+      error: () => {
+        this.victoriaHistoriaRegistrada = false;
+        this.showToast('No se pudo guardar el progreso de historia.');
+      },
+    });
+  }
+
   // ── UI update ─────────────────────────────────────────────────────────────
   private updateUI(m: ManoState): void {
     this.redrawTally(m.puntosHumano, m.puntosMaquina);
@@ -459,6 +565,9 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     if (m.ganadorPartida) {
       this.gameOver    = true;
       this.gameOverWon = m.ganadorPartida === 'Humano';
+      if (this.gameOverWon && this.rivalNivel !== null) {
+        this.registrarVictoriaHistoria(m);
+      }
       this.cdr.markForCheck();
       return;
     }
@@ -505,9 +614,11 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.slots = [0, 1, 2].map(i => {
       const b = m.bazas?.[i];
-      const pendingMaq = !b && i === (m.bazas?.length ?? 0) && !!m.cartaMaquinaEnMesa;
+      const idxActual = m.bazas?.length ?? 0;
+      const pendingMaq = !b && i === idxActual && !!m.cartaMaquinaEnMesa;
+      const pendingHum = !b && i === idxActual && !!m.cartaHumanoEnMesa && !m.cartaMaquinaEnMesa;
       return {
-        jugador: b?.cartaJugador,
+        jugador: b?.cartaJugador ?? (pendingHum ? m.cartaHumanoEnMesa : undefined),
         maquina: b?.cartaMaquina ?? (pendingMaq ? m.cartaMaquinaEnMesa : undefined),
         pending: pendingMaq,
         winner:  b?.ganador,
