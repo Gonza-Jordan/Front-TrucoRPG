@@ -40,7 +40,6 @@ export default class Portal {
       .setVisible(false);
   }
 
-  // En tu archivo Portal.js, modificá el método update:
   update(jugador, teclaE, botonMobilePresionado = false) {
     const enZona = this.escena.physics.overlap(jugador, this.zone);
 
