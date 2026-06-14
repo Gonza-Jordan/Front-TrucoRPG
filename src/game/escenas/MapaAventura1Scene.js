@@ -3,6 +3,7 @@ import BaseScene from './BaseScene.js';
 import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
 import Npc from '../personajes/Npc.js';
 import Portal from '../objetos/Portal.js';
+import ZonaInteraccionNpc from '../objetos/ZonaInteraccionNpc.js';
 
 const RIVAL_NAHUELITO_NIVEL = 1;
 const RIVAL_POMBERITO_NIVEL = 2;
@@ -126,69 +127,22 @@ export default class MapaAventura1Scene extends BaseScene {
 
   _crearJefeNahuelito() {
     this.jefe1 = new Npc(this, JEFE1_X, JEFE1_Y, 'troll').setDepth(0);
-
-    this.zonaJefe1 = this.add.zone(this.jefe1.x, this.jefe1.y, this.jefe1.width, this.jefe1.height);
-    this.physics.add.existing(this.zonaJefe1);
-    this.zonaJefe1.body.setAllowGravity(false);
-    this.zonaJefe1.body.moves = false;
-
-    const mensajeJefe1 = this.esTactil
-      ? '¡Tocá "Interactuar" para desafiar al Nahuelito!'
-      : '¡Presioná E para desafiar al Nahuelito!';
-    this.mensajeJefe1 = this.add
-      .text(this.jefe1.x, this.jefe1.y - this.jefe1.height / 2 - 20, mensajeJefe1, {
-        fontFamily: '"Jersey 10"',
-        fontSize: '18px',
-        color: '#000',
-        backgroundColor: '#fff',
-        padding: { x: 10, y: 5 },
-      })
-      .setOrigin(0.5)
-      .setVisible(false)
-      .setDepth(10);
-
-    this.estaEnZonaJefe1 = false;
-    this.physics.add.overlap(
-      this.JugadorPrincipal,
-      this.zonaJefe1,
-      () => {
-        this.estaEnZonaJefe1 = true;
-      },
-      null,
-      this,
-    );
+    this.zonaJefe1 = new ZonaInteraccionNpc(this, this.jefe1.x, this.jefe1.y);
   }
 
   _crearJefePomberito() {
     this.jefe2 = new Npc(this, JEFE2_X, JEFE2_Y, 'troll').setDepth(0);
-
-    this.zonaJefe2 = this.add.zone(this.jefe2.x, this.jefe2.y, this.jefe2.width, this.jefe2.height);
-    this.physics.add.existing(this.zonaJefe2);
-    this.zonaJefe2.body.setAllowGravity(false);
-    this.zonaJefe2.body.moves = false;
-
-    this.mensajeJefe2 = this.add
-      .text(this.jefe2.x, this.jefe2.y - this.jefe2.height / 2 - 20, '', {
+    this.zonaJefe2 = new ZonaInteraccionNpc(this, this.jefe2.x, this.jefe2.y);
+    this.etiquetaBloqueoPomberito = this.add
+      .text(this.jefe2.x, this.jefe2.y - 55, 'Derrotá al Nahuelito antes', {
         fontFamily: '"Jersey 10"',
-        fontSize: '18px',
-        color: '#000',
-        backgroundColor: '#fff',
-        padding: { x: 10, y: 5 },
+        fontSize: '14px',
+        color: '#ffffff',
+        backgroundColor: '#573a04',
+        padding: { x: 8, y: 4 },
       })
       .setOrigin(0.5)
-      .setVisible(false)
       .setDepth(10);
-
-    this.estaEnZonaJefe2 = false;
-    this.physics.add.overlap(
-      this.JugadorPrincipal,
-      this.zonaJefe2,
-      () => {
-        this.estaEnZonaJefe2 = true;
-      },
-      null,
-      this,
-    );
   }
 
   async cargarPuedePelearPomberito() {
@@ -202,25 +156,16 @@ export default class MapaAventura1Scene extends BaseScene {
       const data = await res.json();
       this.puedePelearPomberito = !!data.puedePelear;
       this.motivoBloqueoPomberito = data.motivo ?? null;
-      this.actualizarMensajePomberito();
+      this._actualizarEtiquetaBloqueoPomberito();
     } catch {
       this.puedePelearPomberito = false;
-      this.actualizarMensajePomberito();
+      this._actualizarEtiquetaBloqueoPomberito();
     }
   }
 
-  actualizarMensajePomberito() {
-    if (!this.mensajeJefe2) return;
-
-    if (this.puedePelearPomberito) {
-      this.mensajeJefe2.setText(
-        this.esTactil
-          ? '¡Tocá "Interactuar" para desafiar a El Pomberito!'
-          : '¡Presioná E para desafiar a El Pomberito!',
-      );
-    } else {
-      this.mensajeJefe2.setText('Derrotá al Nahuelito antes de enfrentar a El Pomberito.');
-    }
+  _actualizarEtiquetaBloqueoPomberito() {
+    if (!this.etiquetaBloqueoPomberito) return;
+    this.etiquetaBloqueoPomberito.setVisible(!this.puedePelearPomberito);
   }
 
   iniciarPelea(rivalNivel) {
@@ -252,25 +197,24 @@ export default class MapaAventura1Scene extends BaseScene {
       interactuoMobile,
     );
 
-    this.mensajeJefe1.setVisible(this.estaEnZonaJefe1);
-    this.mensajeJefe2.setVisible(this.estaEnZonaJefe2);
+    const enZonaJefe1 = this.zonaJefe1.update(this.JugadorPrincipal);
+    const enZonaJefe2 = this.zonaJefe2.update(
+      this.JugadorPrincipal,
+      this.puedePelearPomberito,
+    );
 
     const interactuar =
       Phaser.Input.Keyboard.JustDown(this.teclaE) ||
       this.botonInteractuarPresionado;
 
-    if (this.estaEnZonaJefe1 && interactuar) {
+    if (enZonaJefe1 && interactuar) {
       this.iniciarPelea(RIVAL_NAHUELITO_NIVEL);
     }
 
-    if (this.estaEnZonaJefe2 && interactuar) {
-      if (this.puedePelearPomberito) {
-        this.iniciarPelea(RIVAL_POMBERITO_NIVEL);
-      }
+    if (enZonaJefe2 && interactuar && this.puedePelearPomberito) {
+      this.iniciarPelea(RIVAL_POMBERITO_NIVEL);
     }
 
     this.botonInteractuarPresionado = false;
-    this.estaEnZonaJefe1 = false;
-    this.estaEnZonaJefe2 = false;
   }
 }

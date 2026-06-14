@@ -46,6 +46,9 @@ export interface VistaHabilidadesRival {
   habilidadesActivasEnPartida: boolean;
   salpicaduraActiva: boolean;
   salpicaduraBloqueando: boolean;
+  travesuraActiva: boolean;
+  travesuraBloqueando: boolean;
+  cartasOcultasTravesura?: { numero: number; palo: string }[];
   ultimoMensajeHabilidad?: string;
 }
 
@@ -81,6 +84,9 @@ export interface ManoState {
   vistaHabilidadesRival?: VistaHabilidadesRival;
   salpicaduraActiva?: boolean;
   salpicaduraBloqueando?: boolean;
+  travesuraActiva?: boolean;
+  travesuraBloqueando?: boolean;
+  cartasOcultasTravesura?: { numero: number; palo: string }[];
 }
 
 export interface Btn {
@@ -132,6 +138,7 @@ const API_HISTORIA = '/api/historia';
 const FAN_ANGLES = [-16, 0, 16];
 const FAN_X      = [-84, 0, 84];
 const SALPICADURA_REVEAL_SEG = 5;
+const TRAVESURA_REVEAL_SEG = 5;
 
 // ── Componente ───────────────────────────────────────────────────────────────
 
@@ -176,12 +183,27 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.mano?.vistaHabilidadesRival;
   }
 
+  /** SOLO PRUEBAS — Botón debug de victoria automática. Eliminar antes de producción. */
+  get mostrarBotonGanarAutomatico(): boolean {
+    return this.esPartidaHistoria(this.mano) && !this.gameOver && !!this.mano;
+  }
+
+  get accionesBloqueadasPorHabilidadRival(): boolean {
+    return this.salpicaduraRevelando
+      || this.travesuraRevelando
+      || !!this.vistaRival?.salpicaduraBloqueando
+      || !!this.vistaRival?.travesuraBloqueando;
+  }
+
+  /** @deprecated usar accionesBloqueadasPorHabilidadRival */
   get accionesBloqueadasPorSalpicadura(): boolean {
-    return this.salpicaduraRevelando || !!this.vistaRival?.salpicaduraBloqueando;
+    return this.accionesBloqueadasPorHabilidadRival;
   }
 
   salpicaduraRevelando = false;
   salpicaduraSegundos = 0;
+  travesuraRevelando = false;
+  travesuraSegundos = 0;
   private salpicaduraCartasOriginales: Carta[] = [];
 
   // Habilidad disponible = el backend dice que está lista y no fue usada esta mano
@@ -208,10 +230,10 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   opCards: { visible: boolean }[] = [
     { visible: true }, { visible: true }, { visible: true },
   ];
-  misCarts: { carta: Carta | null; visible: boolean; seleccionada: boolean }[] = [
-    { carta: null, visible: false, seleccionada: false },
-    { carta: null, visible: false, seleccionada: false },
-    { carta: null, visible: false, seleccionada: false },
+  misCarts: { carta: Carta | null; visible: boolean; seleccionada: boolean; oculta: boolean }[] = [
+    { carta: null, visible: false, seleccionada: false, oculta: false },
+    { carta: null, visible: false, seleccionada: false, oculta: false },
+    { carta: null, visible: false, seleccionada: false, oculta: false },
   ];
 
   rivalLabel  = 'Esperando mano...';
@@ -243,6 +265,9 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   private salpicaduraManoId: string | null = null;
   private salpicaduraTimer: ReturnType<typeof setTimeout> | null = null;
   private salpicaduraInterval: ReturnType<typeof setInterval> | null = null;
+  private travesuraManoId: string | null = null;
+  private travesuraTimer: ReturnType<typeof setTimeout> | null = null;
+  private travesuraInterval: ReturnType<typeof setInterval> | null = null;
   private victoriaHistoriaRegistrada = false;
   private maquinaCorriendo = false;
 
@@ -302,6 +327,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.toastTimer)  clearTimeout(this.toastTimer);
     this.cancelarCountdown();
     this.cancelarSalpicaduraTimer();
+    this.cancelarTravesuraTimer();
   }
 
   // ── Template helpers ──────────────────────────────────────────────────────
@@ -333,7 +359,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private esperaAccionHumano(m: ManoState): boolean {
-    if (m.salpicaduraBloqueando) return true;
+    if (m.salpicaduraBloqueando || m.travesuraBloqueando) return true;
     if (m.envidoPendienteRespuestaHumano || m.trucoPendienteRespuestaHumano) return true;
     if (m.cartaMaquinaEnMesa) return true;
     if (m.cartaHumanoEnMesa) return false;
@@ -360,7 +386,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       while (this.mano) {
         const m = this.mano;
         if (m.ganadorPartida || m.ganadorMano) break;
-        if (this.accionesBloqueadasPorSalpicadura) break;
+        if (this.accionesBloqueadasPorHabilidadRival) break;
         if (this.esperaAccionHumano(m)) break;
 
         const firmaAntes = this.firmaEstadoMaquina(m);
@@ -402,7 +428,10 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async call(endpoint: string, body: object): Promise<void> {
     if (this.loading || this.maquinaCorriendo) return;
-    if (endpoint !== 'confirmar-salpicadura' && this.accionesBloqueadasPorSalpicadura) return;
+    if (endpoint !== 'confirmar-salpicadura'
+      && endpoint !== 'confirmar-travesura'
+      && endpoint !== 'ganar-automatico-debug'
+      && this.accionesBloqueadasPorHabilidadRival) return;
     this.loading = true;
     try {
       const data = await firstValueFrom(
@@ -444,7 +473,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Jugar carta ───────────────────────────────────────────────────────────
   jugarCarta(i: number): void {
-    if (this.maquinaCorriendo || this.accionesBloqueadasPorSalpicadura) return;
+    if (this.maquinaCorriendo || this.accionesBloqueadasPorHabilidadRival) return;
     const c = this.misCarts[i]?.carta;
     if (!c || !this.mano) return;
 
@@ -471,7 +500,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Usar habilidad ────────────────────────────────────────────────────────
   usarHabilidad(): void {
-    if (this.maquinaCorriendo || !this.mano || !this.habilidadDisponible || this.accionesBloqueadasPorSalpicadura) return;
+    if (this.maquinaCorriendo || !this.mano || !this.habilidadDisponible || this.accionesBloqueadasPorHabilidadRival) return;
 
     // Manipulador: activar modo selección (si ya está activo, ignorar)
     if (this.heroe?.id === 0) {
@@ -512,8 +541,10 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     this.habilidadCartaIdx = null;
     this.modoSeleccionCarta = false;
     this.salpicaduraManoId = null;
+    this.travesuraManoId = null;
     this.salpicaduraCartasOriginales = [];
     this.cancelarSalpicaduraTimer();
+    this.cancelarTravesuraTimer();
     this.call('nueva-partida', this.construirBodyPartida());
   }
 
@@ -539,6 +570,14 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   cancelarSalir(): void {
     this.mostrarConfirmSalir = false;
+  }
+
+  // SOLO PRUEBAS — Forzar victoria a 30 puntos en historia. Eliminar antes de producción.
+  ganarAutomaticoDebug(): void {
+    if (!this.mano || !this.esPartidaHistoria(this.mano)) return;
+    this.cancelarSalpicaduraTimer();
+    this.cancelarTravesuraTimer();
+    this.call('ganar-automatico-debug', { manoId: this.mano.id });
   }
 
   private registrarVictoriaHistoria(m: ManoState): void {
@@ -594,7 +633,9 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     const esMiTurno = (m.turnoActual === 'Humano' || !!m.cartaMaquinaEnMesa)
                       && !m.ganadorMano && !m.ganadorPartida && !pendEnv && !pendTru;
 
-    if (this.accionesBloqueadasPorSalpicadura) {
+    if (this.travesuraRevelando) {
+      this.turnoBadge = 'Travesura: memorizá tus cartas...';
+    } else if (this.salpicaduraRevelando) {
       this.turnoBadge = 'Salpicadura: mirá tus cartas originales...';
     } else {
       this.turnoBadge = esMiTurno
@@ -626,8 +667,9 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.manejarSalpicadura(m);
+    this.manejarTravesura(m);
 
-    const manoVisible = this.accionesBloqueadasPorSalpicadura && this.salpicaduraCartasOriginales.length > 0
+    const manoVisible = this.salpicaduraRevelando && this.salpicaduraCartasOriginales.length > 0
       ? this.salpicaduraCartasOriginales
       : (m.humano?.mano ?? []);
 
@@ -637,6 +679,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
         carta,
         visible: !!carta && !m.ganadorMano,
         seleccionada: this.habilidadCartaIdx === i,
+        oculta: !!carta && this.cartaEsOculta(carta, m),
       };
     });
 
@@ -697,6 +740,68 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
         this.call('confirmar-salpicadura', { manoId: m.id });
       }
     }, SALPICADURA_REVEAL_SEG * 1000);
+
+    this.cdr.markForCheck();
+  }
+
+  private cartaEsOculta(carta: Carta, m: ManoState): boolean {
+    if (this.travesuraRevelando || m.travesuraBloqueando || !!m.vistaHabilidadesRival?.travesuraBloqueando) {
+      return false;
+    }
+    const ocultas = m.cartasOcultasTravesura
+      ?? m.vistaHabilidadesRival?.cartasOcultasTravesura
+      ?? [];
+    return ocultas.some(o => o.numero === carta.numero && o.palo === carta.palo);
+  }
+
+  private cancelarTravesuraTimer(): void {
+    if (this.travesuraTimer) {
+      clearTimeout(this.travesuraTimer);
+      this.travesuraTimer = null;
+    }
+    if (this.travesuraInterval) {
+      clearInterval(this.travesuraInterval);
+      this.travesuraInterval = null;
+    }
+    this.travesuraRevelando = false;
+    this.travesuraSegundos = 0;
+  }
+
+  private manejarTravesura(m: ManoState): void {
+    const bloqueando = !!m.vistaHabilidadesRival?.travesuraBloqueando || !!m.travesuraBloqueando;
+    if (!bloqueando) {
+      if (!this.travesuraTimer) {
+        this.travesuraRevelando = false;
+        this.travesuraSegundos = 0;
+      }
+      return;
+    }
+
+    if (this.travesuraManoId === m.id) return;
+
+    if (this.travesuraTimer) clearTimeout(this.travesuraTimer);
+    if (this.travesuraInterval) clearInterval(this.travesuraInterval);
+
+    this.travesuraManoId = m.id;
+    this.travesuraRevelando = true;
+    this.travesuraSegundos = TRAVESURA_REVEAL_SEG;
+
+    this.travesuraInterval = setInterval(() => {
+      this.travesuraSegundos = Math.max(0, this.travesuraSegundos - 1);
+      this.cdr.markForCheck();
+    }, 1000);
+
+    this.travesuraTimer = setTimeout(() => {
+      this.travesuraTimer = null;
+      if (this.travesuraInterval) clearInterval(this.travesuraInterval);
+      this.travesuraInterval = null;
+      this.travesuraRevelando = false;
+      this.travesuraSegundos = 0;
+      this.cdr.markForCheck();
+      if (this.mano?.id === m.id) {
+        this.call('confirmar-travesura', { manoId: m.id });
+      }
+    }, TRAVESURA_REVEAL_SEG * 1000);
 
     this.cdr.markForCheck();
   }
@@ -945,7 +1050,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
         raw.push(['Ir al mazo', '#556677', () => this.call('irse-al-mazo', { manoId: m.id })]);
     }
 
-    const bloqueado = this.accionesBloqueadasPorSalpicadura;
+    const bloqueado = this.accionesBloqueadasPorHabilidadRival;
     this.btns = raw.map(([label, color, action]) => ({
       label, color, action,
       enabled: !!action && !bloqueado,
