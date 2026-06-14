@@ -110,13 +110,10 @@ export default class MapaAventura1Scene extends BaseScene {
     // this.physics.add.overlap(this.JugadorPrincipal, this.portalDeVuelta.zone);
 
     // TODO: agregar portales según el diseño del mapa
-    this.portalMapaAventura2 = new Portal(
-      this,
-      1092, 131,
-      'MapaAventura2',
-      false,
-      { x: 1078, y: 611 },
-    );
+    this.portalMapaAventura2 = new Portal(this, 1092, 131, 'MapaAventura2', false, {
+      x: 1078,
+      y: 611,
+    });
     this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura2.zone);
   }
 
@@ -135,6 +132,12 @@ export default class MapaAventura1Scene extends BaseScene {
       this.estabaMoviendose = false;
     }
 
-    this.portalMapaAventura2.update(this.JugadorPrincipal, this.teclaE);
+    const interactuoMobile = this.botonInteractuarPresionado;
+
+    this.portalMapaAventura2.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+
+    if (this.botonInteractuarPresionado) {
+      this.botonInteractuarPresionado = false;
+    }
   }
 }
