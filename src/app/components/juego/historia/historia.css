@@ -29,9 +29,15 @@ main {
 #historia-container {
   width: 100%;
   height: 100%;
-  background-color: #150e05;
+  background-color: #20170a;
 }
 
 #historia-container canvas{
   margin: 0% !important;
+}
+
+@media (max-width: 767px) {
+    main {
+        padding: 0;
+    }
 }
