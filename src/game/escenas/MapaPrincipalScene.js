@@ -13,10 +13,10 @@ export default class MapaPrincipalScene extends BaseScene {
     this.startY = data.y || 470;
   }
 
-  preload(){
-     this.load.image('CartelOponentes','./assets/mapa-principal/CartelOponentes.png');
-     
-     this.load.audio('pasos', './assets/musica/sonidos/paso.ogg'); 
+  preload() {
+    this.load.image('CartelOponentes', './assets/mapa-principal/CartelOponentes.png');
+
+    this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
   }
 
   create() {
@@ -101,22 +101,17 @@ export default class MapaPrincipalScene extends BaseScene {
 
     this.physics.add.overlap(this.JugadorPrincipal, this.portalAPulperia.zone);
 
-    this.portalAOponentes = new Portal(
-      this,
-      1917,
-      300,
-      'MapaAventura1',
-      'CartelOponentes',
-      { x: 35, y: 552 },
-    );
+    this.portalAOponentes = new Portal(this, 1917, 300, 'MapaAventura1', 'CartelOponentes', {
+      x: 35,
+      y: 552,
+    });
   }
 
   update() {
     this.JugadorPrincipal.update(this.keys, this.teclaE);
-    
+
     const seMueve =
       this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
-
     if (seMueve) {
       this.estabaMoviendose = true;
     } else if (this.estabaMoviendose) {
@@ -126,8 +121,14 @@ export default class MapaPrincipalScene extends BaseScene {
       this.estabaMoviendose = false;
     }
 
-    this.portalACasa.update(this.JugadorPrincipal, this.teclaE);
-    this.portalAPulperia.update(this.JugadorPrincipal, this.teclaE);
-    this.portalAOponentes.update(this.JugadorPrincipal, this.teclaE);
+    const interactuoMobile = this.botonInteractuarPresionado;
+
+    this.portalACasa.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+    this.portalAPulperia.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+    this.portalAOponentes.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+
+    if (this.botonInteractuarPresionado) {
+      this.botonInteractuarPresionado = false;
+    }
   }
 }

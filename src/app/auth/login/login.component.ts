@@ -41,7 +41,7 @@ export class LoginComponent {
     this.authService.login(this.form.value).subscribe({
       next: (res) => {
         this.authService.guardarToken(res.token);
-        this.router.navigate(['/']);
+        this.router.navigate(['/home']);
       },
       error: (err) => {
         this.errorServidor = err.error?.error ?? 'Email o contraseña incorrectos.';

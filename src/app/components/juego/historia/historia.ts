@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, Inject, OnInit } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common'; // Importamos DOCUMENT
 import { SeleccionPersonajeHistoria } from '../../../pages/seleccion-personaje-historia/seleccion-personaje-historia';
 import { HistoriaService } from '../../../services/historia/historia-service';
 import { TrucoSoloComponent } from '../../../../game/truco-solo/truco-solo.component';
@@ -15,7 +15,10 @@ export class Historia implements OnInit, OnDestroy {
   vistaActual: 'seleccion-heroe' | 'en-juego' = 'seleccion-heroe';
   mostrarTrucoSolo = false;
 
-  constructor(private historiaService: HistoriaService) {}
+  constructor(
+    private historiaService: HistoriaService,
+    @Inject(DOCUMENT) private document: Document,
+  ) {}
 
   ngOnInit(): void {
     window.addEventListener('truco-solo:start', this.abrirMesaTruco);
@@ -24,13 +27,15 @@ export class Historia implements OnInit, OnDestroy {
 
   alConfirmarHeroe(evento: { heroeId: number; habilidad: string }): void {
     this.historiaService.setHeroeSeleccionado(evento.heroeId);
-
     this.historiaService.setHabilidadSeleccionada(evento.habilidad);
 
     this.vistaActual = 'en-juego';
 
+    this.document.body.classList.add('modo-phaser-mobile');
+
     setTimeout(() => {
       this.historiaService.iniciarJuego('historia-container');
+      window.dispatchEvent(new Event('resize'));
     }, 0);
   }
 
@@ -50,5 +55,6 @@ export class Historia implements OnInit, OnDestroy {
     localStorage.removeItem('historiaPartida');
     localStorage.removeItem('rivalNivel');
     this.historiaService.destruirJuego();
+    this.document.body.classList.remove('modo-phaser-mobile');
   }
 }
