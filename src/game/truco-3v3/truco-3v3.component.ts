@@ -7,20 +7,18 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SalaService } from '../../app/services/sala.service';
 
-// ── Tipos del backend (payload personalizado de TrucoEstado2v2) ───────────────
-export interface Carta2v2 { numero: number; palo: string; valorTruco?: number; }
+// ── Tipos del backend (payload personalizado de TrucoEstado3v3) ──────────────
+export interface Carta3v3 { numero: number; palo: string; valorTruco?: number; }
 
-interface Vuelta2v2 {
-  cartasJugadas: Record<string, Carta2v2>;
+interface Vuelta3v3 {
+  cartasJugadas: Record<string, Carta3v3>;
   ganadorVuelta: string | null;
-  mejorCartaEquipoA: Carta2v2 | null;
-  mejorCartaEquipoB: Carta2v2 | null;
 }
 
 /** Estado compartido (camelCase) que viaja dentro de cada mensaje personalizado. */
-interface Estado2v2 {
+interface Estado3v3 {
   numeroDeMano: number;
-  turnoActual: string;          // 'J1'..'J4'
+  turnoActual: string;          // 'J1'..'J6'
   jugadorMano: string;
   equipoMano: string;           // 'EquipoA' | 'EquipoB'
   ganadorMano: string | null;   // 'EquipoA' | 'EquipoB'
@@ -56,74 +54,93 @@ interface Estado2v2 {
   trucoPendienteRespuestaDe: string | null;
   puedeEscalarTruco: string | null;
 
-  vueltas: Vuelta2v2[];
-  vueltaActual: Vuelta2v2 | null;
+  vueltas: Vuelta3v3[];
+  vueltaActual: Vuelta3v3 | null;
+
+  // Pica-Pica
+  picaPica: boolean;
+  picaPicaSlot: number;
+  jugadoresActivos: string[];
 }
 
 /** Mensaje personalizado que cada jugador recibe (solo ve sus cartas). */
-interface Msg2v2 {
-  miRol: string;                // 'J1'..'J4'  → asiento propio
-  miEquipo: string;             // 'EquipoA' | 'EquipoB'
-  misCartas: Carta2v2[];        // mi mano (boca arriba)
-  misJugadas: Carta2v2[];       // mis cartas ya jugadas
-  cartasCompanero: Carta2v2[];  // jugadas del compañero
-  estado: Estado2v2;
+interface Msg3v3 {
+  miRol: string;                       // 'J1'..'J6' → asiento propio
+  miEquipo: string;                    // 'EquipoA' | 'EquipoB'
+  misCartas: Carta3v3[];
+  misJugadas: Carta3v3[];
+  cartasCompaneros: Record<string, Carta3v3[]>;
+  estado: Estado3v3;
 }
 
-// ── Tipos de UI ───────────────────────────────────────────────────────────────
-interface MesaJugadas {
-  yo: Carta2v2[];
-  compa: Carta2v2[];
-  izq: Carta2v2[];   // rival de la izquierda
-  der: Carta2v2[];   // rival de la derecha
+interface AsientoRival {
+  rol: string;
+  nombre: string;
+  equipo: 'nosotros' | 'ellos';
+  cartasEnMano: number;
+  activo: boolean;                     // false = mira el duelo Pica-Pica
 }
 
 interface BtnAccion { label: string; color: string; action: () => void; enabled: boolean; }
 
-type Seat = 'yo' | 'compa' | 'izq' | 'der';
-
 @Component({
-  selector: 'app-truco-2v2',
+  selector: 'app-truco-3v3',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './truco-2v2.component.html',
+  templateUrl: './truco-3v3.component.html',
   styleUrls: [
     '../truco-solo/truco-solo.component.css',
-    '../truco-solo-2v2/truco-solo-2v2.component.css',
-    './truco-2v2.component.css',
+    '../truco-2v2/truco-2v2.component.css',
+    './truco-3v3.component.css',
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TrucoMulti2v2Component implements OnInit, OnDestroy {
+export class Truco3v3Component implements OnInit, OnDestroy {
 
   // ── Estado ────────────────────────────────────────────────────
-  msg: Msg2v2 | null = null;
-  get estado(): Estado2v2 | null { return this.msg?.estado ?? null; }
+  msg: Msg3v3 | null = null;
+  get estado(): Estado3v3 | null { return this.msg?.estado ?? null; }
   get miRol(): string { return this.msg?.miRol ?? 'J1'; }
   get miEquipo(): string { return this.msg?.miEquipo ?? 'EquipoA'; }
   get equipoRival(): string { return this.miEquipo === 'EquipoA' ? 'EquipoB' : 'EquipoA'; }
 
+  // ── Asiento propio (abajo) ────────────────────────────────────
+  yoNombre = 'VOS';
+  get misCartas(): Carta3v3[] { return this.msg?.misCartas ?? []; }
+
+  readonly fanAngles = [-14, 0, 14];
+  readonly fanXOff   = [-22, 0, 22];
+
+  // ── Asientos relativos (se recalculan con cada estado) ────────
+  // frente = +3, derecha (arriba→abajo) = [+2, +1], izquierda (arriba→abajo) = [+4, +5]
+  frente: AsientoRival      = this.placeholder('J4');
+  izquierda: AsientoRival[] = [this.placeholder('J5'), this.placeholder('J3')];
+  derecha: AsientoRival[]   = [this.placeholder('J6'), this.placeholder('J2')];
+
   // ── UI ────────────────────────────────────────────────────────
   btns: BtnAccion[] = [];
-  mesa: MesaJugadas = { yo: [], compa: [], izq: [], der: [] };
-  tallySticksNosotros: any[] = [];
-  tallySticksEllos:    any[] = [];
+  /** Cartas jugadas en la mesa por rol ('J1'..'J6'). */
+  mesa: Record<string, Carta3v3[]> = { J1: [], J2: [], J3: [], J4: [], J5: [], J6: [] };
 
-  toastMsg = '';
-  mostrarConfirmSalir = false;
+  puntosNosotros = 0;
+  puntosEllos    = 0;
+  estadoEnvido = 'No se cantó.';
+  estadoTruco  = 'No se cantó.';
+  turnoBadge   = 'Esperando inicio de partida...';
+  picaPicaBanner = '';
+
   gameOver = false;
   gameOverGanamos = false;
+  mostrarConfirmSalir = false;
+  toastMsg = '';
 
   countdown: number | null = null;
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
   private prevGanadorMano: string | null = null;
 
-  readonly fanAngles = [-12, 0, 12];
-  readonly fanXOff   = [-18, 0, 18];
-
-  // Burbujas de diálogo por asiento
-  dialogos: Record<Seat, { texto: string } | null> = { yo: null, compa: null, izq: null, der: null };
-  private dialogoTimers: Record<Seat, ReturnType<typeof setTimeout> | null> = { yo: null, compa: null, izq: null, der: null };
+  // Burbujas de diálogo por rol ('J1'..'J6')
+  dialogos: Record<string, { texto: string } | null> = {};
+  private dialogoTimers: Record<string, ReturnType<typeof setTimeout> | null> = {};
   private prevEstadoEnvido = '';
   private prevEstadoTruco  = '';
 
@@ -138,8 +155,8 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subs.push(
-      this.sala.trucoEstado2v2$.subscribe(data => {
-        if (data) this.onEstado(data as Msg2v2);
+      this.sala.trucoEstado3v3$.subscribe(data => {
+        if (data) this.onEstado(data as Msg3v3);
       }),
       this.sala.jugadorDesconectado$.subscribe(v => {
         if (v) this.showToast('Un jugador se desconectó de la partida.');
@@ -151,71 +168,38 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
     this.subs.forEach(s => s.unsubscribe());
     if (this.toastTimer) clearTimeout(this.toastTimer);
     this.cancelarCountdown();
-    for (const k of Object.keys(this.dialogoTimers) as Seat[]) {
+    for (const k of Object.keys(this.dialogoTimers)) {
       const t = this.dialogoTimers[k];
       if (t) clearTimeout(t);
     }
   }
 
-  // ── Mapeo de asientos relativos a miRol ───────────────────────
-  // La ronda gira hacia la derecha: yo → der → compa (arriba) → izq.
-  private rolAsiento(seat: Seat): string {
-    const p = Number(this.miRol.replace('J', '')) || 1; // 1..4
-    const off: Record<Seat, number> = { yo: 0, der: 1, compa: 2, izq: 3 };
-    return 'J' + (((p - 1 + off[seat]) % 4) + 1);
-  }
-  get rolYo():    string { return this.rolAsiento('yo'); }
-  get rolCompa(): string { return this.rolAsiento('compa'); }
-  get rolDer():   string { return this.rolAsiento('der'); }
-  get rolIzq():   string { return this.rolAsiento('izq'); }
-
-  /** ¿El asiento dado es el "mano" de la ronda? */
-  esMano(seat: Seat): boolean { return this.estado?.jugadorMano === this.rolAsiento(seat); }
-
-  /** Cartas que le quedan en mano a un asiento (no propio) → para dibujar reversos. */
-  cartasEnMano(seat: Seat): number[] {
-    const rol = this.rolAsiento(seat);
-    const e = this.estado;
-    if (!e) return [];
-    let jugadas = 0;
-    const vueltas = [...(e.vueltas ?? [])];
-    if (e.vueltaActual) vueltas.push(e.vueltaActual);
-    for (const v of vueltas) if (v.cartasJugadas?.[rol]) jugadas++;
-    const quedan = Math.max(0, 3 - jugadas);
-    return Array.from({ length: quedan }, (_, i) => i);
-  }
-
-  // ── Puntos / textos ───────────────────────────────────────────
-  get puntosNosotros(): number {
-    const e = this.estado; if (!e) return 0;
-    return this.miEquipo === 'EquipoA' ? e.puntosEquipoA : e.puntosEquipoB;
-  }
-  get puntosEllos(): number {
-    const e = this.estado; if (!e) return 0;
-    return this.miEquipo === 'EquipoA' ? e.puntosEquipoB : e.puntosEquipoA;
-  }
-  get estadoEnvido(): string { return this.estado?.estadoEnvido ?? 'No se cantó.'; }
-  get estadoTruco():  string { return this.estado?.estadoTruco  ?? 'No se cantó.'; }
-  get turnoBadge():   string { return this.calcularTurnoBadge(); }
-  get misCartas(): Carta2v2[] { return this.msg?.misCartas ?? []; }
-
   // ── Procesar estado entrante ──────────────────────────────────
-  private onEstado(msg: Msg2v2): void {
+  private onEstado(msg: Msg3v3): void {
     this.msg = msg;
     const e = msg.estado;
 
+    this.frente    = this.armarAsiento(this.rolAsiento(3));
+    this.derecha   = [this.armarAsiento(this.rolAsiento(2)), this.armarAsiento(this.rolAsiento(1))];
+    this.izquierda = [this.armarAsiento(this.rolAsiento(4)), this.armarAsiento(this.rolAsiento(5))];
+
     this.mesa = this.buildMesa(e);
     this.buildBtns(e);
-    this.redrawTally(this.puntosNosotros, this.puntosEllos);
     this.updateBurbujas(e);
+
+    this.puntosNosotros = this.miEquipo === 'EquipoA' ? e.puntosEquipoA : e.puntosEquipoB;
+    this.puntosEllos    = this.miEquipo === 'EquipoA' ? e.puntosEquipoB : e.puntosEquipoA;
+    this.estadoEnvido   = e.estadoEnvido ?? 'No se cantó.';
+    this.estadoTruco    = e.estadoTruco  ?? 'No se cantó.';
+    this.picaPicaBanner = this.calcularPicaPicaBanner(e);
+    this.turnoBadge     = this.calcularTurnoBadge(e);
 
     if (e.partidaTerminada && !this.gameOver) {
       this.gameOver = true;
       this.gameOverGanamos = e.ganadorPartida === this.miEquipo;
     }
 
-    // Nueva mano automática: solo el jugador "mano" dispara la cuenta regresiva
-    // (los demás reciben el broadcast). El botón manual queda para todos.
+    // Nueva mano automática: solo el jugador "mano" dispara la cuenta regresiva.
     if (e.ganadorMano && !e.partidaTerminada) {
       if (e.ganadorMano !== this.prevGanadorMano && this.miRol === e.jugadorMano) {
         this.iniciarCountdown(() => {
@@ -233,25 +217,81 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  private buildMesa(e: Estado2v2): MesaJugadas {
-    const mesa: MesaJugadas = { yo: [], compa: [], izq: [], der: [] };
+  // ── Mapeo de asientos relativos a miRol ───────────────────────
+  // Offset 0 = yo (abajo); +1..+5 girando horario (a la derecha).
+  private rolAsiento(offset: number): string {
+    const p = Number(this.miRol.replace('J', '')) || 1; // 1..6
+    return 'J' + (((p - 1 + offset) % 6) + 1);
+  }
+
+  private armarAsiento(rol: string): AsientoRival {
+    const equipo: 'nosotros' | 'ellos' = this.mismoEquipo(rol) ? 'nosotros' : 'ellos';
+    return {
+      rol,
+      nombre: rol,
+      equipo,
+      cartasEnMano: this.cartasEnMano(rol),
+      activo: this.esActivo(rol),
+    };
+  }
+
+  /** ¿El rol participa de esta mano? (en Pica-Pica solo juegan 2). */
+  esActivo(rol: string): boolean {
+    const e = this.estado;
+    if (!e || !e.picaPica) return true;
+    return (e.jugadoresActivos ?? []).includes(rol);
+  }
+
+  get soyActivo(): boolean { return this.esActivo(this.miRol); }
+
+  /** Cartas que le quedan en mano a un rol → para dibujar reversos. */
+  private cartasEnMano(rol: string): number {
+    const e = this.estado;
+    if (!e) return 3;
+    if (!this.esActivo(rol)) return 0;
+    let jugadas = 0;
+    const vueltas = [...(e.vueltas ?? [])];
+    if (e.vueltaActual) vueltas.push(e.vueltaActual);
+    for (const v of vueltas) if (v.cartasJugadas?.[rol]) jugadas++;
+    return Math.max(0, 3 - jugadas);
+  }
+
+  /** EquipoA = J1/J3/J5 (impares), EquipoB = J2/J4/J6 (pares). */
+  private mismoEquipo(rol: string): boolean {
+    const n  = Number(rol.replace('J', ''));
+    const yo = Number(this.miRol.replace('J', ''));
+    return (n % 2) === (yo % 2);
+  }
+
+  /** ¿El rol dado es el "mano" de la ronda? */
+  esMano(rol: string): boolean { return this.estado?.jugadorMano === rol; }
+
+  // ── Mesa (cartas jugadas por rol) ─────────────────────────────
+  private buildMesa(e: Estado3v3): Record<string, Carta3v3[]> {
+    const mesa: Record<string, Carta3v3[]> = {};
+    for (let i = 1; i <= 6; i++) mesa['J' + i] = [];
     const vueltas = [...(e.vueltas ?? [])];
     if (e.vueltaActual) vueltas.push(e.vueltaActual);
     for (const v of vueltas) {
       const cj = v.cartasJugadas ?? {};
-      if (cj[this.rolYo])    mesa.yo.push(cj[this.rolYo]);
-      if (cj[this.rolCompa]) mesa.compa.push(cj[this.rolCompa]);
-      if (cj[this.rolIzq])   mesa.izq.push(cj[this.rolIzq]);
-      if (cj[this.rolDer])   mesa.der.push(cj[this.rolDer]);
+      for (const rol of Object.keys(cj)) (mesa[rol] ??= []).push(cj[rol]);
     }
     return mesa;
   }
 
   // ── Botones de acción ─────────────────────────────────────────
-  private buildBtns(e: Estado2v2): void {
+  private buildBtns(e: Estado3v3): void {
     const btns: BtnAccion[] = [];
     const esMiTurno = e.turnoActual === this.miRol;
     const manoEnd   = e.manoTerminada || !!e.ganadorMano || e.partidaTerminada;
+
+    // En Pica-Pica, si no soy duelista solo miro (sin acciones de juego).
+    if (!this.soyActivo) {
+      if (manoEnd && !e.partidaTerminada)
+        btns.push({ label: 'NUEVA MANO', color: '#cc8800', enabled: true, action: () => this.nuevaMano() });
+      this.btns = btns;
+      return;
+    }
 
     const yaJugue = (this.msg?.misJugadas?.length ?? 0) > 0;
     const envidoDisponible =
@@ -280,9 +320,7 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
     else if (e.envidoPendienteRespuestaDe === this.miRol && e.faseEnvido === 'declarando_tantos') {
       const tanto = this.calcularMiTanto();
       btns.push({ label: `TENGO ${tanto}`, color: '#44ff44', enabled: true, action: () => this.declararTanto(tanto) });
-      const rivalDeclaro = (e.tantosDeclarados?.[this.rolDer] ?? null) !== null
-                        || (e.tantosDeclarados?.[this.rolIzq] ?? null) !== null;
-      if (rivalDeclaro)
+      if (this.algunRivalDeclaro(e))
         btns.push({ label: 'SON BUENAS', color: '#ffaa00', enabled: true, action: () => this.sonBuenas() });
     }
     // ── Esperando que otros resuelvan el envido ──────────────
@@ -332,56 +370,79 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
     this.btns = btns;
   }
 
-  private calcularTurnoBadge(): string {
-    const e = this.estado;
-    if (!e) return 'Esperando inicio de partida...';
+  /** ¿Algún rival ya declaró su tanto? (habilita "son buenas"). */
+  private algunRivalDeclaro(e: Estado3v3): boolean {
+    for (let i = 1; i <= 6; i++) {
+      const rol = 'J' + i;
+      if (this.mismoEquipo(rol)) continue;
+      if ((e.tantosDeclarados?.[rol] ?? null) !== null) return true;
+    }
+    return false;
+  }
+
+  private calcularPicaPicaBanner(e: Estado3v3): string {
+    if (!e.picaPica) return '';
+    const duelo = (e.jugadoresActivos ?? []).join(' vs ');
+    return `PICA-PICA · ${duelo}`;
+  }
+
+  private calcularTurnoBadge(e: Estado3v3): string {
     if (e.partidaTerminada) return '';
-    if (e.manoTerminada) {
+    if (e.manoTerminada || e.ganadorMano) {
       const gan = e.ganadorMano === this.miEquipo ? '¡Ganaron la mano!' : 'Perdieron la mano.';
       return this.countdown != null ? `${gan} Nueva mano en ${this.countdown}...` : gan;
     }
+    if (!this.soyActivo) return `Duelo Pica-Pica: mirás desde afuera. Turno de ${e.turnoActual}...`;
     if (e.trucoPendienteRespuestaDe === this.miRol) return 'Respondé el Truco';
     if (e.envidoPendienteRespuestaDe === this.miRol && e.faseEnvido === 'pendiente_respuesta') return 'Respondé el Envido';
     if (e.envidoPendienteRespuestaDe === this.miRol && e.faseEnvido === 'declarando_tantos') return 'Declarás tus tantos';
     if (e.turnoActual === this.miRol) return 'Tu turno — jugá una carta o cantá';
-    if (e.turnoActual === this.rolCompa) return 'Turno de tu compañero...';
-    return 'Turno de un rival...';
+    if (this.mismoEquipo(e.turnoActual)) return `Turno de tu compañero ${e.turnoActual}...`;
+    return `Turno del rival ${e.turnoActual}...`;
   }
 
+  private placeholder(rol: string): AsientoRival {
+    return { rol, nombre: rol, equipo: 'ellos', cartasEnMano: 3, activo: true };
+  }
+
+  // Helper para dibujar N reversos
+  reversos(n: number): number[] { return Array.from({ length: n }, (_, i) => i); }
+
   // ── Acciones (invocan al hub) ─────────────────────────────────
-  jugarCarta(carta: Carta2v2): void {
+  jugarCarta(carta: Carta3v3): void {
     const e = this.estado;
     if (!e) return;
     if (e.manoTerminada || e.ganadorMano || e.partidaTerminada) return;
+    if (!this.soyActivo) { this.showToast('Estás mirando el duelo Pica-Pica.'); return; }
     if (e.turnoActual !== this.miRol) { this.showToast('No es tu turno.'); return; }
     if (e.trucoPendienteRespuestaDe || e.envidoPendienteRespuestaDe) return;
-    this.hub('JugarCarta2v2', carta.numero, carta.palo);
+    this.hub('JugarCarta3v3', carta.numero, carta.palo);
   }
 
-  cantarEnvido(tipo: string): void   { this.mostrarDialogo('yo', '¡' + tipo + '!'); this.hub('SolicitarEnvido2v2', tipo); }
-  escalarEnvido(tipo: string): void  { this.mostrarDialogo('yo', '¡' + tipo + '!'); this.hub('EscalarEnvido2v2', tipo); }
+  cantarEnvido(tipo: string): void   { this.mostrarDialogo(this.miRol, '¡' + tipo + '!'); this.hub('SolicitarEnvido3v3', tipo); }
+  escalarEnvido(tipo: string): void  { this.mostrarDialogo(this.miRol, '¡' + tipo + '!'); this.hub('EscalarEnvido3v3', tipo); }
   responderEnvido(aceptar: boolean): void {
-    this.mostrarDialogo('yo', aceptar ? '¡Quiero!' : '¡No quiero!');
-    this.hub('ResponderEnvido2v2', aceptar);
+    this.mostrarDialogo(this.miRol, aceptar ? '¡Quiero!' : '¡No quiero!');
+    this.hub('ResponderEnvido3v3', aceptar);
   }
-  declararTanto(tanto: number): void { this.mostrarDialogo('yo', String(tanto)); this.hub('DeclararTanto2v2', tanto); }
-  sonBuenas(): void                  { this.mostrarDialogo('yo', '¡Son buenas!'); this.hub('SonBuenas2v2'); }
+  declararTanto(tanto: number): void { this.mostrarDialogo(this.miRol, String(tanto)); this.hub('DeclararTanto3v3', tanto); }
+  sonBuenas(): void                  { this.mostrarDialogo(this.miRol, '¡Son buenas!'); this.hub('SonBuenas3v3'); }
 
-  cantarTruco(): void { this.mostrarDialogo('yo', '¡Truco!'); this.hub('SolicitarTruco2v2'); }
+  cantarTruco(): void { this.mostrarDialogo(this.miRol, '¡Truco!'); this.hub('SolicitarTruco3v3'); }
   responderTruco(aceptar: boolean, escalarA?: string): void {
     const txt = escalarA
       ? '¡' + (escalarA === 'retruco' ? 'Retruco' : 'Vale cuatro') + '!'
       : (aceptar ? '¡Quiero!' : '¡No quiero!');
-    this.mostrarDialogo('yo', txt);
-    this.hub('ResponderTruco2v2', aceptar, escalarA ?? null);
+    this.mostrarDialogo(this.miRol, txt);
+    this.hub('ResponderTruco3v3', aceptar, escalarA ?? null);
   }
   escalarTruco(): void {
     const nombre = this.estado?.nivelTruco === 1 ? 'Retruco' : 'Vale cuatro';
-    this.mostrarDialogo('yo', '¡' + nombre + '!');
-    this.hub('EscalarTruco2v2');
+    this.mostrarDialogo(this.miRol, '¡' + nombre + '!');
+    this.hub('EscalarTruco3v3');
   }
-  irseAlMazo(): void { this.mostrarDialogo('yo', 'Me voy al mazo.'); this.hub('IrseAlMazo2v2'); }
-  nuevaMano(): void  { this.cancelarCountdown(); this.gameOver = false; this.hub('NuevaMano2v2'); }
+  irseAlMazo(): void { this.mostrarDialogo(this.miRol, 'Me voy al mazo.'); this.hub('IrseAlMazo3v3'); }
+  nuevaMano(): void  { this.cancelarCountdown(); this.gameOver = false; this.hub('NuevaMano3v3'); }
 
   private hub(method: string, ...args: unknown[]): void {
     this.sala.invocarHub(method, ...args).catch(err => {
@@ -391,10 +452,8 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
 
   // ── Cálculo del tanto propio ──────────────────────────────────
   private calcularMiTanto(): number {
-    const cartas: Carta2v2[] = [...(this.msg?.misCartas ?? []), ...(this.msg?.misJugadas ?? [])];
-    return this.calcularTanto(cartas);
-  }
-  private calcularTanto(cartas: Carta2v2[]): number {
+    const cartas: Carta3v3[] = [...(this.msg?.misCartas ?? []), ...(this.msg?.misJugadas ?? [])];
+    if (cartas.length === 0) return 0;
     const grupos: Record<string, number[]> = {};
     for (const c of cartas) {
       const v = c.numero >= 10 ? 0 : c.numero;
@@ -410,49 +469,37 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
   }
 
   // ── Burbujas de canto ─────────────────────────────────────────
-  private updateBurbujas(e: Estado2v2): void {
+  private updateBurbujas(e: Estado3v3): void {
     const envidoChanged = (e.estadoEnvido ?? '') !== this.prevEstadoEnvido;
     const trucoChanged  = (e.estadoTruco  ?? '') !== this.prevEstadoTruco;
 
     // Canto de envido pendiente → burbuja en el asiento del cantor (si no soy yo)
-    if (envidoChanged && e.envidoCantado && e.envidoPendienteRespuestaDe != null && e.cantorEnvido) {
-      const seat = this.seatDeRol(e.cantorEnvido);
-      if (seat && seat !== 'yo') {
-        const nombres: Record<string, string> = {
-          Envido: 'Envido', EnvidoEnvido: 'Envido Envido',
-          RealEnvido: 'Real Envido', FaltaEnvido: 'Falta Envido',
-        };
-        const tipo = nombres[e.tipoEnvidoCantado ?? 'Envido'] ?? e.tipoEnvidoCantado ?? 'Envido';
-        this.mostrarDialogo(seat, '¡' + tipo + '!');
-      }
+    if (envidoChanged && e.envidoCantado && e.envidoPendienteRespuestaDe != null && e.cantorEnvido
+        && e.cantorEnvido !== this.miRol) {
+      const nombres: Record<string, string> = {
+        Envido: 'Envido', EnvidoEnvido: 'Envido Envido',
+        RealEnvido: 'Real Envido', FaltaEnvido: 'Falta Envido',
+      };
+      const tipo = nombres[e.tipoEnvidoCantado ?? 'Envido'] ?? e.tipoEnvidoCantado ?? 'Envido';
+      this.mostrarDialogo(e.cantorEnvido, '¡' + tipo + '!');
     }
     // Canto de truco pendiente → burbuja en el asiento del cantor (si no soy yo)
-    if (trucoChanged && e.trucoCantado && e.trucoPendienteRespuestaDe != null && e.cantorTruco) {
-      const seat = this.seatDeRol(e.cantorTruco);
-      if (seat && seat !== 'yo') {
-        const nivel = e.nivelTruco ?? 1;
-        const txt = nivel === 1 ? '¡Truco!' : nivel === 2 ? '¡Retruco!' : '¡Vale Cuatro!';
-        this.mostrarDialogo(seat, txt);
-      }
+    if (trucoChanged && e.trucoCantado && e.trucoPendienteRespuestaDe != null && e.cantorTruco
+        && e.cantorTruco !== this.miRol) {
+      const nivel = e.nivelTruco ?? 1;
+      const txt = nivel === 1 ? '¡Truco!' : nivel === 2 ? '¡Retruco!' : '¡Vale Cuatro!';
+      this.mostrarDialogo(e.cantorTruco, txt);
     }
   }
 
-  private seatDeRol(rol: string): Seat | null {
-    if (rol === this.rolYo) return 'yo';
-    if (rol === this.rolCompa) return 'compa';
-    if (rol === this.rolIzq) return 'izq';
-    if (rol === this.rolDer) return 'der';
-    return null;
-  }
-
-  private mostrarDialogo(seat: Seat, texto: string): void {
+  private mostrarDialogo(rol: string, texto: string): void {
     if (!texto) return;
-    this.dialogos[seat] = { texto };
+    this.dialogos[rol] = { texto };
     this.cdr.markForCheck();
-    const prev = this.dialogoTimers[seat];
+    const prev = this.dialogoTimers[rol];
     if (prev) clearTimeout(prev);
-    this.dialogoTimers[seat] = setTimeout(() => {
-      this.dialogos[seat] = null;
+    this.dialogoTimers[rol] = setTimeout(() => {
+      this.dialogos[rol] = null;
       this.cdr.markForCheck();
     }, 2400);
   }
@@ -464,6 +511,7 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
     this.cdr.markForCheck();
     this.countdownInterval = setInterval(() => {
       this.countdown = (this.countdown ?? 1) - 1;
+      if (this.estado) this.turnoBadge = this.calcularTurnoBadge(this.estado);
       this.cdr.markForCheck();
       if ((this.countdown ?? 0) <= 0) {
         this.cancelarCountdown();
@@ -476,46 +524,14 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
     this.countdown = null;
   }
 
-  // ── Tanteador ─────────────────────────────────────────────────
-  private redrawTally(ptsNos: number, ptsEll: number): void {
-    this.tallySticksNosotros = this.buildTally(ptsNos, '#c8a030');
-    this.tallySticksEllos    = this.buildTally(ptsEll, '#d46010');
-  }
-  private buildTally(pts: number, color: string): any[] {
-    const out: any[] = [];
-    const capped = Math.min(pts, 30);
-    if (capped <= 0) return out;
-    this.buildTallyMitad(out, Math.min(capped, 15), color, 6);
-    if (capped > 15) this.buildTallyMitad(out, capped - 15, color, 71);
-    return out;
-  }
-  private buildTallyMitad(out: any[], pts: number, color: string, startX: number): void {
-    if (pts <= 0) return;
-    const full = Math.floor(pts / 5), rem = pts % 5;
-    const BS = 14, BGAP = 3, SL = 9, SGAP = 3, y = 19;
-    let bx = startX;
-    for (let i = 0; i < Math.min(full, 3); i++) { this.addBox(out, bx, y, BS, color); bx += BS + BGAP; }
-    if (rem > 0 && full < 3) {
-      let sx = bx;
-      for (let i = 0; i < rem; i++) { out.push({ x1: sx, y1: y + SL, x2: sx + SL, y2: y, color }); sx += SL + SGAP; }
-    }
-  }
-  private addBox(out: any[], x: number, y: number, s: number, color: string): void {
-    out.push({ x1: x,   y1: y+s, x2: x,   y2: y,   color });
-    out.push({ x1: x,   y1: y,   x2: x+s, y2: y,   color });
-    out.push({ x1: x+s, y1: y,   x2: x+s, y2: y+s, color });
-    out.push({ x1: x+s, y1: y+s, x2: x,   y2: y+s, color });
-    out.push({ x1: x,   y1: y+s, x2: x+s, y2: y,   color });
-  }
-
   // ── Imagen de carta ───────────────────────────────────────────
-  cardImg(c: Carta2v2): string {
+  cardImg(c: Carta3v3): string {
     const nums: Record<number, number> = { 1:1,2:2,3:3,4:4,5:5,6:6,7:7,10:8,11:9,12:10 };
     const palos: Record<string, number> = { Oro:0, Copa:10, Espada:20, Basto:30 };
     return `assets/cards/${(palos[c.palo] ?? 0) + (nums[c.numero] ?? 1)}.PNG`;
   }
 
-  // ── Game over / salir ─────────────────────────────────────────
+  // ── Salir ─────────────────────────────────────────────────────
   salirPartida():  void { this.mostrarConfirmSalir = true; }
   cancelarSalir(): void { this.mostrarConfirmSalir = false; }
   async confirmarSalir(): Promise<void> {

@@ -31,11 +31,11 @@
       <!-- Badge modo -->
       <div class="modo-badge">
         <span class="modo-label">MODO:</span>
-        <span class="modo-valor">{{ gameMode === '2v2' ? '2 VS 2' : '1 VS 1' }}</span>
+        <span class="modo-valor">{{ gameMode === '3v3' ? '3 VS 3' : gameMode === '2v2' ? '2 VS 2' : '1 VS 1' }}</span>
       </div>
 
-      <!-- ══ LOBBY 2v2 ══ -->
-      @if (gameMode === '2v2') {
+      <!-- ══ LOBBY POR EQUIPOS (2v2 / 3v3) ══ -->
+      @if (esPorEquipos) {
         <div class="lobby-2v2">
           <p class="lobby-titulo">ESPERANDO JUGADORES</p>
           <div class="lobby-slots">
@@ -56,9 +56,9 @@
             }
           </div>
           <div class="lobby-contador">
-            {{ jugadoresEnSala }} / {{ maxJugadores2v2 }} jugadores
+            {{ jugadoresEnSala }} / {{ maxJugadores }} jugadores
           </div>
-          @if (jugadoresEnSala === maxJugadores2v2) {
+          @if (jugadoresEnSala === maxJugadores) {
             <div class="lobby-completo">¡Todos listos! Cargando equipos...</div>
           }
         </div>

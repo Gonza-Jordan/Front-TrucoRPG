@@ -11,7 +11,7 @@ import { ConnectionStatusComponent } from '../../components/connection-status/co
 export class MenuMultijugadorTipo {
   constructor(private router: Router) {}
 
-  seleccionarModo(modo: '1v1' | '2v2'): void {
+  seleccionarModo(modo: '1v1' | '2v2' | '3v3'): void {
     this.router.navigate(['/menu-multijugador-tradicional'], {
       queryParams: { gameMode: modo },
     });
