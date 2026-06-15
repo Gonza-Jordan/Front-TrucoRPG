@@ -1,0 +1,253 @@
+<div class="root">
+
+  <!-- ── PANEL IZQ — botones ───────────────────────────────────── -->
+  <aside class="side-panel left-panel">
+    <div class="btn-list">
+      @for (b of btns; track b.label) {
+        <button class="action-btn" [class.disabled]="!b.enabled"
+                [style.--btn-color]="b.color"
+                [disabled]="!b.enabled" (click)="b.action()">
+          {{ b.label }}
+        </button>
+      }
+      @if (btns.length === 0 && estado && !estado.manoTerminada && !estado.partidaTerminada) {
+        <div class="esperando-ia">
+          {{ soyActivo ? 'Esperando a los otros jugadores...' : 'Mirás el duelo Pica-Pica...' }}
+        </div>
+      }
+      @if (!estado) {
+        <div class="esperando-ia">Esperando inicio de partida...</div>
+      }
+    </div>
+  </aside>
+
+  <!-- ── ARENA 3v3 ──────────────────────────────────────────────── -->
+  <main class="arena-3v3">
+
+    <!-- Rival de enfrente (arriba) -->
+    <div class="seat seat-top" [class.seat-inactivo]="!frente.activo">
+      <div class="seat-info" [class.equipo-nosotros]="frente.equipo === 'nosotros'"
+           [class.equipo-ellos]="frente.equipo === 'ellos'">
+        <img src="assets/2v2/gaucho_compañero.png" class="avatar-seat" alt="jugador" />
+        <span class="seat-name">{{ frente.nombre }}</span>
+        <span class="seat-tag" [class.tag-compa]="frente.equipo === 'nosotros'" [class.tag-rival]="frente.equipo === 'ellos'">
+          {{ frente.equipo === 'nosotros' ? 'Compañero' : 'Rival' }}
+        </span>
+        @if (esMano(frente.rol)) { <span class="mano-badge">MANO</span> }
+      </div>
+      <div class="player-cards-row">
+        @for (c of reversos(frente.cartasEnMano); track $index) {
+          <img class="card-back" src="assets/cards/back.PNG" alt="reverso" />
+        }
+      </div>
+      @if (dialogos[frente.rol]) {
+        <div class="dialogo-burbuja burbuja-top">{{ dialogos[frente.rol]!.texto }}</div>
+      }
+    </div>
+
+    <!-- Fila media: izquierda (x2) + mesa + derecha (x2) -->
+    <div class="row-middle-3v3">
+
+      <!-- Columna izquierda -->
+      <div class="columna columna-izq">
+        @for (j of izquierda; track j.rol) {
+          <div class="seat seat-side seat-left" [class.seat-inactivo]="!j.activo">
+            <div class="seat-info" [class.equipo-nosotros]="j.equipo === 'nosotros'"
+                 [class.equipo-ellos]="j.equipo === 'ellos'">
+              <img src="assets/2v2/gaucho_izquierda.png" class="avatar-seat" alt="jugador" />
+              <span class="seat-name">{{ j.nombre }}</span>
+              <span class="seat-tag" [class.tag-compa]="j.equipo === 'nosotros'" [class.tag-rival]="j.equipo === 'ellos'">
+                {{ j.equipo === 'nosotros' ? 'Compañero' : 'Rival' }}
+              </span>
+              @if (esMano(j.rol)) { <span class="mano-badge">MANO</span> }
+            </div>
+            <div class="side-cards">
+              @for (c of reversos(j.cartasEnMano); track $index) {
+                <img class="card-back card-back-side" src="assets/cards/back.PNG" alt="reverso" />
+              }
+            </div>
+            @if (dialogos[j.rol]) {
+              <div class="dialogo-burbuja burbuja-left">{{ dialogos[j.rol]!.texto }}</div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Mesa -->
+      <div class="table-wrap-3v3">
+        <div class="table-surface-3v3">
+          <div class="mesa-centro-3v3"></div>
+
+          <!-- Cartas jugadas, una zona por asiento -->
+          <div class="mesa-zona zona-top">
+            <div class="pila pila-top">
+              @for (c of mesa[frente.rol]; track $index) {
+                <img class="mesa-card" [src]="cardImg(c)" alt="" />
+              }
+            </div>
+          </div>
+          <div class="mesa-zona zona-lsuperior">
+            <div class="pila pila-left">
+              @for (c of mesa[izquierda[0].rol]; track $index) {
+                <img class="mesa-card" [src]="cardImg(c)" alt="" />
+              }
+            </div>
+          </div>
+          <div class="mesa-zona zona-linferior">
+            <div class="pila pila-left">
+              @for (c of mesa[izquierda[1].rol]; track $index) {
+                <img class="mesa-card" [src]="cardImg(c)" alt="" />
+              }
+            </div>
+          </div>
+          <div class="mesa-zona zona-rsuperior">
+            <div class="pila pila-right">
+              @for (c of mesa[derecha[0].rol]; track $index) {
+                <img class="mesa-card" [src]="cardImg(c)" alt="" />
+              }
+            </div>
+          </div>
+          <div class="mesa-zona zona-rinferior">
+            <div class="pila pila-right">
+              @for (c of mesa[derecha[1].rol]; track $index) {
+                <img class="mesa-card" [src]="cardImg(c)" alt="" />
+              }
+            </div>
+          </div>
+          <div class="mesa-zona zona-bottom">
+            <div class="pila pila-bottom">
+              @for (c of mesa[miRol]; track $index) {
+                <img class="mesa-card" [src]="cardImg(c)" alt="" />
+              }
+            </div>
+          </div>
+
+          @if (picaPicaBanner) {
+            <div class="pica-banner">{{ picaPicaBanner }}</div>
+          }
+          @if (turnoBadge) {
+            <div class="turno-badge-3v3">{{ turnoBadge }}</div>
+          }
+        </div>
+      </div>
+
+      <!-- Columna derecha -->
+      <div class="columna columna-der">
+        @for (j of derecha; track j.rol) {
+          <div class="seat seat-side seat-right" [class.seat-inactivo]="!j.activo">
+            <div class="side-cards side-cards-right">
+              @for (c of reversos(j.cartasEnMano); track $index) {
+                <img class="card-back card-back-side" src="assets/cards/back.PNG" alt="reverso" />
+              }
+            </div>
+            <div class="seat-info" [class.equipo-nosotros]="j.equipo === 'nosotros'"
+                 [class.equipo-ellos]="j.equipo === 'ellos'">
+              <img src="assets/2v2/gaucho_derecha.png" class="avatar-seat" alt="jugador" />
+              <span class="seat-name">{{ j.nombre }}</span>
+              <span class="seat-tag" [class.tag-compa]="j.equipo === 'nosotros'" [class.tag-rival]="j.equipo === 'ellos'">
+                {{ j.equipo === 'nosotros' ? 'Compañero' : 'Rival' }}
+              </span>
+              @if (esMano(j.rol)) { <span class="mano-badge">MANO</span> }
+            </div>
+            @if (dialogos[j.rol]) {
+              <div class="dialogo-burbuja burbuja-right">{{ dialogos[j.rol]!.texto }}</div>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- Fila inferior: yo -->
+    <div class="seat seat-bottom" [class.seat-inactivo]="!soyActivo">
+      <div class="yo-info">
+        <img src="assets/gaucho.png" class="avatar-yo" alt="yo" />
+        <span class="yo-nombre">{{ yoNombre }} ({{ miRol }})</span>
+        @if (esMano(miRol)) { <span class="mano-badge">MANO</span> }
+        @if (dialogos[miRol]) {
+          <div class="dialogo-burbuja burbuja-bottom">{{ dialogos[miRol]!.texto }}</div>
+        }
+      </div>
+      <div class="fan-wrap-3v3">
+        @for (carta of misCartas; track $index) {
+          <div class="fan-card-3v3"
+               [style.--ang]="fanAngles[$index] + 'deg'"
+               [style.--xoff]="fanXOff[$index] + 'px'"
+               (click)="jugarCarta(carta)">
+            <img class="fan-img" [src]="cardImg(carta)" [alt]="carta.numero + ' ' + carta.palo" />
+          </div>
+        }
+        @if (misCartas.length === 0 && estado && !estado.manoTerminada) {
+          <div class="sin-cartas">{{ soyActivo ? 'Sin cartas' : 'Mirando el duelo' }}</div>
+        }
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── PANEL DER — tanteador ──────────────────────────────────── -->
+  <aside class="side-panel right-panel">
+    <div class="scoreboard-2v2">
+      <div class="score-title-2v2">TANTEADOR</div>
+      <div class="score-equipo nosotros-row">
+        <span class="score-label nosotros-label">NOSOTROS</span>
+        <span class="score-pts nosotros-pts">{{ puntosNosotros }}</span>
+      </div>
+      <div class="score-sep-2v2"></div>
+      <div class="score-equipo ellos-row">
+        <span class="score-label ellos-label">ELLOS</span>
+        <span class="score-pts ellos-pts">{{ puntosEllos }}</span>
+      </div>
+    </div>
+
+    <div class="state-section">
+      <div class="state-title envido-title">ENVIDO</div>
+      <div class="state-text">{{ estadoEnvido }}</div>
+    </div>
+    <div class="state-section">
+      <div class="state-title truco-title">TRUCO</div>
+      <div class="state-text">{{ estadoTruco }}</div>
+    </div>
+
+    <button class="back-btn" (click)="salirPartida()">← Volver</button>
+  </aside>
+
+  <!-- ── GAME OVER ──────────────────────────────────────────────── -->
+  @if (gameOver) {
+    <div class="game-over-overlay" (click)="$event.stopPropagation()">
+      <div class="game-over-box">
+        <div class="go-title" [class.go-win]="gameOverGanamos" [class.go-lose]="!gameOverGanamos">
+          {{ gameOverGanamos ? '¡GANARON!' : '¡PERDIERON!' }}
+        </div>
+        <div class="go-subtitle">
+          {{ gameOverGanamos
+            ? '¡El equipo llegó a 30 puntos! Los rivales cayeron.'
+            : 'Los rivales llegaron a 30 puntos. ¡La próxima será!' }}
+        </div>
+        <div class="go-btn-row">
+          <button class="go-btn go-btn-exit" (click)="confirmarSalir()">Salir al mapa</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── CONFIRM SALIR ──────────────────────────────────────────── -->
+  @if (mostrarConfirmSalir) {
+    <div class="confirm-overlay" (click)="cancelarSalir()">
+      <div class="confirm-box" (click)="$event.stopPropagation()">
+        <div class="confirm-title">¿Salir de la partida?</div>
+        <div class="confirm-sub">Se perderá el progreso de la mano actual.</div>
+        <div class="confirm-btn-row">
+          <button class="confirm-btn confirm-btn-si" (click)="confirmarSalir()">Sí, salir</button>
+          <button class="confirm-btn confirm-btn-no" (click)="cancelarSalir()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── TOAST ──────────────────────────────────────────────────── -->
+  @if (toastMsg) {
+    <div class="toast-2v2">{{ toastMsg }}</div>
+  }
+
+</div>

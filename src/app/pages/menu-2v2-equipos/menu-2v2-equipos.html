@@ -20,7 +20,7 @@
               <span class="equipo-nombre">EQUIPO</span>
               <span class="equipo-apellido">SAN MARTÍN</span>
             </div>
-            @if (estadoEquipos?.countSanMartin === 2) {
+            @if (estadoEquipos?.countSanMartin === cupoPorEquipo) {
               <span class="equipo-badge-lleno">COMPLETO</span>
             }
           </div>
@@ -44,7 +44,7 @@
             [disabled]="equipoDeshabilitado('sanMartin')"
           >
             @if (miEquipo === 'sanMartin') { ✓ EN ESTE EQUIPO }
-            @else if (estadoEquipos?.countSanMartin === 2) { COMPLETO }
+            @else if (estadoEquipos?.countSanMartin === cupoPorEquipo) { COMPLETO }
             @else { UNIRME }
           </button>
         </div>
@@ -62,7 +62,7 @@
               <span class="equipo-nombre">EQUIPO</span>
               <span class="equipo-apellido">BELGRANO</span>
             </div>
-            @if (estadoEquipos?.countBelgrano === 2) {
+            @if (estadoEquipos?.countBelgrano === cupoPorEquipo) {
               <span class="equipo-badge-lleno">COMPLETO</span>
             }
           </div>
@@ -86,7 +86,7 @@
             [disabled]="equipoDeshabilitado('belgrano')"
           >
             @if (miEquipo === 'belgrano') { ✓ EN ESTE EQUIPO }
-            @else if (estadoEquipos?.countBelgrano === 2) { COMPLETO }
+            @else if (estadoEquipos?.countBelgrano === cupoPorEquipo) { COMPLETO }
             @else { UNIRME }
           </button>
         </div>

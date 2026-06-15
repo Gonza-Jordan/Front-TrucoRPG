@@ -14,6 +14,9 @@ import { AudioService } from './services/audio.service';
 export class App implements OnInit, OnDestroy {
   protected readonly title = signal('TrucoRPG-Front');
 
+  /** True en pantallas de juego (requieren landscape). Los menús funcionan en portrait. */
+  protected readonly esRutaJuego = signal(false);
+
   private readonly _esTactil =
     navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
 
@@ -29,11 +32,14 @@ export class App implements OnInit, OnDestroy {
     document.addEventListener('click', this._onButtonClick);
 
     const rutasPartida = ['/maquina', '/juego/multi', '/jugar/solitario'];
+    const rutasJuego   = ['/maquina', '/juego', '/jugar'];
 
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe((e: any) => {
-        const enPartida = rutasPartida.some(r => e.urlAfterRedirects.startsWith(r));
+        const url = e.urlAfterRedirects as string;
+        const enPartida = rutasPartida.some(r => url.startsWith(r));
+        this.esRutaJuego.set(rutasJuego.some(r => url.startsWith(r)));
         if (enPartida) {
           this.audio.pausar();
         } else {

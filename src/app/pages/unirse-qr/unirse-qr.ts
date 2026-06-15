@@ -18,7 +18,7 @@ import { SalaService } from '../../services/sala.service';
 export class UnirseQrComponent implements OnInit {
   estado: 'uniendo' | 'error' = 'uniendo';
   mensaje = 'Uniéndote a la sala...';
-  private gameMode: '1v1' | '2v2' = '1v1';
+  private gameMode: '1v1' | '2v2' | '3v3' = '1v1';
 
   constructor(
     private sala: SalaService,
