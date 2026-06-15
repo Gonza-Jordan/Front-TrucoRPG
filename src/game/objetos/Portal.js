@@ -50,7 +50,7 @@ export default class Portal {
 
     if (enZona) {
       this.textoE.x = jugador.x;
-      this.textoE.y = jugador.y - 45;
+      this.textoE.y = jugador.y - 55;
 
       const quiereInteractuar = Phaser.Input.Keyboard.JustDown(teclaE) || botonMobilePresionado;
 

@@ -43,7 +43,7 @@ export default class InteriorCasaScene extends BaseScene {
 
     this.JugadorPrincipal.setCollideWorldBounds(true);
     this.physics.add.collider(this.JugadorPrincipal, colisiones);
-    this.JugadorPrincipal.setScale(2.4);
+    this.JugadorPrincipal.setScale(2.5);
 
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
