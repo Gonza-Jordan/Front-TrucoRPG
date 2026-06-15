@@ -3,13 +3,11 @@ import { CommonModule, DOCUMENT } from '@angular/common'; // Importamos DOCUMENT
 import { SeleccionPersonajeHistoria } from '../../../pages/seleccion-personaje-historia/seleccion-personaje-historia';
 import { HistoriaService } from '../../../services/historia/historia-service';
 import { HistoriaOverlayManagerComponent } from '../../historia-overlay-manager-component/historia-overlay-manager-component/historia-overlay-manager-component';
-import { Header } from '../../header/header';
-import { Footer } from '../../footer/footer';
 
 @Component({
   selector: 'app-historia',
   standalone: true,
-  imports: [CommonModule, SeleccionPersonajeHistoria, HistoriaOverlayManagerComponent,Header,Footer],
+  imports: [CommonModule, SeleccionPersonajeHistoria, HistoriaOverlayManagerComponent],
   templateUrl: './historia.html',
   styleUrl: './historia.css',
 })
@@ -31,8 +29,9 @@ export class Historia implements OnDestroy {
 
     setTimeout(() => {
       this.historiaService.iniciarJuego('historia-container');
+
       window.dispatchEvent(new Event('resize'));
-    }, 0);
+    }, 50);
   }
 
   ngOnDestroy(): void {

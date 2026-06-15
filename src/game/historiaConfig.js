@@ -7,7 +7,7 @@ import InteriorPulperiaScene from './escenas/InteriorPulperiaScene.js';
 import MapaAventura1Scene from './escenas/MapaAventura1Scene.js';
 import MapaAventura2Scene from './escenas/MapaAventura2Scene.js';
 
-export function initHistoria(parent = 'contenedor-juego') {
+export function initHistoria(parent = 'historia-container') {
   const esTactil = navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
 
   const config = {
@@ -26,8 +26,7 @@ export function initHistoria(parent = 'contenedor-juego') {
               if (ctx) ctx.imageSmoothingEnabled = false;
               game.canvas.style.imageRendering = 'pixelated';
             }
-          } catch (err) {
-          }
+          } catch (err) {}
         } else {
           try {
             if (game && game.canvas) {
@@ -42,7 +41,7 @@ export function initHistoria(parent = 'contenedor-juego') {
       autoCenter: Phaser.Scale.CENTER_BOTH,
       width: 1280,
       height: 708,
-      fullscreenTarget: parent,
+      fullscreenTarget: '.contenedor-juego-wrapper',
     },
     physics: {
       default: 'arcade',

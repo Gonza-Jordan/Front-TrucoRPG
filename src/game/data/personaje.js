@@ -1,8 +1,8 @@
 export const PERSONAJES = [
-    { id: 0, nombrePersonaje: 'Primero', spriteKey: 'nene-hacha' },
-    { id: 1, nombrePersonaje: 'Segundo', spriteKey: 'nena-hacha' },
-    { id: 2, nombrePersonaje: 'Tercero', spriteKey: 'nene-arco' },
-    { id: 3, nombrePersonaje: 'Cuarto', spriteKey: 'nena-arco' }
+    { id: 0, nombrePersonaje: 'Primero', spriteKey: 'personaje' },
+    { id: 1, nombrePersonaje: 'Segundo', spriteKey: 'personaje' },
+    { id: 2, nombrePersonaje: 'Tercero', spriteKey: 'personaje' },
+    { id: 3, nombrePersonaje: 'Cuarto', spriteKey: 'personaje' }
 ];
 
 export function personajePorId(id) {

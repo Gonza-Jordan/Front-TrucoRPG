@@ -55,7 +55,6 @@ export default class BaseScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setInteractive();
 
-    // Configurar profundidades base
     if (this.joystick.base) this.joystick.base.setDepth(1000).setScrollFactor(0);
     if (this.joystick.thumb) this.joystick.thumb.setDepth(1001).setScrollFactor(0);
 
@@ -63,20 +62,17 @@ export default class BaseScene extends Phaser.Scene {
       const w = gameSize.width;
       const h = gameSize.height;
 
-      // Reposicionar Joystick de forma fluida
       if (this.joystick) {
         this.joystick.x = w * 0.15;
         this.joystick.y = h * 0.8;
       }
 
-      // Reposicionar Botón de Interactuar
       if (this._btnInteractuarBg && this._btnInteractuarTxt) {
         this._btnInteractuarBg.setPosition(w * 0.85, h * 0.8);
         this._btnInteractuarTxt.setPosition(w * 0.85, h * 0.8);
       }
     });
 
-    // Lógica del botón de interactuar
     const activarInteraccion = () => {
       this.botonInteractuarPresionado = true;
       this._btnInteractuarBg.setFillStyle(0x334433, 0.8);
@@ -107,7 +103,6 @@ export default class BaseScene extends Phaser.Scene {
 
   botonPantallaCompleta() {
     let teclaF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F, false);
-    // Ignorar si el foco está en un input/textarea DOM (ej: lobby code input)
     teclaF.on('down', () => {
       const tag = document.activeElement?.tagName?.toLowerCase();
       if (tag === 'input' || tag === 'textarea' || tag === 'select') return;

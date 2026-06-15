@@ -15,10 +15,6 @@ export default class InteriorCasaScene extends BaseScene {
   }
 
   preload() {
-    this.load.image('InteriorCasa', './assets/mapa-casa/InteriorCasa.png');
-    this.load.image('Paredes', './assets/mapa-casa/Paredes.png');
-    this.load.tilemapTiledJSON('mapa-casa', './assets/mapa-casa/InteriorCasa.json');
-    this.load.image('cartel','./assets/mapa-principal/Cartel.png');
   }
 
   create() {
@@ -68,15 +64,19 @@ export default class InteriorCasaScene extends BaseScene {
   }
 
   update() {
-    this.puntosDeInteraccion.forEach((punto) => {
-      punto.update(this.JugadorPrincipal, this.teclaE);
-    });
-
     this.JugadorPrincipal.update(this.keys, this.teclaE);
+
+    const interactuoMobile = this.botonInteractuarPresionado;
+    
+    this.puntosDeInteraccion.forEach((punto) => {
+      punto.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+    });
 
     const seMueve =
       this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
 
-    this.salirAfuera.update(this.JugadorPrincipal,this.teclaE);
+    this.salirAfuera.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+
+    this.botonInteractuarPresionado = false;
   }
 }
