@@ -11,41 +11,41 @@ export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
 
     this.sonidoPasos = escena.sound.add('pasos', {
       loop: true,
-      volume: 0.5 
+      volume: 0.5,
     });
 
     if (!escena.anims.exists(`${this.nombre}-quieto`)) {
       escena.anims.create({
         key: `${this.nombre}-quieto`,
-        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 312, end: 313 }),
+        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 0, end: 3 }),
         frameRate: 5,
         repeat: -1,
       });
 
       escena.anims.create({
         key: `${this.nombre}-caminando-arriba`,
-        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 105, end: 113 }),
+        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 8, end: 11 }),
         frameRate: 10,
         repeat: -1,
       });
 
       escena.anims.create({
         key: `${this.nombre}-caminando-abajo`,
-        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 131, end: 139 }),
+        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 4, end: 7 }),
         frameRate: 10,
         repeat: -1,
       });
 
       escena.anims.create({
         key: `${this.nombre}-caminando-izquierda`,
-        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 117, end: 125 }),
+        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 16, end: 19 }),
         frameRate: 10,
         repeat: -1,
       });
 
       escena.anims.create({
         key: `${this.nombre}-caminando-derecha`,
-        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 143, end: 151 }),
+        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 12, end: 15 }),
         frameRate: 10,
         repeat: -1,
       });
@@ -73,17 +73,15 @@ export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
       this.body.velocity.normalize().scale(velocidad);
     }
 
-    const seEstaMoviendo = moverIzquierda || moverDerecha || moverArriba || moverAbajo;
+    const seEstaMoviendo = this.body.velocity.x !== 0 || this.body.velocity.y !== 0;
 
     if (seEstaMoviendo) {
       if (!this.sonidoPasos.isPlaying) {
         this.sonidoPasos.play();
-      } else if (this.sonidoPasos.isPaused) {
-        this.sonidoPasos.resume();
       }
     } else {
-      if (this.sonidoPasos.isPlaying) {
-        this.sonidoPasos.pause();
+      if (this.sonidoPasos.isPlaying || this.sonidoPasos.isPaused) {
+        this.sonidoPasos.stop();
       }
     }
 

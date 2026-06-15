@@ -18,9 +18,6 @@ export default class BaseScene extends Phaser.Scene {
 
     if (!this.esTactil) return;
 
-    const width = this.scale.width;
-    const height = this.scale.height;
-
     const rexPlugin = this.plugins.get ? this.plugins.get('rexvirtualjoystickplugin') : null;
     if (!rexPlugin) {
       console.warn('Plugin rexvirtualjoystickplugin no disponible');
@@ -28,66 +25,75 @@ export default class BaseScene extends Phaser.Scene {
     }
 
     this.joystick = rexPlugin.add(this, {
-      x: width * 0.15,
-      y: height * 0.8,
-
+      x: this.scale.width * 0.15,
+      y: this.scale.height * 0.8,
       radius: 80,
-
       base: this.add.circle(0, 0, 80, 0x000000, 0.4),
-
       thumb: this.add.circle(0, 0, 40, 0xffffff, 0.7),
-
       dir: '8dir',
       forceMin: 16,
     });
 
-    console.log('Joystick activadoooo');
-
     this.joyStick = this.joystick;
 
-    // ── Botón "Interactuar" (equivalente tecla E) ─────────────────
-    const btnBg = this.add.rectangle(width * 0.85, height * 0.8, 130, 50, 0x000000, 0.5)
+    // Crear el botón "Interactuar" inicialmente
+    this._btnInteractuarBg = this.add
+      .rectangle(this.scale.width * 0.85, this.scale.height * 0.8, 130, 50, 0x000000, 0.5)
       .setStrokeStyle(2, 0xffffff, 0.6)
       .setDepth(1000)
       .setScrollFactor(0)
       .setInteractive();
-    const btnTxt = this.add.text(width * 0.85, height * 0.8, '⚡ Interactuar', {
-      fontFamily: '"Jersey 10"',
-      fontSize: '18px',
-      color: '#ffffff',
-    }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
 
-    this._btnInteractuarBg  = btnBg;
-    this._btnInteractuarTxt = btnTxt;
+    this._btnInteractuarTxt = this.add
+      .text(this.scale.width * 0.85, this.scale.height * 0.8, '⚡ Interactuar', {
+        fontFamily: '"Jersey 10"',
+        fontSize: '18px',
+        color: '#ffffff',
+      })
+      .setOrigin(0.5)
+      .setDepth(1001)
+      .setScrollFactor(0)
+      .setInteractive();
 
-    btnBg.on('pointerdown', () => {
-      this.botonInteractuarPresionado = true;
-      btnBg.setFillStyle(0x334433, 0.8);
+    if (this.joystick.base) this.joystick.base.setDepth(1000).setScrollFactor(0);
+    if (this.joystick.thumb) this.joystick.thumb.setDepth(1001).setScrollFactor(0);
+
+    this.scale.on('resize', (gameSize) => {
+      const w = gameSize.width;
+      const h = gameSize.height;
+
+      if (this.joystick) {
+        this.joystick.x = w * 0.15;
+        this.joystick.y = h * 0.8;
+      }
+
+      if (this._btnInteractuarBg && this._btnInteractuarTxt) {
+        this._btnInteractuarBg.setPosition(w * 0.85, h * 0.8);
+        this._btnInteractuarTxt.setPosition(w * 0.85, h * 0.8);
+      }
     });
-    btnBg.on('pointerup', () => btnBg.setFillStyle(0x000000, 0.5));
-    btnBg.on('pointerout', () => btnBg.setFillStyle(0x000000, 0.5));
 
-    try {
-      if (this.joystick.base) {
-        this.joystick.base.setDepth(1000).setScrollFactor(0).setVisible(true);
-        if (this.joystick.base.setStrokeStyle) this.joystick.base.setStrokeStyle(2, 0xffffff, 0.4);
+    const activarInteraccion = () => {
+      this.botonInteractuarPresionado = true;
+      this._btnInteractuarBg.setFillStyle(0x334433, 0.8);
+      this.time.delayedCall(100, () => {
+        this._btnInteractuarBg.setFillStyle(0x000000, 0.5);
+      });
+    };
+
+    this._btnInteractuarBg.on('pointerdown', activarInteraccion);
+    this._btnInteractuarTxt.on('pointerdown', activarInteraccion);
+
+    const restaurarBoton = () => {
+      if (this._btnInteractuarBg.active) {
+        this._btnInteractuarBg.setFillStyle(0x000000, 0.5);
       }
-      if (this.joystick.thumb) {
-        this.joystick.thumb.setDepth(1001).setScrollFactor(0).setVisible(true);
-        if (this.joystick.thumb.setStrokeStyle)
-          this.joystick.thumb.setStrokeStyle(2, 0x000000, 0.4);
-      }
-      console.log(
-        'Joystick base pos:',
-        this.joystick.base?.x,
-        this.joystick.base?.y,
-        'scene size',
-        width,
-        height,
-      );
-    } catch (e) {
-      console.warn('Error ajustando propiedades del joystick', e);
-    }
+    };
+
+    this._btnInteractuarBg.on('pointerup', restaurarBoton);
+    this._btnInteractuarBg.on('pointerout', restaurarBoton);
+    this._btnInteractuarTxt.on('pointerup', restaurarBoton);
+    this._btnInteractuarTxt.on('pointerout', restaurarBoton);
   }
 
   ocultarBotonInteractuar() {
@@ -97,7 +103,6 @@ export default class BaseScene extends Phaser.Scene {
 
   botonPantallaCompleta() {
     let teclaF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F, false);
-    // Ignorar si el foco está en un input/textarea DOM (ej: lobby code input)
     teclaF.on('down', () => {
       const tag = document.activeElement?.tagName?.toLowerCase();
       if (tag === 'input' || tag === 'textarea' || tag === 'select') return;

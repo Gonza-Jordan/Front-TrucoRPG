@@ -1,11 +1,11 @@
 @if (vistaActual === 'seleccion-heroe') {
-  <app-seleccion-personaje-historia
-    (heroeConfirmado)="alConfirmarHeroe($event)">
+  <app-seleccion-personaje-historia (heroeConfirmado)="alConfirmarHeroe($event)">
   </app-seleccion-personaje-historia>
 }
 
 @if (vistaActual === 'en-juego') {
   <div class="contenedor-juego-wrapper">
     <div id="historia-container"></div>
+    <app-historia-overlay-manager></app-historia-overlay-manager>
   </div>
 }

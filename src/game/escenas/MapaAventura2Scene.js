@@ -1,6 +1,8 @@
 import BaseScene from './BaseScene.js';
 import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
 import Portal from '../objetos/Portal.js';
+import Oponente from '../personajes/Oponente.js';
+
 
 export default class MapaAventura2Scene extends BaseScene {
     constructor() {
@@ -15,6 +17,7 @@ export default class MapaAventura2Scene extends BaseScene {
 
     preload() {
         this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
+        this.load.spritesheet('lobizon','./assets/sprites/lobizon.png',{frameWidth:32,frameHeight:32});
     }
 
     create() {
@@ -83,6 +86,9 @@ export default class MapaAventura2Scene extends BaseScene {
         //   { x: 1917, y: 323 },
         // );
         // this.physics.add.overlap(this.JugadorPrincipal, this.portalDeVuelta.zone);
+
+        this.oponente = new Oponente(this, 475, 445, 'lobizon').setDepth(0);
+        this.oponente.setScale(3);
     }
 
     update() {
