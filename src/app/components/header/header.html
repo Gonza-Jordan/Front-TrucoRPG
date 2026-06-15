@@ -5,13 +5,7 @@
       <img src="/TyM-horizontal.png" alt="Truco y maña - Logotipo" class="logo-nombre" />
     </a>
   }
-  @if (headerType() === 'home') {
-    <a routerLink="home">
-      <img src="/icon-2-sin-borde.png" alt="Truco y maña - Logo" class="logo" />
-      <img src="/TyM-horizontal.png" alt="Truco y maña - Logotipo" class="logo-nombre" />
-    </a>
-  }
-  @if (headerType() === 'registro' || headerType() === 'login' || headerType() === 'configuracion' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala' || headerType() === 'tutorial' || headerType() === 'reglas-truco' || headerType() === 'valores-carta') {
+  @if (headerType() === 'home' || headerType() === 'perfil' || headerType() === 'registro' || headerType() === 'login' || headerType() === 'configuracion' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala' || headerType() === 'tutorial' || headerType() === 'reglas-truco' || headerType() === 'valores-carta') {
     <a routerLink="home">
       <img src="/icon-2-sin-borde.png" alt="Truco y maña - Logo" class="logo" />
       <img src="/TyM-horizontal.png" alt="Truco y maña - Logotipo" class="logo-nombre" />
@@ -24,8 +18,48 @@
         <li><app-boton enlace="login">Iniciar Sesión</app-boton></li>
         <li><app-boton enlace="registro">Registrarse</app-boton></li>
       }
-      @if (headerType() === 'home' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala' || headerType() === 'tutorial'|| headerType() === 'reglas-truco' || headerType() === 'valores-carta') {
-        <li><app-boton [accion]="cerrarSesion.bind(this)">Cerrar Sesión</app-boton></li>
+
+      @if (headerType() === 'home' || headerType() === 'perfil' || headerType() === 'menu-multijugador' || headerType() === 'menu-multijugador-tradicional' || headerType() === 'menu-multijugador-tradicional-sala' || headerType() === 'tutorial' || headerType() === 'reglas-truco' || headerType() === 'valores-carta') {
+        <li class="avatar-wrapper">
+
+          <!-- Trigger -->
+          <button class="avatar-trigger" (click)="toggleDropdown($event)">
+            <span class="avatar">
+              @if (avatarUrl()) {
+                <img [src]="avatarUrl()!" class="avatar-img" alt="avatar" />
+              } @else {
+                {{ inicial() }}
+              }
+            </span>
+            <span class="avatar-nombre">{{ usuario()?.nombre }}</span>
+            <span class="chevron" [class.abierto]="dropdownAbierto()">›</span>
+          </button>
+
+          <!-- Dropdown -->
+          @if (dropdownAbierto()) {
+            <div class="dropdown" (click)="$event.stopPropagation()">
+              <div class="dropdown-header">
+                <span class="avatar avatar-lg">
+                  @if (avatarUrl()) {
+                    <img [src]="avatarUrl()!" class="avatar-img" alt="avatar" />
+                  } @else {
+                    {{ inicial() }}
+                  }
+                </span>
+                <div>
+                  <p class="dropdown-nombre">{{ usuario()?.nombre }}</p>
+                  <p class="dropdown-email">{{ usuario()?.email }}</p>
+                </div>
+              </div>
+              <div class="dropdown-sep"></div>
+              <a routerLink="/perfil" class="dropdown-item">Mi perfil</a>
+              <a routerLink="/configuracion" class="dropdown-item">Configuración</a>
+              <div class="dropdown-sep"></div>
+              <button class="dropdown-item dropdown-cerrar" (click)="cerrarSesion()">Cerrar Sesión</button>
+            </div>
+          }
+
+        </li>
       }
     </ul>
   </nav>
