@@ -60,6 +60,10 @@ export class App implements OnInit, OnDestroy {
     }
   };
 
+  solicitarPantallaCompleta(): void {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+
   private _onOrientationChange = () => {
     if (screen.orientation?.type?.includes('landscape') && !document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});

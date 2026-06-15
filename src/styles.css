@@ -56,6 +56,25 @@ body {
   text-align: center;
 }
 
+.rotate-fullscreen-btn {
+  margin-top: 8px;
+  padding: 10px 22px;
+  font-family: 'VT323', monospace, sans-serif;
+  font-size: 20px;
+  color: #ffdd44;
+  background: transparent;
+  border: 2px solid #ffdd44;
+  border-radius: 6px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.rotate-fullscreen-btn:active {
+  background: #ffdd44;
+  color: #080604;
+}
+
 @keyframes rotateDeviceHint {
 
   0%,
