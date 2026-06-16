@@ -245,24 +245,76 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     return `assets/cards/${offsetPalo[carta.palo] + mapaNumeros[carta.numero]}.PNG`;
   }
 
+  // ── Delay "la máquina piensa" (compartido con 2v2/3v3 vía cfg_delay) ────────
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /** Delay (ms) configurable desde Configuración ("Delay de juego"). */
+  private get delayMaquinaMs(): number {
+    const raw = localStorage.getItem('cfg_delay');
+    if (raw == null) return 1200; // default si nunca se configuró
+    const v = Number(raw);
+    return Number.isFinite(v) && v >= 0 ? v : 1200;
+  }
+
+  /** Acciones tras las cuales la máquina juega/responde → conviene simular que "piensa". */
+  private readonly ENDPOINTS_PENSAR = new Set([
+    'jugar-carta', 'cantar-envido', 'cantar-envido-tipo', 'responder-envido',
+    'son-buenas', 'cantar-truco', 'responder-truco', 'escalar-truco',
+  ]);
+
   // ── API ───────────────────────────────────────────────────────────────────
   async call(endpoint: string, body: object): Promise<void> {
     if (this.loading) return;
     this.loading = true;
+
+    const pensar = this.ENDPOINTS_PENSAR.has(endpoint);
+    // Tu carta aparece al instante en la mesa; la máquina "piensa" antes de mostrar su jugada.
+    if (endpoint === 'jugar-carta') this.colocarCartaHumanoOptimista(body);
+
     try {
       const data = await firstValueFrom(
         this.http.post<ManoState>(`${API}/${endpoint}`, body)
       );
+      // Pausa que simula a la máquina pensando antes de revelar su jugada/respuesta.
+      if (pensar) await this.delay(this.delayMaquinaMs);
       this.mano = data;
       this.updateEventosHabilidad(data);
       this.updateUI(data);
     } catch (err: any) {
       const msg = (typeof err?.error === 'string' ? err.error : null) ?? err?.error?.message ?? err?.message ?? String(err);
       this.showToast(`Error en ${endpoint}: ${msg}`);
+      // Deshacer la jugada optimista: re-renderizar desde el último estado válido.
+      if (this.mano) this.updateUI(this.mano);
     } finally {
       this.loading = false;
       this.cdr.markForCheck();
     }
+  }
+
+  /**
+   * Coloca la carta que el humano acaba de jugar en la mesa de inmediato (sin esperar
+   * al backend), para que su propia jugada no se sienta lenta durante el delay.
+   * El estado autoritativo del backend se aplica después y reemplaza esta vista.
+   */
+  private colocarCartaHumanoOptimista(body: any): void {
+    const m = this.mano;
+    if (!m) return;
+
+    const idxHand = this.misCarts.findIndex(
+      mc => mc.carta?.numero === body?.numero && mc.carta?.palo === body?.palo
+    );
+    if (idxHand < 0) return;
+    const carta = this.misCarts[idxHand].carta;
+
+    this.misCarts = this.misCarts.map((mc, i) => i === idxHand ? { ...mc, visible: false } : mc);
+
+    const slotIdx = m.bazas?.length ?? 0;
+    if (carta && slotIdx >= 0 && slotIdx < this.slots.length) {
+      this.slots = this.slots.map((s, i) => i === slotIdx ? { ...s, jugador: carta, pending: true } : s);
+    }
+    this.cdr.markForCheck();
   }
 
   // Acumula los eventos de habilidad en el log
