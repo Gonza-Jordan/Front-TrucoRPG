@@ -1,8 +1,8 @@
 export const PERSONAJES = [
     { id: 0, nombrePersonaje: 'Primero', spriteKey: 'personaje1', img:'/Imagenes/avatares/personaje1.png' },
-    { id: 1, nombrePersonaje: 'Segundo', spriteKey: 'personaje', img:'/Imagenes/avatares/personaje2.png'},
+    { id: 1, nombrePersonaje: 'Segundo', spriteKey: 'personaje2', img:'/Imagenes/avatares/personaje2.png'},
     { id: 2, nombrePersonaje: 'Tercero', spriteKey: 'personaje1', img:'/Imagenes/avatares/personaje1.png'},
-    { id: 3, nombrePersonaje: 'Cuarto', spriteKey: 'personaje', img:'/Imagenes/avatares/personaje2.png'}
+    { id: 3, nombrePersonaje: 'Cuarto', spriteKey: 'personaje2', img:'/Imagenes/avatares/personaje2.png'}
 ];
 
 export function personajePorId(id) {

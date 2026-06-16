@@ -1,6 +1,6 @@
 @if (vistaActiva !== null) {
   <div class="contenedor-overlay-principal">
-    <div class="contenedor-modal">
+    <div class="contenedor-modal" [class.modal-ancho]="vistaActiva === 'partida-solo'">
       @switch (vistaActiva) {
         @case ('multijugador') {
           <app-menu-multijugador></app-menu-multijugador>
