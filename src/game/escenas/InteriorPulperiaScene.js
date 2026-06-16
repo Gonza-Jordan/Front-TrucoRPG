@@ -2,6 +2,7 @@ import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
 import BaseScene from './BaseScene.js';
 import Npc from '../personajes/Npc.js';
 import Tutorial from '../objetos/Tutorial.js';
+import Portal from '../objetos/Portal.js';
 
 export default class InteriorPulperiaScene extends BaseScene {
   constructor() {
@@ -57,6 +58,7 @@ export default class InteriorPulperiaScene extends BaseScene {
 
     this.JugadorPrincipal.setScale(1.8);
     this.keys = this.input.keyboard.createCursorKeys();
+    this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
     this.npc = new Npc(this, 536, 272, 'personaje').setDepth(1);
 
@@ -84,6 +86,9 @@ export default class InteriorPulperiaScene extends BaseScene {
     //mientras lo guardamos en el localStorage, después tendríamos que mandarlo a la base de datos!!!!!!!!!
     this.tutorial = new Tutorial(this, 'tutorial_pulperia_v1', pasosPulperia, true);
     this.tutorial.iniciar();
+
+    this.salirAfuera = new Portal(this, 644, 656, 'MapaPrincipal', false, { x: 1600, y: 170 });
+    this.physics.add.overlap(this.JugadorPrincipal, this.salirAfuera.zone);
   }
 
   update() {
@@ -91,6 +96,8 @@ export default class InteriorPulperiaScene extends BaseScene {
       this.tutorial.update();
     } else {
       this.JugadorPrincipal.update(this.keys, this.teclaE);
+
+      const interactuoMobile = this.botonInteractuarPresionado;
 
       const seMueve =
         this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
@@ -102,6 +109,10 @@ export default class InteriorPulperiaScene extends BaseScene {
         );
         this.estabaMoviendose = false;
       }
+
+      this.salirAfuera.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+
+      this.botonInteractuarPresionado = false;
     }
   }
 }

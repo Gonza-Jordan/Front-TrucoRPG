@@ -72,9 +72,6 @@ export default class InteriorCasaScene extends BaseScene {
       punto.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
     });
 
-    const seMueve =
-      this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
-
     this.salirAfuera.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
 
     this.botonInteractuarPresionado = false;

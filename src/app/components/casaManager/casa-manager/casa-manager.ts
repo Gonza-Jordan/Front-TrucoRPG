@@ -1,25 +1,25 @@
-import { Component, OnInit, HostListener, ChangeDetectorRef } from '@angular/core';
-import { GameUiService } from '../../../services/historia-overlay/overlay-config';
-import { TiendaOverlayComponent } from '../../overlays/tienda-overlay/tienda-overlay';
+import { Component,OnInit, HostListener, ChangeDetectorRef } from '@angular/core';
+import { GameUiService } from '../../../services/casaOverlay/casa-overlay-config';
 import { InventarioOverlay } from '../../overlays/inventario-overlay/inventario-overlay';
 import { LogrosOverlay } from '../../overlays/logros-overlay/logros-overlay';
 import { ArmarioOverlay } from '../../overlays/armario-overlay/armario-overlay';
+import { config } from 'rxjs';
 
 @Component({
-  selector: 'app-historia-overlay-manager',
+  selector: 'app-casa-manager',
   standalone: true,
-  imports: [TiendaOverlayComponent, InventarioOverlay, LogrosOverlay, ArmarioOverlay], 
-  templateUrl: './historia-overlay-manager-component.html',
-  styleUrls: ['./historia-overlay-manager-component.css']
+  imports: [InventarioOverlay, LogrosOverlay, ArmarioOverlay],
+  templateUrl: './casa-manager.html',
+  styleUrl: './casa-manager.css',
 })
-export class HistoriaOverlayManagerComponent implements OnInit {
+export class CasaManager implements OnInit{
   vistaActiva: any = null;
   datosRecibidos: any = null;
 
   constructor(private uiService: GameUiService, private cdr: ChangeDetectorRef) {}
 
-  ngOnInit() {
-    this.uiService.overlayState$.subscribe(config => {
+  ngOnInit(): void {
+    this.uiService.estadoOverlay$.subscribe(config => {
       this.vistaActiva = config.tipoVista;
       this.datosRecibidos = config.datos;
       this.cdr.detectChanges();
@@ -36,4 +36,5 @@ export class HistoriaOverlayManagerComponent implements OnInit {
     this.uiService.cerrarOverlay();
     window.dispatchEvent(new CustomEvent('resume-game'));
   }
+
 }
