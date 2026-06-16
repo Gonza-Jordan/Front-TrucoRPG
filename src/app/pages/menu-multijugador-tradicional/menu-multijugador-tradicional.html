@@ -86,7 +86,10 @@
             <li class="sala-item">
               <div class="sala-info">
                 <span class="sala-codigo">{{ s.codigo }}</span>
-                <span class="sala-estado">Esperando rival ({{ s.jugadores }}/{{ s.maxJugadores }})</span>
+                <span class="sala-estado">
+                  {{ gameMode === '1v1' ? 'Esperando rival' : 'Esperando jugadores' }}
+                  ({{ s.jugadores }}/{{ s.maxJugadores }})
+                </span>
               </div>
               <button class="boton-unirse sala-unir" (click)="unirseASalaDisponible(s.codigo)" [disabled]="cargando">
                 UNIRSE
