@@ -19,21 +19,6 @@ export class Camara implements AfterViewInit, OnDestroy {
   // Se implementan mecanismos de estabilidad temporal para evitar falsos positivos (ej. requerir que un guiño se mantenga por 700ms).
   // El componente también incluye calibración automática al iniciar la cámara para adaptarse a diferentes rostros y condiciones de iluminación.
 
-  //PRIMERO DEFINIMOS QUE ES UN GUIÑO IZQUIEDO
-  async toggleCamera() {
-    const eyeBlinkLeft = 0.9; // Simulación de un valor de parpadeo del ojo izquierdo
-    const eyeBlinkRight = 0.1; // Simulación de un valor de parpadeo del ojo derecho
-      if (
-      eyeBlinkLeft > 0.8 &&
-      eyeBlinkRight < 0.2
-    ) {
-      console.log("Guiño izquierdo");
-    }
-  }
-
-}
-
-/*
   @ViewChild('videoElement', { static: false }) videoRef?: ElementRef<HTMLVideoElement>;
   @ViewChild('canvasElement', { static: false }) canvasRef?: ElementRef<HTMLCanvasElement>;
 
@@ -41,6 +26,7 @@ export class Camara implements AfterViewInit, OnDestroy {
   cameraStatus = 'Cámara apagada';
   expressionLabel = 'Ninguna';
   expressionTranslation = '...';
+
 
   private detector?: FaceLandmarksDetector;
   private rafId?: number;
@@ -61,17 +47,30 @@ export class Camara implements AfterViewInit, OnDestroy {
     // Listo para iniciar cuando el usuario presione el botón.
   }
 
-  ngOnDestroy() {
-    this.stopCamera();
-  }
+  //PRIMERO DEFINIMOS QUE ES UN GUIÑO IZQUIEDO
 
   async toggleCamera() {
     if (this.cameraOn) {
       this.stopCamera();
       return;
     }
-
     await this.startCamera();
+
+  }
+
+  async GuiñoIzquierdo() {
+    const eyeBlinkLeft = 0.9; // Simulación de un valor de parpadeo del ojo izquierdo
+    const eyeBlinkRight = 0.1; // Simulación de un valor de parpadeo del ojo derecho
+      if (
+      eyeBlinkLeft > 0.8 &&
+      eyeBlinkRight < 0.2
+    ) {
+      console.log("Guiño izquierdo");
+    }
+  }
+
+  ngOnDestroy() {
+    this.stopCamera();
   }
 
   private async startCamera() {
@@ -177,6 +176,68 @@ export class Camara implements AfterViewInit, OnDestroy {
     }
   }
 
+  private async calibrateBaseline() {
+    if (!this.detector || !this.videoRef?.nativeElement || !this.canvasRef?.nativeElement) return;
+    const video = this.videoRef.nativeElement;
+    const canvas = this.canvasRef.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const samples = 30;
+    let sumMouthWidth = 0;
+    let sumMouthHeight = 0;
+    let sumBrowEye = 0;
+    let sumEyeOpenNorm = 0;
+    let valid = 0;
+
+    for (let i = 0; i < samples; i++) {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      try {
+        const faces = await this.detector.estimateFaces(this.canvasRef!.nativeElement, { flipHorizontal: true });
+        if (faces && faces.length > 0) {
+          const face = faces[0];
+          const get = (index: number) => face.keypoints[index];
+          const distance = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(a.x - b.x, a.y - b.y);
+          const mouthLeft = get(61);
+          const mouthRight = get(291);
+          const mouthTop = get(13);
+          const mouthBottom = get(14);
+          const mouthWidth = distance(mouthLeft, mouthRight);
+          const mouthHeight = distance(mouthTop, mouthBottom);
+          const leftBrow = get(70);
+          const rightBrow = get(300);
+          const leftEyeCenter = { x: (get(33).x + get(133).x) / 2, y: (get(159).y + get(145).y) / 2 };
+          const rightEyeCenter = { x: (get(362).x + get(263).x) / 2, y: (get(386).y + get(374).y) / 2 };
+          const browEyeDistance = (distance(leftBrow, leftEyeCenter) + distance(rightBrow, rightEyeCenter)) / 2;
+          const leftEyeTop = get(159);
+          const leftEyeBottom = get(145);
+          const rightEyeTop = get(386);
+          const rightEyeBottom = get(374);
+          const leftEyeHeight = distance(leftEyeTop, leftEyeBottom);
+          const rightEyeHeight = distance(rightEyeTop, rightEyeBottom);
+          const faceWidth = distance(get(33), get(263));
+
+          sumMouthWidth += mouthWidth;
+          sumMouthHeight += mouthHeight;
+          sumBrowEye += browEyeDistance;
+          sumEyeOpenNorm += (leftEyeHeight + rightEyeHeight) / 2 / Math.max(faceWidth, 1);
+          valid++;
+        }
+      } catch (e) {
+        // ignore
+      }
+      await new Promise((r) => setTimeout(r, 33));
+    }
+
+    if (valid > 0) {
+      this.baselineMouthWidth = sumMouthWidth / valid;
+      this.baselineMouthHeight = sumMouthHeight / valid;
+      this.baselineBrowEyeDistance = sumBrowEye / valid;
+      this.baselineEyeOpen = sumEyeOpenNorm / valid;
+      this.baselineInitialized = true;
+    }
+  }
+
   private runDetection = async () => {
     if (!this.cameraOn || !this.detector || !this.videoRef?.nativeElement || !this.canvasRef?.nativeElement) {
       return;
@@ -274,13 +335,13 @@ export class Camara implements AfterViewInit, OnDestroy {
     this.rafId = requestAnimationFrame(this.runDetection);
   };
 
-  private drawFace(ctx: CanvasRenderingContext2D, face: Face) {
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.8)';
+    private drawFace(ctx: CanvasRenderingContext2D, face: Face) {
+    ctx.strokeStyle = 'rgba(65, 44, 158, 0.8)';
     ctx.lineWidth = 2;
     for (const point of face.keypoints) {
       ctx.beginPath();
       ctx.arc(point.x, point.y, 1.5, 0, 2 * Math.PI);
-      ctx.fillStyle = 'rgba(255, 215, 0, 0.7)';
+      ctx.fillStyle = 'rgba(65, 44, 158, 0.8)';
       ctx.fill();
     }
   }
@@ -433,65 +494,104 @@ export class Camara implements AfterViewInit, OnDestroy {
     this.pendingLabelStart = undefined;
   }
 
-  private async calibrateBaseline() {
-    if (!this.detector || !this.videoRef?.nativeElement || !this.canvasRef?.nativeElement) return;
-    const video = this.videoRef.nativeElement;
-    const canvas = this.canvasRef.nativeElement;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
 
-    const samples = 30;
-    let sumMouthWidth = 0;
-    let sumMouthHeight = 0;
-    let sumBrowEye = 0;
-    let sumEyeOpenNorm = 0;
-    let valid = 0;
 
-    for (let i = 0; i < samples; i++) {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      try {
-        const faces = await this.detector.estimateFaces(this.canvasRef!.nativeElement, { flipHorizontal: true });
-        if (faces && faces.length > 0) {
-          const face = faces[0];
-          const get = (index: number) => face.keypoints[index];
-          const distance = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(a.x - b.x, a.y - b.y);
-          const mouthLeft = get(61);
-          const mouthRight = get(291);
-          const mouthTop = get(13);
-          const mouthBottom = get(14);
-          const mouthWidth = distance(mouthLeft, mouthRight);
-          const mouthHeight = distance(mouthTop, mouthBottom);
-          const leftBrow = get(70);
-          const rightBrow = get(300);
-          const leftEyeCenter = { x: (get(33).x + get(133).x) / 2, y: (get(159).y + get(145).y) / 2 };
-          const rightEyeCenter = { x: (get(362).x + get(263).x) / 2, y: (get(386).y + get(374).y) / 2 };
-          const browEyeDistance = (distance(leftBrow, leftEyeCenter) + distance(rightBrow, rightEyeCenter)) / 2;
-          const leftEyeTop = get(159);
-          const leftEyeBottom = get(145);
-          const rightEyeTop = get(386);
-          const rightEyeBottom = get(374);
-          const leftEyeHeight = distance(leftEyeTop, leftEyeBottom);
-          const rightEyeHeight = distance(rightEyeTop, rightEyeBottom);
-          const faceWidth = distance(get(33), get(263));
+}
 
-          sumMouthWidth += mouthWidth;
-          sumMouthHeight += mouthHeight;
-          sumBrowEye += browEyeDistance;
-          sumEyeOpenNorm += (leftEyeHeight + rightEyeHeight) / 2 / Math.max(faceWidth, 1);
-          valid++;
-        }
-      } catch (e) {
-        // ignore
-      }
-      await new Promise((r) => setTimeout(r, 33));
+/*
+
+
+
+
+
+  private async startCamera() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      this.cameraStatus = 'Este navegador no soporta cámara.';
+      return;
     }
 
-    if (valid > 0) {
-      this.baselineMouthWidth = sumMouthWidth / valid;
-      this.baselineMouthHeight = sumMouthHeight / valid;
-      this.baselineBrowEyeDistance = sumBrowEye / valid;
-      this.baselineEyeOpen = sumEyeOpenNorm / valid;
-      this.baselineInitialized = true;
+    this.cameraStatus = 'Solicitando acceso a la cámara...';
+
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false,
+      });
+
+      const video = this.videoRef?.nativeElement;
+      if (!video) {
+        this.cameraStatus = 'No se encontró el elemento de video.';
+        return;
+      }
+
+      video.srcObject = this.stream;
+      await video.play();
+
+      // Esperar a que el video tenga dimensiones válidas antes de crear el detector
+      await new Promise<void>((resolve) => {
+        if (video.readyState >= 2 && video.videoWidth && video.videoHeight) {
+          resolve();
+          return;
+        }
+        const onLoaded = () => {
+          video.removeEventListener('loadeddata', onLoaded);
+          resolve();
+        };
+        video.addEventListener('loadeddata', onLoaded);
+        // Fallback por si el evento no se dispara
+        setTimeout(() => resolve(), 1200);
+      });
+
+      // Inicializar tamaño del canvas con las dimensiones del video
+      if (this.canvasRef?.nativeElement) {
+        const canvas = this.canvasRef.nativeElement;
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+      }
+
+      await tf.ready();
+      // Try to use WebGL backend for better performance and detection reliability
+      try {
+        await tf.setBackend && (await tf.setBackend('webgl'));
+        await tf.ready();
+      } catch (e) {
+        // ignore webgl backend failures silently
+      }
+
+      this.detector = await faceLandmarksDetection.createDetector(
+        faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh,
+        {
+          runtime: 'tfjs',
+          maxFaces: 1,
+          refineLandmarks: false,
+        }
+      );
+
+      // calibrar baseline para evitar falsos positivos (muestra ~30 frames ~1s)
+      try {
+        await this.calibrateBaseline();
+      } catch (e) {
+        // ignore calibration failures
+      }
+
+      this.cameraOn = true;
+      this.cameraStatus = 'Cámara activa. Detectando...';
+      this.runDetection();
+    } catch (error) {
+      console.error(error);
+      this.cameraStatus = 'Error al iniciar la cámara.';
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
   */
