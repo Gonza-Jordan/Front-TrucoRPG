@@ -7,12 +7,14 @@ export default class PuntoInteraccion {
    * @param {number} y
    * @param {string} tipoVista
    * @param {string|null|undefined} texturaSprite
+   * @param {number|null|undefined} scaleTextura
    * @param {Object|undefined} datosExtra
    */
 
-  constructor(escena, x, y, tipoVista, texturaSprite, datosExtra = {}) {
+  constructor(escena, x, y, tipoVista, texturaSprite, scaleTextura = 1, datosExtra = {}) {
     this.escena = escena;
     this.tipoVista = tipoVista;
+    this.scaleTextura = scaleTextura;
     this.datosExtra = datosExtra;
     this.cercaDelObjeto = false;
 
@@ -21,7 +23,7 @@ export default class PuntoInteraccion {
       texturaSprite.trim() !== '' &&
       texturaSprite !== 'false'
     ) {
-      this.sprite = this.escena.add.image(x, y, texturaSprite).setScale(0.8).setDepth(0);
+      this.sprite = this.escena.add.image(x, y, texturaSprite).setScale(scaleTextura).setDepth(0);
     }
 
     this.zone = this.escena.add.zone(x, y, 24, 24);

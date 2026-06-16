@@ -23,7 +23,7 @@ export default class InteriorCasaScene extends BaseScene {
     this.cameras.main.fadeIn(1000, 0, 0, 0);
 
     const map = this.make.tilemap({ key: 'mapa-casa' });
-    const paredesTileset = map.addTilesetImage('Paredes', 'Paredes');
+    const paredesTileset = map.addTilesetImage('Paredes', 'ParedesCasa');
     const interiorCasaTileset = map.addTilesetImage('InteriorCasa', 'InteriorCasa');
 
     map.createLayer('Base', interiorCasaTileset);

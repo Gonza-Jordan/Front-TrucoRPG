@@ -83,7 +83,7 @@ export default class MapaPrincipalScene extends BaseScene {
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.startFollow(this.JugadorPrincipal, true, 0.1, 0.1);
 
-    this.JugadorPrincipal.setScale(1.5);
+    this.JugadorPrincipal.setScale(1.3);
 
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
@@ -92,8 +92,8 @@ export default class MapaPrincipalScene extends BaseScene {
     this.physics.add.overlap(this.JugadorPrincipal, this.portalACasa.zone);
 
     this.portalAPulperia = new Portal(this, 1603, 163, 'InteriorPulperiaScene', false, {
-      x: 621,
-      y: 64,
+      x: 627,
+      y: 640,
     });
     this.physics.add.overlap(this.JugadorPrincipal, this.portalAPulperia.zone);
 
