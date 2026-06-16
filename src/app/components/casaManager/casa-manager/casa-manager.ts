@@ -3,7 +3,6 @@ import { GameUiService } from '../../../services/casaOverlay/casa-overlay-config
 import { InventarioOverlay } from '../../overlays/inventario-overlay/inventario-overlay';
 import { LogrosOverlay } from '../../overlays/logros-overlay/logros-overlay';
 import { ArmarioOverlay } from '../../overlays/armario-overlay/armario-overlay';
-import { config } from 'rxjs';
 
 @Component({
   selector: 'app-casa-manager',

@@ -3,6 +3,7 @@ import BaseScene from './BaseScene.js';
 import Npc from '../personajes/Npc.js';
 import Tutorial from '../objetos/Tutorial.js';
 import Portal from '../objetos/Portal.js';
+import PuntoInteraccion from '../objetos/PuntoInteraccion.js';
 
 export default class InteriorPulperiaScene extends BaseScene {
   constructor() {
@@ -89,6 +90,12 @@ export default class InteriorPulperiaScene extends BaseScene {
 
     this.salirAfuera = new Portal(this, 644, 656, 'MapaPrincipal', false, { x: 1600, y: 170 });
     this.physics.add.overlap(this.JugadorPrincipal, this.salirAfuera.zone);
+
+    this.puntosDeInteraccion = [];
+
+    this.puntosDeInteraccion.push(new PuntoInteraccion(this, 500, 290, 'tienda', false, {}));
+
+    this.puntosDeInteraccion.push(new PuntoInteraccion(this, 1600, 180, 'partida-solo', false, {}));
   }
 
   update() {
@@ -109,6 +116,10 @@ export default class InteriorPulperiaScene extends BaseScene {
         );
         this.estabaMoviendose = false;
       }
+
+      this.puntosDeInteraccion.forEach((punto) => {
+        punto.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+      });
 
       this.salirAfuera.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
 

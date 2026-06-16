@@ -3,11 +3,12 @@ import { CommonModule, DOCUMENT } from '@angular/common'; // Importamos DOCUMENT
 import { SeleccionPersonajeHistoria } from '../../../pages/seleccion-personaje-historia/seleccion-personaje-historia';
 import { HistoriaService } from '../../../services/historia/historia-service';
 import { CasaManager } from '../../casaManager/casa-manager/casa-manager';
+import { PulperiaManager } from '../../pulperiaManager/pulperia-manager/pulperia-manager';
 
 @Component({
   selector: 'app-historia',
   standalone: true,
-  imports: [CommonModule, SeleccionPersonajeHistoria, CasaManager],
+  imports: [CommonModule, SeleccionPersonajeHistoria, CasaManager,PulperiaManager],
   templateUrl: './historia.html',
   styleUrl: './historia.css',
 })

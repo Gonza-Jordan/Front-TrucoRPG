@@ -1,0 +1,26 @@
+@if (vistaActiva !== null) {
+  <div class="contenedor-overlay-principal">
+    <div class="contenedor-modal">
+      @switch (vistaActiva) {
+
+        @case ('multijugador') {
+          <app-menu-multijugador></app-menu-multijugador>
+        }
+
+        @case ('partida-solo') {
+          <app-partida-solo></app-partida-solo>
+        }
+
+        @case ('tienda') {
+          <app-tienda-overlay></app-tienda-overlay>
+        }
+
+        @default {
+          <p>Error D:</p>
+        }
+      }
+
+      <div class="botonCerrar" (click)="cerrar()">VOLVER</div>
+    </div>
+  </div>
+}
