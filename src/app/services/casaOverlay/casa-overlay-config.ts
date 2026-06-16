@@ -9,7 +9,7 @@ export interface CasaOverlayConfig {
 @Injectable({
   providedIn: 'root',
 })
-export class GameUiService {
+export class CasaUiService {
 
   private fuenteOverlay = new BehaviorSubject<CasaOverlayConfig>({ tipoVista: null});
   estadoOverlay$ = this.fuenteOverlay.asObservable();

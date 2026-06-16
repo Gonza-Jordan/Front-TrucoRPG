@@ -1,21 +1,24 @@
 import { Component, OnInit, HostListener, ChangeDetectorRef } from '@angular/core';
-import { GameUiService } from '../../../services/pulperiaOverlay/pulperia-overlay-config';
+import { PulperiaUiService } from '../../../services/pulperiaOverlay/pulperia-overlay-config';
 import { MenuMultijugador } from '../../../pages/menu-multijugador/menu-multijugador';
 import { TiendaOverlayComponent } from '../../overlays/tienda-overlay/tienda-overlay';
 import { PartidaSoloComponent } from '../../juego/partida-solo/partida-solo';
 
 @Component({
   selector: 'app-pulperia-manager',
-  imports: [MenuMultijugador,PartidaSoloComponent,TiendaOverlayComponent],
+  standalone: true,
+  imports: [MenuMultijugador, PartidaSoloComponent, TiendaOverlayComponent],
   templateUrl: './pulperia-manager.html',
   styleUrl: './pulperia-manager.css',
 })
 export class PulperiaManager implements OnInit {
-  vistaActiva: any = null;
+  vistaActiva: 'tienda' | 'partida-solo' | 'multijugador' | null = null;
   datosRecibidos: any = null;
 
+  private vistasValidas = ['tienda', 'partida-solo', 'multijugador'];
+
   constructor(
-    private uiService: GameUiService,
+    private uiService: PulperiaUiService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -30,7 +33,16 @@ export class PulperiaManager implements OnInit {
   @HostListener('window:game-interact', ['$event'])
   onGameInteract(event: Event) {
     const customEvent = event as CustomEvent;
-    this.uiService.abrirOverlay(customEvent.detail.vista, customEvent.detail.datos);
+    const vista = customEvent.detail.vista;
+
+    if (!this.vistasValidas.includes(vista)) {
+      return;
+    }
+
+    this.uiService.abrirOverlay(
+      vista as 'tienda' | 'partida-solo' | 'multijugador',
+      customEvent.detail.datos,
+    );
   }
 
   cerrar() {

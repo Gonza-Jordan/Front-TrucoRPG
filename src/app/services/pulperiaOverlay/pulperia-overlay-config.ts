@@ -9,7 +9,7 @@ export interface PulperiaOverlayConfig {
 @Injectable({
   providedIn: 'root',
 })
-export class GameUiService {
+export class PulperiaUiService {
 
   private fuenteOverlay = new BehaviorSubject<PulperiaOverlayConfig>({ tipoVista: null});
     estadoOverlay$ = this.fuenteOverlay.asObservable();
