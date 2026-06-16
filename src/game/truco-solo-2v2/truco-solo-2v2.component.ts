@@ -136,6 +136,7 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
   mostrarConfirmSalir = false;
   mostrarAcciones = false;
   toastMsg = '';
+  toastTipo: 'error' | 'info' = 'error';
   gameOver = false;
   gameOverGanamos = false;
 
@@ -203,7 +204,13 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
       this.showToast('La mano ha sido terminada.');
       return;
     }
-    if (this.mano.turnoActual !== 'J1') return;
+    if (this.mano.trucoPendienteRespuestaDe === 'J1' ||
+        (this.mano.envidoPendienteRespuestaDe === 'J1' &&
+         (this.mano.faseEnvido === 'pendiente_respuesta' || this.mano.faseEnvido === 'declarando_tantos'))) {
+      this.showToast('No podés jugar: primero respondé el canto.', 'info');
+      return;
+    }
+    if (this.mano.turnoActual !== 'J1') { this.showToast('Esperá tu turno para jugar.', 'info'); return; }
     await this.call('jugar-carta', { manoId: this.mano.id, numero: carta.numero, palo: carta.palo });
   }
 
@@ -812,10 +819,11 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     this.mostrarDialogo(jugadorId, respuesta, 3600);
   }
 
-  private showToast(msg: string): void {
-    this.toastMsg = msg;
+  private showToast(msg: string, tipo: 'error' | 'info' = 'error'): void {
+    this.toastMsg  = msg;
+    this.toastTipo = tipo;
     this.cdr.markForCheck();
     if (this.toastTimer) clearTimeout(this.toastTimer);
-    this.toastTimer = setTimeout(() => { this.toastMsg = ''; this.cdr.markForCheck(); }, 4000);
+    this.toastTimer = setTimeout(() => { this.toastMsg = ''; this.cdr.markForCheck(); }, tipo === 'info' ? 2600 : 4000);
   }
 }

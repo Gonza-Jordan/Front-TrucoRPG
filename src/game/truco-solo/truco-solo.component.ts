@@ -182,6 +182,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   gameOver    = false;
   gameOverWon = false;
   toastMsg    = '';
+  toastTipo: 'error' | 'info' = 'error';
 
   readonly fanAngles = FAN_ANGLES;
   readonly fanXOff   = FAN_X;
@@ -357,6 +358,18 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       };
       this.misCarts = this.misCarts.map(mc => ({ ...mc, seleccionada: false }));
       this.call('activar-habilidad', body);
+      return;
+    }
+
+    // No podés jugar una carta si hay un canto de la máquina sin responder.
+    if (this.mano.trucoPendienteRespuestaHumano || this.mano.envidoPendienteRespuestaHumano) {
+      this.showToast('No podés jugar: primero respondé el canto.', 'info');
+      return;
+    }
+
+    // Tampoco si todavía no es tu turno.
+    if (this.mano.turnoActual === 'Maquina' && !this.mano.cartaMaquinaEnMesa) {
+      this.showToast('Esperá tu turno para jugar.', 'info');
       return;
     }
 
@@ -663,15 +676,16 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ── Toast ─────────────────────────────────────────────────────────────────
-  private showToast(msg: string): void {
+  private showToast(msg: string, tipo: 'error' | 'info' = 'error'): void {
     if (this.toastTimer) { clearTimeout(this.toastTimer); this.toastTimer = null; }
-    this.toastMsg = msg;
+    this.toastMsg  = msg;
+    this.toastTipo = tipo;
     this.cdr.markForCheck();
     this.toastTimer = setTimeout(() => {
       this.toastMsg = '';
       this.toastTimer = null;
       this.cdr.markForCheck();
-    }, 4000);
+    }, tipo === 'info' ? 2600 : 4000);
   }
 
   // ── Botones ───────────────────────────────────────────────────────────────

@@ -716,6 +716,23 @@
   animation: toastIn 0.2s ease;
 }
 
+/* Aviso amigable (reglas del juego) — lado izquierdo, tono cálido en vez de error rojo. */
+.toast.toast-info {
+  left: 18px;
+  transform: none;
+  background: #14331a;
+  border-color: #4a8a3a;
+  color: #c8efc0;
+  max-width: 230px;
+  text-align: center;
+  animation: toastInLeft 0.2s ease;
+}
+
+@keyframes toastInLeft {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .nueva-mano-countdown {
   position: absolute;
   bottom: 18px;
