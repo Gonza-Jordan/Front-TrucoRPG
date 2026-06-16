@@ -3,7 +3,7 @@ import { GameComponent } from './game/game.component';
 import { RegistroComponent } from './auth/registro/registro.component';
 import { LoginComponent } from './auth/login/login.component';
 import { Home } from './pages/home/home';
-import { Camara } from './pages/camara/camara';
+import { Camara } from './pages/camara/Intento con TensorFlow/camara';
 import { LandingPage } from './pages/landing-page/landing-page';
 import { ConfiguracionComponent } from './pages/configuracion/configuracion';
 import { MenuMultijugador } from './pages/menu-multijugador/menu-multijugador';
