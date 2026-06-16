@@ -43,6 +43,8 @@ export default class BootScene extends Phaser.Scene {
         });
         dummy.setVisible(false);
 
-        this.scene.start('CharacterScene');
+        // CharacterScene/WeaponScene fueron removidas: la selección previa la maneja la app
+        // Angular, así que Phaser arranca directo en la selección de modo/héroe.
+        this.scene.start('HeroSelectScene');
     }
 }

@@ -27,6 +27,13 @@ export interface LobbyListos {
   requeridos: number;
 }
 
+export interface SalaPublicaInfo {
+  codigo: string;
+  modo: string;
+  jugadores: number;
+  maxJugadores: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SalaService {
   private hub: signalR.HubConnection;
@@ -121,10 +128,15 @@ export class SalaService {
     await this.hub.start();
   }
 
-  async crearSala(modo: '1v1' | '2v2' | '3v3' = '1v1'): Promise<string> {
-    const codigo = await this.hub.invoke<string>('CrearSala', modo);
+  async crearSala(modo: '1v1' | '2v2' | '3v3' = '1v1', publica = false): Promise<string> {
+    const codigo = await this.hub.invoke<string>('CrearSala', modo, publica);
     this.codigoSala$.next(codigo);
     return codigo;
+  }
+
+  /** Lista las salas públicas con lugar disponible para el modo dado. */
+  async listarSalasPublicas(modo: '1v1' | '2v2' | '3v3' = '1v1'): Promise<SalaPublicaInfo[]> {
+    return await this.hub.invoke<SalaPublicaInfo[]>('ListarSalasPublicas', modo);
   }
 
   async unirseASala(codigo: string): Promise<boolean> {
