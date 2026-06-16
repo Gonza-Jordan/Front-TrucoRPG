@@ -23,7 +23,7 @@ export default class InteriorCasaScene extends BaseScene {
     this.cameras.main.fadeIn(1000, 0, 0, 0);
 
     const map = this.make.tilemap({ key: 'mapa-casa' });
-    const paredesTileset = map.addTilesetImage('Paredes', 'Paredes');
+    const paredesTileset = map.addTilesetImage('Paredes', 'ParedesCasa');
     const interiorCasaTileset = map.addTilesetImage('InteriorCasa', 'InteriorCasa');
 
     map.createLayer('Base', interiorCasaTileset);
@@ -43,7 +43,7 @@ export default class InteriorCasaScene extends BaseScene {
 
     this.JugadorPrincipal.setCollideWorldBounds(true);
     this.physics.add.collider(this.JugadorPrincipal, colisiones);
-    this.JugadorPrincipal.setScale(2.4);
+    this.JugadorPrincipal.setScale(2.5);
 
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
@@ -71,9 +71,6 @@ export default class InteriorCasaScene extends BaseScene {
     this.puntosDeInteraccion.forEach((punto) => {
       punto.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
     });
-
-    const seMueve =
-      this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
 
     this.salirAfuera.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
 
