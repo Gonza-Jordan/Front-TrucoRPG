@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Reglas } from '../interfaces/reglas';
 import { Cartas } from '../interfaces/cartas';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -13,13 +14,13 @@ export class TutorialService {
 
   obtenerReglas(): Observable<Reglas[]> {
     return this.http.get<Reglas[]>(
-      'http://localhost:5001/api/Tutorial/generales'
+      `${environment.apiUrl}/api/Tutorial/generales`
     );
   }
 
   obtenerCartas(): Observable<Cartas[]> {
     return this.http.get<Cartas[]>(
-      'http://localhost:5001/api/Tutorial/cartas'
+      `${environment.apiUrl}/api/Tutorial/cartas`
     );
   }
 }
