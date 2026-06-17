@@ -5,15 +5,15 @@
   <div class="menu-wrapper">
     <div class="contenedor-menu">
       <div class="menu-sep"></div>
-      <a (click)="abrirModalCrear()" style="cursor:pointer">
+      <a (click)="abrirModalCrear()" style="cursor: pointer">
         <span>CREAR SALA</span>
       </a>
-      <a (click)="abrirModalUnirse()" style="cursor:pointer">
+      <a (click)="abrirModalUnirse()" style="cursor: pointer">
         <span>UNIRSE A SALA</span>
       </a>
-      <a (click)="abrirModalBuscar()" style="cursor:pointer"><span>BUSCAR PARTIDA</span></a>
+      <a (click)="abrirModalBuscar()" style="cursor: pointer"><span>BUSCAR PARTIDA</span></a>
       <div class="menu-sep"></div>
-      <a routerLink="/menu-multijugador-tipo"><span>VOLVER</span></a>
+      <a (click)="volver()" style="cursor: pointer"><span>VOLVER</span></a>
     </div>
   </div>
 </main>
@@ -57,9 +57,11 @@
         <span>Sala pública</span>
       </label>
       <p class="modal-hint">
-        {{ salaPublica
-          ? 'Aparecerá en "Buscar partida" para que cualquiera se una.'
-          : 'Privada: solo se entra con el código o el QR.' }}
+        {{
+          salaPublica
+            ? 'Aparecerá en "Buscar partida" para que cualquiera se una.'
+            : 'Privada: solo se entra con el código o el QR.'
+        }}
       </p>
       <button class="boton-unirse" (click)="confirmarCrear()">CREAR</button>
       <a class="boton-cancelar" (click)="cerrarModalCrear()">CANCELAR</a>
@@ -91,7 +93,11 @@
                   ({{ s.jugadores }}/{{ s.maxJugadores }})
                 </span>
               </div>
-              <button class="boton-unirse sala-unir" (click)="unirseASalaDisponible(s.codigo)" [disabled]="cargando">
+              <button
+                class="boton-unirse sala-unir"
+                (click)="unirseASalaDisponible(s.codigo)"
+                [disabled]="cargando"
+              >
                 UNIRSE
               </button>
             </li>
@@ -113,8 +119,5 @@
 
 <!-- Escáner de QR -->
 @if (escanerAbierto) {
-  <app-qr-scanner
-    (codigoLeido)="onCodigoQr($event)"
-    (cerrado)="cerrarEscanerQr()"
-  ></app-qr-scanner>
+  <app-qr-scanner (codigoLeido)="onCodigoQr($event)" (cerrado)="cerrarEscanerQr()"></app-qr-scanner>
 }

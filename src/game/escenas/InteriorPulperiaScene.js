@@ -93,9 +93,11 @@ export default class InteriorPulperiaScene extends BaseScene {
 
     this.puntosDeInteraccion = [];
 
-    this.puntosDeInteraccion.push(new PuntoInteraccion(this, 500, 290, 'tienda', false, {}));
+    this.puntosDeInteraccion.push(new PuntoInteraccion(this, 536, 378, 'tienda', false, {}));
 
     this.puntosDeInteraccion.push(new PuntoInteraccion(this, 1600, 180, 'partida-solo', false, {}));
+
+    this.puntosDeInteraccion.push(new PuntoInteraccion(this, 1400, 180, 'multijugador', false, {}));
   }
 
   update() {
