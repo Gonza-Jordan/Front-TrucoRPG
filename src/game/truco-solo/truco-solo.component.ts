@@ -372,19 +372,6 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     'son-buenas', 'cantar-truco', 'responder-truco', 'escalar-truco',
   ]);
 
-  // ── API ───────────────────────────────────────────────────────────────────
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  /** Delay (ms) antes de cada jugada de la máquina — configurable en Configuración. */
-  private get delayMaquinaMs(): number {
-    const raw = localStorage.getItem('cfg_delay');
-    if (raw == null) return 1200;
-    const v = Number(raw);
-    return Number.isFinite(v) && v >= 0 ? v : 1200;
-  }
-
   private esPartidaHistoria(m?: ManoState | null): boolean {
     return (m?.configuracion?.modo ?? (this.rivalNivel !== null || this.heroe !== null ? 1 : 0)) === 1;
   }
