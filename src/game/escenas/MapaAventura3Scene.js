@@ -4,9 +4,9 @@ import Portal from '../objetos/Portal.js';
 import Oponente from '../personajes/Oponente.js';
 
 
-export default class MapaAventura2Scene extends BaseScene {
+export default class MapaAventura3Scene extends BaseScene {
     constructor() {
-        super('MapaAventura2');
+        super('MapaAventura3');
     }
 
     init(data) {
@@ -17,7 +17,7 @@ export default class MapaAventura2Scene extends BaseScene {
 
     preload() {
         this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
-        this.load.spritesheet('lobizon', './assets/sprites/lobizon.png', { frameWidth: 32, frameHeight: 32 });
+        //this.load.spritesheet('lobizon', './assets/sprites/lobizon.png', { frameWidth: 32, frameHeight: 32 });
     }
 
     create() {
@@ -26,20 +26,21 @@ export default class MapaAventura2Scene extends BaseScene {
 
         // CREACION DEL MAPA
 
-        const map = this.make.tilemap({ key: 'mapa-aventura-2' });
+        const map = this.make.tilemap({ key: 'mapa-aventura-3' });
         console.log('map:', map);
         console.log('map.tilesets:', map?.tilesets);
 
-        const cuevaTileset = map.addTilesetImage('Cueva', 'Cueva Av2')
-        const cuevaDecoracionTileset = map.addTilesetImage('CuevaDecoracion', 'CuevaDecoracion Av2')
+        const cuevaTileset = map.addTilesetImage('Cueva', 'Cueva Av3')
+        const cuevaDecoracionTileset = map.addTilesetImage('CuevaDecoracion', 'CuevaDecoracion Av3')
+        const tronoTileset = map.addTilesetImage('Trono', 'Trono Av3')
 
         //capas principales
         const baseLayer = map.createLayer('Base', cuevaTileset);
         const caminoLayer = map.createLayer('Camino', [cuevaTileset, cuevaDecoracionTileset]);
-        const piedritasLayer = map.createLayer('PiedritasPiso/Agua', cuevaTileset);
-        const agujerosLayer = map.createLayer('Agujeros', cuevaTileset);
+
+        const piedritasLayer = map.createLayer('PiedritasPiso/Lava', cuevaTileset);
         const paredesLayer = map.createLayer('Paredes', cuevaTileset);
-        const piedrasLayer = map.createLayer('Piedras', [cuevaTileset, cuevaDecoracionTileset]);
+        const piedrasLayer = map.createLayer('Piedras', [cuevaTileset, cuevaDecoracionTileset, tronoTileset]);
         const piedras2Layer = map.createLayer('Piedras2', [cuevaTileset, cuevaDecoracionTileset]);
 
 
@@ -48,7 +49,7 @@ export default class MapaAventura2Scene extends BaseScene {
 
         //colisiones
         const colisionesLayer = map.createLayer('Colisiones', cuevaTileset);
-        colisionesLayer.setCollisionByExclusion([-1]);
+        //colisionesLayer.setCollisionByExclusion([-1]);
 
 
         //player
@@ -87,15 +88,8 @@ export default class MapaAventura2Scene extends BaseScene {
         // );
         // this.physics.add.overlap(this.JugadorPrincipal, this.portalDeVuelta.zone);
 
-        this.portalMapaAventura3 = new Portal(this, 1109, 35, 'MapaAventura3', false, {
-            x: 35,
-            y: 488,
-        });
-        this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura3.zone);
-
-
-        this.oponente = new Oponente(this, 475, 445, 'lobizon').setDepth(0);
-        this.oponente.setScale(3);
+        // this.oponente = new Oponente(this, 475, 445, 'lobizon').setDepth(0);
+        //this.oponente.setScale(3);
     }
 
     update() {
@@ -113,13 +107,6 @@ export default class MapaAventura2Scene extends BaseScene {
             this.estabaMoviendose = false;
         }
 
-        const interactuoMobile = this.botonInteractuarPresionado;
-
-        this.portalMapaAventura3.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
-
-        if (this.botonInteractuarPresionado) {
-            this.botonInteractuarPresionado = false;
-        }
+        // this.portalDeVuelta.update(this.JugadorPrincipal, this.teclaE);
     }
 }
-

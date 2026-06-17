@@ -53,6 +53,13 @@ export default class HistoriaBootScene extends Phaser.Scene {
     this.load.image('Cueva Av2', './assets/mapa-aventura-2/Cueva.png');
     this.load.image('CuevaDecoracion Av2', './assets/mapa-aventura-2/CuevaDecoracion.png');
 
+
+    //mapa aventura 3
+    this.load.tilemapTiledJSON('mapa-aventura-3', './assets/mapa-aventura-3/mapa-aventura-3.json');
+    this.load.image('Cueva Av3', './assets/mapa-aventura-3/Cueva.png');
+    this.load.image('CuevaDecoracion Av3', './assets/mapa-aventura-3/CuevaDecoracion.png');
+    this.load.image('Trono Av3', './assets/mapa-aventura-3/Trono.png');
+
     this.load.plugin(
       'rexvirtualjoystickplugin',
       'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js',
