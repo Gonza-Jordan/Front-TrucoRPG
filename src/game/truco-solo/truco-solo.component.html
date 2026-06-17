@@ -38,8 +38,7 @@
 
     <div class="rival-zone">
       <div class="rival-portrait">
-        <img [src]="rival ? 'assets/sprites/troll.png' : 'assets/gaucho.png'" alt="rival" class="rival-img"
-          [class.rival-troll]="!!rival" />
+        <img src="assets/gaucho.png" alt="rival" class="rival-img" />
       </div>
       @if (rival) {
       <div class="rival-nombre">{{ rival.nombre }}</div>

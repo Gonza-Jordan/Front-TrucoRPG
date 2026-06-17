@@ -103,19 +103,16 @@ export default class MapaAventura1Scene extends BaseScene {
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-    // portal mapa aventura 2
     this.portalMapaAventura2 = new Portal(this, 1092, 131, 'MapaAventura2', false, {
       x: 1078,
       y: 611,
     });
-    this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura2.zone);
 
     // portal volver al mapa principal
     this.portalMapaPrincipal = new Portal(this, 35, 552, 'MapaPrincipal', false, {
       x: 1917,
       y: 352,
     });
-    this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaPrincipal.zone);
 
     this._crearJefeNahuelito();
     this._crearJefePomberito();
@@ -135,14 +132,12 @@ export default class MapaAventura1Scene extends BaseScene {
   }
 
   _crearJefeNahuelito() {
-    this.oponenteNahuelito = new Oponente(this, JEFE1_X, JEFE1_Y, 'nahuelito').setDepth(0);
-    this.oponenteNahuelito.setScale(2);
+    new Oponente(this, JEFE1_X, JEFE1_Y, 'nahuelito').setDepth(0).setScale(2);
     this.zonaJefe1 = new ZonaInteraccionNpc(this, JEFE1_X, JEFE1_Y);
   }
 
   _crearJefePomberito() {
-    this.oponentePomberito = new Oponente(this, JEFE2_X, JEFE2_Y, 'pomberito').setDepth(0);
-    this.oponentePomberito.setScale(1);
+    new Oponente(this, JEFE2_X, JEFE2_Y, 'pomberito').setDepth(0).setScale(1);
     this.zonaJefe2 = new ZonaInteraccionNpc(this, JEFE2_X, JEFE2_Y);
     this.etiquetaBloqueoPomberito = this.add
       .text(JEFE2_X, JEFE2_Y - 55, 'Derrotá al Nahuelito antes', {
@@ -166,7 +161,6 @@ export default class MapaAventura1Scene extends BaseScene {
 
       const data = await res.json();
       this.puedePelearPomberito = !!data.puedePelear;
-      this.motivoBloqueoPomberito = data.motivo ?? null;
       this._actualizarEtiquetaBloqueoPomberito();
     } catch {
       this.puedePelearPomberito = false;
@@ -191,15 +185,6 @@ export default class MapaAventura1Scene extends BaseScene {
   update() {
     this.JugadorPrincipal.update(this.keys, this.teclaE);
 
-    const seMueve =
-      this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
-
-    if (seMueve) {
-      this.estabaMoviendose = true;
-    } else if (this.estabaMoviendose) {
-      this.estabaMoviendose = false;
-    }
-
     const interactuoMobile = this.botonInteractuarPresionado;
 
     this.portalMapaAventura2.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
@@ -219,7 +204,7 @@ export default class MapaAventura1Scene extends BaseScene {
       this.iniciarPelea(RIVAL_NAHUELITO_NIVEL);
     }
 
-    if (enZonaJefe2 && interactuar && this.puedePelearPomberito) {
+    if (enZonaJefe2 && interactuar) {
       this.iniciarPelea(RIVAL_POMBERITO_NIVEL);
     }
 

@@ -871,13 +871,6 @@
   color: #7fd4ff;
 }
 
-.rival-img.rival-troll {
-  width: 76px;
-  height: 76px;
-  object-fit: none;
-  object-position: -64px -192px;
-}
-
 @keyframes toastIn {
   from {
     opacity: 0;
