@@ -73,6 +73,14 @@
       </div>
     </div>
 
+    <!-- Burbuja del jugador (tantos / "son buenas" / cantos) -->
+    @if (bubbleHumanoText) {
+    <div class="bubble bubble-humano">
+      <span class="bubble-tail"></span>
+      {{ bubbleHumanoText }}
+    </div>
+    }
+
     <!-- ── ABANICO ──────────────────────────────────────────────────────── -->
     <div class="fan-wrap">
       @for (c of misCarts; track $index) {
@@ -208,7 +216,7 @@
 
   <!-- Toast -->
   @if (toastMsg) {
-  <div class="toast">{{ toastMsg }}</div>
+  <div class="toast" [class.toast-info]="toastTipo === 'info'">{{ toastMsg }}</div>
   }
 
   <!-- ── CONFIRMAR SALIR ────────────────────────────────────────────────────── -->

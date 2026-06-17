@@ -14,6 +14,7 @@ import { SalaService } from '../../services/sala.service';
 export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
   mode: 'crear' | 'unirse' = 'crear';
   gameMode: '1v1' | '2v2' | '3v3' = '1v1';
+  publica = false;
   codigoSala = '';
   copiado = false;
   qrUrl = '';
@@ -45,6 +46,7 @@ export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
   async ngOnInit() {
     this.mode     = (this.route.snapshot.queryParamMap.get('mode')     as any) ?? 'crear';
     this.gameMode = (this.route.snapshot.queryParamMap.get('gameMode') as any) ?? '1v1';
+    this.publica  = this.route.snapshot.queryParamMap.get('publica') === 'true';
 
     // Si es por equipos (2v2 / 3v3) y creador: inicializar con 1 jugador
     if (this.esPorEquipos && this.mode === 'crear') {
@@ -90,7 +92,7 @@ export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
     if (this.mode === 'crear') {
       try {
         await this.sala.conectar();
-        await this.sala.crearSala(this.gameMode);
+        await this.sala.crearSala(this.gameMode, this.publica);
       } catch {
         this.errorMsg = 'No se pudo conectar al servidor.';
       }

@@ -1,32 +1,21 @@
 @if (vistaActiva !== null) {
-  <div class="master-overlay-container">
-    
-    <div class="modal-wrapper">
-      
+  <div class="contenedor-overlay-principal">
+    <div class="contenedor-modal">
       @switch (vistaActiva) {
-        @case ('tienda') {
-          <app-tienda-overlay [datos]="datosRecibidos"></app-tienda-overlay>
-        }
-
         @case ('inventario') {
           <app-inventario-overlay></app-inventario-overlay>
         }
-
         @case ('logros') {
           <app-logros-overlay></app-logros-overlay>
         }
-
         @case ('armario') {
           <app-armario-overlay></app-armario-overlay>
         }
-
         @default {
           <p>Error D:</p>
         }
       }
-
-      <button class="btn-cerrar" (click)="cerrar()">VOLVER</button>
+      <div class="botonCerrar" (click)="cerrar()">VOLVER</div>
     </div>
-
   </div>
 }

@@ -18,42 +18,42 @@ export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
       escena.anims.create({
         key: `${this.nombre}-quieto`,
         frames: escena.anims.generateFrameNumbers(this.nombre, { start: 0, end: 3 }),
-        frameRate: 5,
+        frameRate: 4,
         repeat: -1,
       });
 
       escena.anims.create({
         key: `${this.nombre}-caminando-arriba`,
         frames: escena.anims.generateFrameNumbers(this.nombre, { start: 8, end: 11 }),
-        frameRate: 10,
+        frameRate: 8,
         repeat: -1,
       });
 
       escena.anims.create({
         key: `${this.nombre}-caminando-abajo`,
         frames: escena.anims.generateFrameNumbers(this.nombre, { start: 4, end: 7 }),
-        frameRate: 10,
+        frameRate: 8,
         repeat: -1,
       });
 
       escena.anims.create({
         key: `${this.nombre}-caminando-izquierda`,
         frames: escena.anims.generateFrameNumbers(this.nombre, { start: 16, end: 19 }),
-        frameRate: 10,
+        frameRate: 8,
         repeat: -1,
       });
 
       escena.anims.create({
         key: `${this.nombre}-caminando-derecha`,
         frames: escena.anims.generateFrameNumbers(this.nombre, { start: 12, end: 15 }),
-        frameRate: 10,
+        frameRate: 8,
         repeat: -1,
       });
     }
   }
 
   update(keys) {
-    const velocidad = 240;
+    const velocidad = 250;
 
     this.setVelocity(0);
 
