@@ -345,22 +345,46 @@ main {
   margin-bottom: 1rem;
 }
 
-.titulo-seccion-mobile { font-size: 1.2rem; color: #c89030; margin: 10px 0 5px 0; }
+.titulo-seccion-mobile { font-size: 1.2rem; color: #fff;
+  text-shadow: 3px 3px 0 #000; margin: 10px 0 5px 0; }
 
-.carrusel-skins-mobile { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; min-height: 40px; }
+.carrusel-skins-mobile { 
+  display: flex; 
+  gap: 12px;       
+  padding: 8px 4px;   
+  min-height: 70px;    
+  align-items: center;
+  align-self: center;
+}
 
 .item-skin-mobile {
-  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;       
+  height: 56px;       
+  min-width: 56px;     
+  padding: 0;          
   background: #1e1508;
-  color: #c89030;
-  border: 2px solid #5a4020;
-  font-family: 'Jersey 20';
-  font-size: 1rem;
-  white-space: nowrap;
+  border: 3px solid #5a4020;
+  border-radius: 8px; 
   cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.4); 
 }
-.item-skin-mobile.seleccionado { background: #c89030; color: #fff; border-color: #fff; }
 
+.item-skin-mobile.seleccionado { 
+  background: #f4eedb;  
+  border-color: #c89030; 
+  transform: scale(1.08); 
+  box-shadow: 3px 3px 0 #000;
+}
+
+.item-skin-mobile img {
+  width: 85% !important;   
+  height: 85% !important;
+  margin: 0;
+}
 .opciones-habilidad-mobile { display: flex; flex-direction: column; gap: 6px; }
 
 .item-habilidad-mobile {

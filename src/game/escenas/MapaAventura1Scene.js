@@ -1,19 +1,18 @@
 import Phaser from 'phaser';
 import BaseScene from './BaseScene.js';
 import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
-import Npc from '../personajes/Npc.js';
+import Oponente from '../personajes/Oponente.js';
 import Portal from '../objetos/Portal.js';
 import ZonaInteraccionNpc from '../objetos/ZonaInteraccionNpc.js';
 
 const RIVAL_NAHUELITO_NIVEL = 1;
 const RIVAL_POMBERITO_NIVEL = 2;
 
-const JEFE1_X = 816;
-const JEFE1_Y = 368;
+const JEFE1_X = 937;
+const JEFE1_Y = 499;
 
-// Puerta de la cueva (cerca del portal a MapaAventura2 en 1092, 131)
-const JEFE2_X = 1060;
-const JEFE2_Y = 155;
+const JEFE2_X = 1085;
+const JEFE2_Y = 200;
 
 function authHeaders() {
   const headers = { 'Content-Type': 'application/json' };
@@ -36,6 +35,8 @@ export default class MapaAventura1Scene extends BaseScene {
 
   preload() {
     this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
+    this.load.spritesheet('nahuelito', './assets/sprites/nahuelito.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('pomberito', './assets/sprites/pomberito.png', { frameWidth: 64, frameHeight: 64 });
   }
 
   create() {
@@ -102,11 +103,19 @@ export default class MapaAventura1Scene extends BaseScene {
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
+    // portal mapa aventura 2
     this.portalMapaAventura2 = new Portal(this, 1092, 131, 'MapaAventura2', false, {
       x: 1078,
       y: 611,
     });
     this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura2.zone);
+
+    // portal volver al mapa principal
+    this.portalMapaPrincipal = new Portal(this, 35, 552, 'MapaPrincipal', false, {
+      x: 1917,
+      y: 352,
+    });
+    this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaPrincipal.zone);
 
     this._crearJefeNahuelito();
     this._crearJefePomberito();
@@ -126,15 +135,17 @@ export default class MapaAventura1Scene extends BaseScene {
   }
 
   _crearJefeNahuelito() {
-    this.jefe1 = new Npc(this, JEFE1_X, JEFE1_Y, 'troll').setDepth(0);
-    this.zonaJefe1 = new ZonaInteraccionNpc(this, this.jefe1.x, this.jefe1.y);
+    this.oponenteNahuelito = new Oponente(this, JEFE1_X, JEFE1_Y, 'nahuelito').setDepth(0);
+    this.oponenteNahuelito.setScale(2);
+    this.zonaJefe1 = new ZonaInteraccionNpc(this, JEFE1_X, JEFE1_Y);
   }
 
   _crearJefePomberito() {
-    this.jefe2 = new Npc(this, JEFE2_X, JEFE2_Y, 'troll').setDepth(0);
-    this.zonaJefe2 = new ZonaInteraccionNpc(this, this.jefe2.x, this.jefe2.y);
+    this.oponentePomberito = new Oponente(this, JEFE2_X, JEFE2_Y, 'pomberito').setDepth(0);
+    this.oponentePomberito.setScale(1);
+    this.zonaJefe2 = new ZonaInteraccionNpc(this, JEFE2_X, JEFE2_Y);
     this.etiquetaBloqueoPomberito = this.add
-      .text(this.jefe2.x, this.jefe2.y - 55, 'Derrotá al Nahuelito antes', {
+      .text(JEFE2_X, JEFE2_Y - 55, 'Derrotá al Nahuelito antes', {
         fontFamily: '"Jersey 10"',
         fontSize: '14px',
         color: '#ffffff',
@@ -191,11 +202,8 @@ export default class MapaAventura1Scene extends BaseScene {
 
     const interactuoMobile = this.botonInteractuarPresionado;
 
-    this.portalMapaAventura2.update(
-      this.JugadorPrincipal,
-      this.teclaE,
-      interactuoMobile,
-    );
+    this.portalMapaAventura2.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+    this.portalMapaPrincipal.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
 
     const enZonaJefe1 = this.zonaJefe1.update(this.JugadorPrincipal);
     const enZonaJefe2 = this.zonaJefe2.update(

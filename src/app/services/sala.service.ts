@@ -27,6 +27,13 @@ export interface LobbyListos {
   requeridos: number;
 }
 
+export interface SalaPublicaInfo {
+  codigo: string;
+  modo: string;
+  jugadores: number;
+  maxJugadores: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SalaService {
   private hub: signalR.HubConnection;
@@ -50,6 +57,11 @@ export class SalaService {
   /** Estado del juego 2v2 multijugador (para TrucoMulti2v2Component) */
   trucoEstado2v2$    = new BehaviorSubject<unknown>(null);
   juegoIniciado2v2$  = new BehaviorSubject<boolean>(false);
+
+  // ── 3v3 observables ─────────────────────────────────────────
+  /** Estado del juego 3v3 multijugador (para Truco3v3Component) */
+  trucoEstado3v3$    = new BehaviorSubject<unknown>(null);
+  juegoIniciado3v3$  = new BehaviorSubject<boolean>(false);
 
   constructor(private auth: AuthService) {
     this.hub = new signalR.HubConnectionBuilder()
@@ -102,6 +114,13 @@ export class SalaService {
       if (!this.juegoIniciado$.value) this.juegoIniciado$.next(true);
       this.trucoEstado2v2$.next(data);
     });
+
+    // ── 3v3 game events ────────────────────────────────────────
+    this.hub.on('TrucoEstado3v3', (data: unknown) => {
+      if (!this.juegoIniciado3v3$.value) this.juegoIniciado3v3$.next(true);
+      if (!this.juegoIniciado$.value) this.juegoIniciado$.next(true);
+      this.trucoEstado3v3$.next(data);
+    });
   }
 
   async conectar(): Promise<void> {
@@ -109,10 +128,15 @@ export class SalaService {
     await this.hub.start();
   }
 
-  async crearSala(modo: '1v1' | '2v2' = '1v1'): Promise<string> {
-    const codigo = await this.hub.invoke<string>('CrearSala', modo);
+  async crearSala(modo: '1v1' | '2v2' | '3v3' = '1v1', publica = false): Promise<string> {
+    const codigo = await this.hub.invoke<string>('CrearSala', modo, publica);
     this.codigoSala$.next(codigo);
     return codigo;
+  }
+
+  /** Lista las salas públicas con lugar disponible para el modo dado. */
+  async listarSalasPublicas(modo: '1v1' | '2v2' | '3v3' = '1v1'): Promise<SalaPublicaInfo[]> {
+    return await this.hub.invoke<SalaPublicaInfo[]>('ListarSalasPublicas', modo);
   }
 
   async unirseASala(codigo: string): Promise<boolean> {
@@ -158,5 +182,7 @@ export class SalaService {
     this.lobbyListos$.next(null);
     this.trucoEstado2v2$.next(null);
     this.juegoIniciado2v2$.next(false);
+    this.trucoEstado3v3$.next(null);
+    this.juegoIniciado3v3$.next(false);
   }
 }

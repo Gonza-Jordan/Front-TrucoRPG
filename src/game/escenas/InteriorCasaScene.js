@@ -1,5 +1,7 @@
 import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
 import BaseScene from './BaseScene.js';
+import PuntoInteraccion from '../objetos/PuntoInteraccion.js';
+import Portal from '../objetos/Portal.js';
 
 export default class InteriorCasaScene extends BaseScene {
   constructor() {
@@ -13,18 +15,24 @@ export default class InteriorCasaScene extends BaseScene {
   }
 
   preload() {
-    this.load.image('Piso', './assets/objetos/piso.png');
-    this.load.image('cartel', './assets/mapa-principal/Cartel.png');
   }
 
   create() {
     this.botonPantallaCompleta();
+    this.crearControlesMobile();
     this.cameras.main.fadeIn(1000, 0, 0, 0);
-    this.add
-      .tileSprite(0, 0, this.scale.width, this.scale.height, 'Piso')
-      .setOrigin(0)
-      .setDepth(0)
-      .setScale(1.8);
+
+    const map = this.make.tilemap({ key: 'mapa-casa' });
+    const paredesTileset = map.addTilesetImage('Paredes', 'ParedesCasa');
+    const interiorCasaTileset = map.addTilesetImage('InteriorCasa', 'InteriorCasa');
+
+    map.createLayer('Base', interiorCasaTileset);
+    map.createLayer('Paredes', paredesTileset);
+    map.createLayer('Marco', paredesTileset);
+    map.createLayer('Muebles', interiorCasaTileset);
+    map.createLayer('Muebles2', interiorCasaTileset);
+    const colisiones = map.createLayer('Colisiones', paredesTileset);
+    colisiones.setCollisionByExclusion([-1]);
 
     this.JugadorPrincipal = new JugadorPrincipal(
       this,
@@ -33,30 +41,39 @@ export default class InteriorCasaScene extends BaseScene {
       this.playerKey,
     ).setDepth(1);
 
-    this.add.image(621, 336, 'cartel').setDepth(0).setScale(2.5);
-
     this.JugadorPrincipal.setCollideWorldBounds(true);
-
-    this.JugadorPrincipal.setScale(2);
+    this.physics.add.collider(this.JugadorPrincipal, colisiones);
+    this.JugadorPrincipal.setScale(2.5);
 
     this.keys = this.input.keyboard.createCursorKeys();
+    this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+
+    this.puntosDeInteraccion = [];
+
+    this.puntosDeInteraccion.push(
+      new PuntoInteraccion(this, 1025, 224, 'inventario', false, {}));
+
+    this.puntosDeInteraccion.push(
+      new PuntoInteraccion(this, 247, 224, 'armario', false, {}));
+
+    this.puntosDeInteraccion.push(
+      new PuntoInteraccion(this, 703, 192, 'logros', false, {}));
+
+    this.salirAfuera = new Portal(this, 644, 656, 'MapaPrincipal', false, { x: 444, y: 195 });
+    this.physics.add.overlap(this.JugadorPrincipal, this.salirAfuera.zone);
   }
 
   update() {
-    this.JugadorPrincipal.update(this.keys);
+    this.JugadorPrincipal.update(this.keys, this.teclaE);
 
-    const seMueve =
-      this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
+    const interactuoMobile = this.botonInteractuarPresionado;
+    
+    this.puntosDeInteraccion.forEach((punto) => {
+      punto.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+    });
 
-    if (seMueve) {
-      this.estabaMoviendose = true;
-    } else if (this.estabaMoviendose) {
-      const xActual = Math.round(this.JugadorPrincipal.x);
-      const yActual = Math.round(this.JugadorPrincipal.y);
+    this.salirAfuera.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
 
-      console.log(`📍 Personaje parado en coordenadas -> X: ${xActual}, Y: ${yActual}`);
-
-      this.estabaMoviendose = false;
-    }
+    this.botonInteractuarPresionado = false;
   }
 }

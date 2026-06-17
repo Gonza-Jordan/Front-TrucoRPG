@@ -1,6 +1,5 @@
 @if (vistaActual === 'seleccion-heroe') {
-  <app-seleccion-personaje-historia
-    (heroeConfirmado)="alConfirmarHeroe($event)">
+  <app-seleccion-personaje-historia (heroeConfirmado)="alConfirmarHeroe($event)">
   </app-seleccion-personaje-historia>
 }
 
@@ -10,5 +9,7 @@
     @if (mostrarTrucoSolo) {
       <app-truco-solo></app-truco-solo>
     }
+    <app-casa-manager></app-casa-manager>
+    <app-pulperia-manager></app-pulperia-manager>
   </div>
 }

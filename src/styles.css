@@ -56,6 +56,25 @@ body {
   text-align: center;
 }
 
+.rotate-fullscreen-btn {
+  margin-top: 8px;
+  padding: 10px 22px;
+  font-family: 'VT323', monospace, sans-serif;
+  font-size: 20px;
+  color: #ffdd44;
+  background: transparent;
+  border: 2px solid #ffdd44;
+  border-radius: 6px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.rotate-fullscreen-btn:active {
+  background: #ffdd44;
+  color: #080604;
+}
+
 @keyframes rotateDeviceHint {
 
   0%,
@@ -72,27 +91,27 @@ body {
   }
 }
 
-@media (max-width: 767px) {
-  body.modo-phaser-mobile {
-    overflow: hidden;
-    background-color: #000000;
-  }
-
+@media (max-width: 950px) {
+  
   body.modo-phaser-mobile app-header,
   body.modo-phaser-mobile header,
   body.modo-phaser-mobile app-footer,
   body.modo-phaser-mobile footer {
     display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    opacity: 0 !important;
   }
 
   body.modo-phaser-mobile .contenedor-juego-wrapper {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
-    width: 100vw !important;
-    height: 100svh !important;
-    z-index: 99999 !important;
-    background: transparent !important;
+    width: 100% !important;
+    height: 100 !important; 
+    height: 100 !important;
+    z-index: 999999 !important;
+    background: #20170a !important;
     padding: 0 !important;
     margin: 0 !important;
   }
@@ -100,11 +119,11 @@ body {
   body.modo-phaser-mobile #historia-container {
     width: 100% !important;
     height: 100% !important;
-    background: transparent !important;
   }
 
   body.modo-phaser-mobile main {
     padding: 0 !important;
+    position: static !important;
     background: none !important;
   }
 }

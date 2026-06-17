@@ -8,6 +8,11 @@
   overflow: hidden;
 }
 
+/* Hacemos el modal más ancho para evitar scroll */
+app-card {
+  width: min(540px, 100%);
+}
+
 .titulo {
   text-align: center;
   font-family: 'Jersey 10', monospace;
@@ -23,13 +28,13 @@
   width: 100%;
   height: 1px;
   background: linear-gradient(to right, transparent, #6a4a20, transparent);
-  margin: 0 0 28px;
+  margin: 0 0 16px;
 }
 
 .campo {
   display: flex;
   flex-direction: column;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 label {
@@ -63,8 +68,36 @@ input::placeholder {
 .error {
   color: #e05050;
   font-family: 'Jersey 10', monospace;
-  font-size: 0.85rem;
+  font-size: 1rem;
   margin-top: 5px;
+}
+
+.requisitos {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.requisitos li {
+  font-family: 'Jersey 10', monospace;
+  font-size: 1rem;
+  color: #a07050;
+  letter-spacing: 0.5px;
+  transition: color 0.2s;
+}
+
+.requisitos li.ok {
+  color: #60c060;
+}
+
+.requisitos .check {
+  display: inline-block;
+  width: 1.2em;
+  text-align: center;
+  font-size: 1rem;
 }
 
 .error-servidor {
@@ -106,7 +139,7 @@ input::placeholder {
   font-family: 'Jersey 10', monospace;
   font-size: 0.9rem;
   letter-spacing: 1px;
-  margin-top: 22px;
+  margin-top: 14px;
 }
 
 .login-link a {
@@ -117,4 +150,15 @@ input::placeholder {
 .login-link a:hover {
   color: #f0b050;
   text-decoration: underline;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+.titulo { font-size: clamp(1.6rem, 5vmin, 2.4rem); }
+
+@media (max-width: 480px), (max-height: 560px) {
+  .sep   { margin-bottom: 16px; }
+  .campo { margin-bottom: 12px; }
+  input  { padding: 9px 12px; font-size: 0.95rem; }
+  .btn-submit { padding: 11px; font-size: 1.05rem; }
+  .login-link { margin-top: 14px; }
 }

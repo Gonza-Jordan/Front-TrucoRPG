@@ -173,6 +173,23 @@
   border-right-color: #333;
 }
 
+/* Burbuja del jugador: centrada arriba de su mano, con la colita apuntando hacia abajo. */
+.bubble-humano {
+  top: auto;
+  bottom: 168px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+}
+.bubble-humano .bubble-tail {
+  right: auto;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: #333;
+}
+
 @keyframes bubblePop {
   from {
     transform: scale(0.7);
@@ -450,6 +467,19 @@
   object-fit: contain;
 }
 
+/* Cada ranura reserva el alto de una carta aunque esté vacía. Sin esto, al abrir
+   la baza tu carta queda "flotando" arriba (lado máquina) hasta que la máquina
+   juega y recién ahí se acomoda — se notaba con el delay de "máquina pensando". */
+.baza-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.baza-slot.far-slot,
+.baza-slot.near-slot {
+  min-height: 113px;
+}
+
 .fan-card:hover:not(.hidden):not(.played-out) {
   transform: translateX(var(--xoff)) rotate(var(--angle)) translateY(-20px);
   box-shadow: 3px 7px 18px #0009;
@@ -715,6 +745,23 @@
   border-radius: 4px;
   z-index: 200;
   animation: toastIn 0.2s ease;
+}
+
+/* Aviso amigable (reglas del juego) — lado izquierdo, tono cálido en vez de error rojo. */
+.toast.toast-info {
+  left: 18px;
+  transform: none;
+  background: #14331a;
+  border-color: #4a8a3a;
+  color: #c8efc0;
+  max-width: 230px;
+  text-align: center;
+  animation: toastInLeft 0.2s ease;
+}
+
+@keyframes toastInLeft {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .nueva-mano-countdown {
@@ -1028,6 +1075,8 @@
   .fan-card { width: 58px; height: 84px; margin-left: -29px; }
   .far-card-img { height: 46px; }
   .near-card-img { height: 66px; }
+  .baza-slot.far-slot  { min-height: 46px; }
+  .baza-slot.near-slot { min-height: 66px; }
   .rival-portrait {
     width: 56px;
     height: 56px;
@@ -1118,6 +1167,8 @@
   .table-surface { width: 420px; height: 300px; }
   .far-card-img { height: 44px; }
   .near-card-img { height: 64px; }
+  .baza-slot.far-slot  { min-height: 44px; }
+  .baza-slot.near-slot { min-height: 64px; }
   .back-btn { min-height: 44px; font-size: 15px; }
   .habilidad-btn { min-height: 44px; }
   .score-title { font-size: 6px; }
@@ -1152,6 +1203,8 @@
   .table-surface { width: 280px; height: 190px; }
   .far-card-img { height: 24px; }
   .near-card-img { height: 36px; }
+  .baza-slot.far-slot  { min-height: 24px; }
+  .baza-slot.near-slot { min-height: 36px; }
   .fan-wrap { height: 70px; width: 155px; margin-top: 2px; }
   .fan-card { width: 38px; height: 55px; margin-left: -19px; }
   .fan-card-img { width: 100%; height: 100%; }

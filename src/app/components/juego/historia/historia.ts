@@ -3,11 +3,14 @@ import { CommonModule, DOCUMENT } from '@angular/common'; // Importamos DOCUMENT
 import { SeleccionPersonajeHistoria } from '../../../pages/seleccion-personaje-historia/seleccion-personaje-historia';
 import { HistoriaService } from '../../../services/historia/historia-service';
 import { TrucoSoloComponent } from '../../../../game/truco-solo/truco-solo.component';
+import { CasaManager } from '../../casaManager/casa-manager/casa-manager';
+import { PulperiaManager } from '../../pulperiaManager/pulperia-manager/pulperia-manager';
+
 
 @Component({
   selector: 'app-historia',
   standalone: true,
-  imports: [CommonModule, SeleccionPersonajeHistoria, TrucoSoloComponent],
+  imports: [CommonModule, SeleccionPersonajeHistoria, TrucoSoloComponent,CasaManager,PulperiaManager],
   templateUrl: './historia.html',
   styleUrl: './historia.css',
 })
@@ -35,8 +38,9 @@ export class Historia implements OnInit, OnDestroy {
 
     setTimeout(() => {
       this.historiaService.iniciarJuego('historia-container');
+
       window.dispatchEvent(new Event('resize'));
-    }, 0);
+    }, 50);
   }
 
   abrirMesaTruco = (): void => {

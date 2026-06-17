@@ -1,156 +1,163 @@
 <div class="root">
 
-  <!-- ── PANEL IZQUIERDO — botones ─────────────────────────────── -->
+  <!-- ── PANEL IZQ — botones ───────────────────────────────────── -->
   <aside class="side-panel left-panel">
     <div class="btn-list">
       @for (b of btns; track b.label) {
-        <button class="action-btn disabled" disabled>{{ b.label }}</button>
+        <button class="action-btn" [class.disabled]="!b.enabled"
+                [style.--btn-color]="b.color"
+                [disabled]="!b.enabled" (click)="b.action()">
+          {{ b.label }}
+        </button>
+      }
+      @if (btns.length === 0 && estado && !estado.manoTerminada && !estado.partidaTerminada) {
+        <div class="esperando-ia">Esperando a los otros jugadores...</div>
       }
     </div>
   </aside>
 
-  <!-- ── ARENA ─────────────────────────────────────────────────── -->
+  <!-- ── ARENA ──────────────────────────────────────────────────── -->
   <main class="arena-2v2">
 
-    <!-- ═══ FILA SUPERIOR — compañero ═══ -->
+    <!-- Compañero (arriba) -->
     <div class="player-top">
-      <div class="player-card compa-card">
-        <div class="player-cards-top">
-          @for (c of [0,1,2]; track c) {
-            <img class="card-back" src="assets/cards/back.PNG" alt="reverso" />
+      @if (estado) {
+        <div class="player-card compa-card">
+          <div class="player-cards-top">
+            @for (c of cartasEnMano('compa'); track $index) {
+              <img class="card-back" src="assets/cards/back.PNG" alt="reverso" />
+            }
+          </div>
+          <div class="player-portrait-row">
+            <img src="assets/2v2/gaucho_compañero.png" class="avatar-top avatar-gaucho" alt="compañero" />
+            <div class="player-tag">
+              <span class="player-tag-role">COMPA</span>
+              <span class="player-tag-name">{{ rolCompa }}</span>
+              @if (esMano('compa')) { <span class="mano-badge">MANO</span> }
+            </div>
+          </div>
+          @if (dialogos['compa']) {
+            <div class="dialogo-burbuja burbuja-top">{{ dialogos['compa']!.texto }}</div>
           }
         </div>
-        <div class="player-portrait-row">
-          <img src="assets/gaucho.png" class="avatar-top" alt="compañero" />
-          <div class="player-tag compa-tag">
-            <span class="player-tag-role">COMPA</span>
-            <span class="player-tag-name">{{ compa.nombre }}</span>
-          </div>
-        </div>
-      </div>
+      }
     </div>
 
-    <!-- ═══ FILA MEDIA — oponentes + mesa ═══ -->
+    <!-- Fila media: rival izq + mesa + rival der -->
     <div class="row-middle">
 
-      <!-- Oponente izquierdo -->
-      <div class="player-side player-left">
-        <div class="side-cards">
-          @for (c of [0,1,2]; track c) {
-            <img class="card-back card-back-side" src="assets/cards/back.PNG" alt="reverso" />
+      <!-- Rival izquierda -->
+      @if (estado) {
+        <div class="player-side player-left">
+          <div class="side-cards">
+            @for (c of cartasEnMano('izq'); track $index) {
+              <img class="card-back card-back-side" src="assets/cards/back.PNG" alt="reverso" />
+            }
+          </div>
+          <div class="side-info">
+            <img src="assets/2v2/gaucho_izquierda.png" class="avatar-side avatar-rival" alt="rival" />
+            <span class="player-tag-name rival-tag">{{ rolIzq }}</span>
+            @if (esMano('izq')) { <span class="mano-badge">MANO</span> }
+          </div>
+          @if (dialogos['izq']) {
+            <div class="dialogo-burbuja burbuja-left">{{ dialogos['izq']!.texto }}</div>
           }
         </div>
-        <div class="side-info">
-          <img src="assets/rival.png" class="avatar-side" alt="rival" />
-          <span class="player-tag-name rival-tag">{{ rivals[0].nombre }}</span>
-        </div>
-      </div>
+      }
 
       <!-- Mesa -->
       <div class="table-wrap-2v2">
         <div class="table-surface-2v2">
-
-          <!-- Bazas — 3 columnas, cada una con 4 cartas (una por jugador) -->
-          <div class="bazas-2v2">
-            @for (slot of bazaSlots; track $index) {
-              <div class="baza-col-2v2">
-                <!-- Carta compa (top) -->
-                <div class="baza-mini baza-top">
-                  @if (slot.compa) {
-                    <img class="baza-card" [src]="cardImg(slot.compa)" alt="" />
-                  }
-                </div>
-                <!-- Cartas laterales (op1 / op2) -->
-                <div class="baza-laterales">
-                  <div class="baza-mini baza-left">
-                    @if (slot.op1) {
-                      <img class="baza-card baza-card-rot" [src]="cardImg(slot.op1)" alt="" />
-                    }
-                  </div>
-                  <div class="baza-mini baza-right">
-                    @if (slot.op2) {
-                      <img class="baza-card baza-card-rot" [src]="cardImg(slot.op2)" alt="" />
-                    }
-                  </div>
-                </div>
-                <!-- Carta mía (bottom) -->
-                <div class="baza-mini baza-bottom">
-                  @if (slot.yo) {
-                    <img class="baza-card" [src]="cardImg(slot.yo)" alt="" />
-                  }
-                </div>
-                <!-- Indicador de ganador -->
-                @if (slot.ganador) {
-                  <div class="baza-ganador-badge"
-                       [class.badge-nosotros]="slot.ganador === 'nosotros'"
-                       [class.badge-ellos]="slot.ganador === 'ellos'"
-                       [class.badge-parda]="slot.ganador === 'parda'">
-                    {{ slot.ganador === 'nosotros' ? '★ NOS.' : slot.ganador === 'ellos' ? '★ ELLOS' : '— PARDA' }}
-                  </div>
+          <div class="mesa-cruz">
+            <div class="pila pila-top">
+              @for (c of mesa.compa; track $index) {
+                <img class="mesa-card" [style.--i]="$index" [src]="cardImg(c)" alt="" />
+              }
+            </div>
+            <div class="pila-medio">
+              <div class="pila pila-left">
+                @for (c of mesa.izq; track $index) {
+                  <img class="mesa-card" [style.--i]="$index" [src]="cardImg(c)" alt="" />
                 }
               </div>
-            }
+              <div class="pila-centro"></div>
+              <div class="pila pila-right">
+                @for (c of mesa.der; track $index) {
+                  <img class="mesa-card" [style.--i]="$index" [src]="cardImg(c)" alt="" />
+                }
+              </div>
+            </div>
+            <div class="pila pila-bottom">
+              @for (c of mesa.yo; track $index) {
+                <img class="mesa-card" [style.--i]="$index" [src]="cardImg(c)" alt="" />
+              }
+            </div>
           </div>
-
-          <!-- Badge de turno -->
           @if (turnoBadge) {
             <div class="turno-badge-2v2">{{ turnoBadge }}</div>
           }
-
         </div>
       </div>
 
-      <!-- Oponente derecho -->
-      <div class="player-side player-right">
-        <div class="side-info">
-          <img src="assets/rival.png" class="avatar-side" alt="rival" />
-          <span class="player-tag-name rival-tag">{{ rivals[1].nombre }}</span>
-        </div>
-        <div class="side-cards side-cards-right">
-          @for (c of [0,1,2]; track c) {
-            <img class="card-back card-back-side" src="assets/cards/back.PNG" alt="reverso" />
+      <!-- Rival derecha -->
+      @if (estado) {
+        <div class="player-side player-right">
+          <div class="side-info">
+            <img src="assets/2v2/gaucho_derecha.png" class="avatar-side avatar-rival" alt="rival" />
+            <span class="player-tag-name rival-tag">{{ rolDer }}</span>
+            @if (esMano('der')) { <span class="mano-badge">MANO</span> }
+          </div>
+          <div class="side-cards side-cards-right">
+            @for (c of cartasEnMano('der'); track $index) {
+              <img class="card-back card-back-side" src="assets/cards/back.PNG" alt="reverso" />
+            }
+          </div>
+          @if (dialogos['der']) {
+            <div class="dialogo-burbuja burbuja-right">{{ dialogos['der']!.texto }}</div>
           }
         </div>
-      </div>
+      }
 
     </div>
 
-    <!-- ═══ FILA INFERIOR — mis cartas ═══ -->
+    <!-- Fila inferior: yo + mis cartas -->
     <div class="player-bottom">
-      <div class="yo-info">
-        <img src="assets/gaucho.png" class="avatar-yo" alt="yo" />
-        <span class="yo-nombre">{{ yo.nombre }}</span>
-      </div>
-      <!-- Abanico de cartas -->
-      <div class="fan-wrap-2v2">
-        @for (fc of miCartas; track $index) {
-          <div class="fan-card-2v2"
-               [class.played]="!fc.carta"
-               [style.--ang]="fanAngles[$index] + 'deg'"
-               [style.--xoff]="fanXOff[$index] + 'px'"
-               (click)="jugarCarta($index)">
-            @if (fc.carta) {
-              <img class="fan-img" [src]="cardImg(fc.carta)" [alt]="fc.carta.numero + ' ' + fc.carta.palo" />
-            }
-          </div>
-        }
-      </div>
+      @if (estado) {
+        <div class="yo-info">
+          <img src="assets/gaucho.png" class="avatar-yo" alt="yo" />
+          <span class="yo-nombre">VOS ({{ miRol }})</span>
+          @if (esMano('yo')) { <span class="mano-badge">MANO</span> }
+          @if (dialogos['yo']) {
+            <div class="dialogo-burbuja burbuja-bottom">{{ dialogos['yo']!.texto }}</div>
+          }
+        </div>
+        <div class="fan-wrap-2v2">
+          @for (carta of misCartas; track $index) {
+            <div class="fan-card-2v2"
+                 [style.--ang]="fanAngles[$index] + 'deg'"
+                 [style.--xoff]="fanXOff[$index] + 'px'"
+                 (click)="jugarCarta(carta)">
+              <img class="fan-img" [src]="cardImg(carta)" [alt]="carta.numero + ' ' + carta.palo" />
+            </div>
+          }
+          @if (misCartas.length === 0 && !estado.manoTerminada) {
+            <div class="sin-cartas">Sin cartas</div>
+          }
+        </div>
+      }
     </div>
 
   </main>
 
-  <!-- ── PANEL DERECHO — tanteador ─────────────────────────────── -->
+  <!-- ── PANEL DER — tanteador ──────────────────────────────────── -->
   <aside class="side-panel right-panel">
 
-    <!-- Tanteador 2v2 -->
     <div class="scoreboard-2v2">
       <div class="score-title-2v2">TANTEADOR</div>
-
       <div class="score-equipo nosotros-row">
         <span class="score-label nosotros-label">NOSOTROS</span>
         <span class="score-pts nosotros-pts">{{ puntosNosotros }}</span>
       </div>
-
       <svg class="tally-svg" viewBox="0 0 130 52" xmlns="http://www.w3.org/2000/svg">
         <line x1="65" y1="0" x2="65" y2="52" stroke="#5a3a10" stroke-width="1" />
         @for (s of tallySticksNosotros; track $index) {
@@ -158,14 +165,11 @@
                 [attr.stroke]="s.color" stroke-width="1.8" />
         }
       </svg>
-
       <div class="score-sep-2v2"></div>
-
       <div class="score-equipo ellos-row">
         <span class="score-label ellos-label">ELLOS</span>
         <span class="score-pts ellos-pts">{{ puntosEllos }}</span>
       </div>
-
       <svg class="tally-svg" viewBox="0 0 130 52" xmlns="http://www.w3.org/2000/svg">
         <line x1="65" y1="0" x2="65" y2="52" stroke="#5a3a10" stroke-width="1" />
         @for (s of tallySticksEllos; track $index) {
@@ -175,13 +179,11 @@
       </svg>
     </div>
 
-    <!-- Estado Envido -->
     <div class="state-section">
       <div class="state-title envido-title">ENVIDO</div>
       <div class="state-text">{{ estadoEnvido }}</div>
     </div>
 
-    <!-- Estado Truco -->
     <div class="state-section">
       <div class="state-title truco-title">TRUCO</div>
       <div class="state-text">{{ estadoTruco }}</div>
@@ -191,23 +193,42 @@
 
   </aside>
 
-  <!-- ── TOAST ──────────────────────────────────────────────────── -->
-  @if (toastMsg) {
-    <div class="toast-2v2">{{ toastMsg }}</div>
+  <!-- ── GAME OVER ──────────────────────────────────────────────── -->
+  @if (gameOver) {
+    <div class="game-over-overlay" (click)="$event.stopPropagation()">
+      <div class="game-over-box">
+        <div class="go-title" [class.go-win]="gameOverGanamos" [class.go-lose]="!gameOverGanamos">
+          {{ gameOverGanamos ? '¡GANARON!' : '¡PERDIERON!' }}
+        </div>
+        <div class="go-subtitle">
+          {{ gameOverGanamos
+            ? '¡El equipo llegó a 30 puntos! Los rivales cayeron.'
+            : 'Los rivales llegaron a 30 puntos. ¡La próxima será!' }}
+        </div>
+        <div class="go-btn-row">
+          <button class="go-btn go-btn-exit" (click)="confirmarSalir()">Salir al mapa</button>
+        </div>
+      </div>
+    </div>
   }
 
-  <!-- ── CONFIRM SALIR ─────────────────────────────────────────── -->
+  <!-- ── CONFIRM SALIR ──────────────────────────────────────────── -->
   @if (mostrarConfirmSalir) {
     <div class="confirm-overlay" (click)="cancelarSalir()">
       <div class="confirm-box" (click)="$event.stopPropagation()">
         <div class="confirm-title">¿Salir de la partida?</div>
-        <div class="confirm-sub">Se notificará al resto de los jugadores.</div>
+        <div class="confirm-sub">Se perderá el progreso de la mano actual.</div>
         <div class="confirm-btn-row">
           <button class="confirm-btn confirm-btn-si" (click)="confirmarSalir()">Sí, salir</button>
           <button class="confirm-btn confirm-btn-no" (click)="cancelarSalir()">Cancelar</button>
         </div>
       </div>
     </div>
+  }
+
+  <!-- ── TOAST ──────────────────────────────────────────────────── -->
+  @if (toastMsg) {
+    <div class="toast-2v2" [class.toast-info]="toastTipo === 'info'">{{ toastMsg }}</div>
   }
 
 </div>

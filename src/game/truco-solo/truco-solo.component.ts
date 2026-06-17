@@ -71,6 +71,10 @@ export interface ManoState {
   tantoCantadoMaquina?: number;
   tantoHumano?: number;
   envidoResuelto?: boolean;
+  cantorEnvido?: 'Humano' | 'Maquina';
+  ganadorEnvido?: 'Humano' | 'Maquina';
+  manoIniciadaPor?: 'Humano' | 'Maquina';
+  sonBuenasDeclarado?: boolean;
   ganadorMano?:    'Humano' | 'Maquina' | 'Parda';
   ganadorPartida?: 'Humano' | 'Maquina';
   partidaTerminada?: boolean;
@@ -239,9 +243,11 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   rivalLabel  = 'Esperando mano...';
   turnoBadge  = '';
   bubbleText  = '';
+  bubbleHumanoText = '';
   gameOver    = false;
   gameOverWon = false;
   toastMsg    = '';
+  toastTipo: 'error' | 'info' = 'error';
 
   readonly fanAngles = FAN_ANGLES;
   readonly fanXOff   = FAN_X;
@@ -260,6 +266,9 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
   countdown: number | null = null;
   private bubbleTimer: ReturnType<typeof setTimeout> | null = null;
+  private bubbleHumanoTimer: ReturnType<typeof setTimeout> | null = null;
+  private envidoSeqTimers: ReturnType<typeof setTimeout>[] = [];
+  private gameOverTimer: ReturnType<typeof setTimeout> | null = null;
   private toastTimer:  ReturnType<typeof setTimeout> | null = null;
   private rivalNivel: number | null = null;
   private salpicaduraManoId: string | null = null;
@@ -324,6 +333,9 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.bubbleTimer) clearTimeout(this.bubbleTimer);
+    if (this.bubbleHumanoTimer) clearTimeout(this.bubbleHumanoTimer);
+    if (this.gameOverTimer) clearTimeout(this.gameOverTimer);
+    this.limpiarEnvidoSeq();
     if (this.toastTimer)  clearTimeout(this.toastTimer);
     this.cancelarCountdown();
     this.cancelarSalpicaduraTimer();
@@ -340,6 +352,25 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     const offsetPalo: Record<Palo, number> = { Oro: 0, Copa: 10, Espada: 20, Basto: 30 };
     return `assets/cards/${offsetPalo[carta.palo] + mapaNumeros[carta.numero]}.PNG`;
   }
+
+  // ── Delay "la máquina piensa" (compartido con 2v2/3v3 vía cfg_delay) ────────
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /** Delay (ms) configurable desde Configuración ("Delay de juego"). */
+  private get delayMaquinaMs(): number {
+    const raw = localStorage.getItem('cfg_delay');
+    if (raw == null) return 1200; // default si nunca se configuró
+    const v = Number(raw);
+    return Number.isFinite(v) && v >= 0 ? v : 1200;
+  }
+
+  /** Acciones tras las cuales la máquina juega/responde → conviene simular que "piensa". */
+  private readonly ENDPOINTS_PENSAR = new Set([
+    'jugar-carta', 'cantar-envido', 'cantar-envido-tipo', 'responder-envido',
+    'son-buenas', 'cantar-truco', 'responder-truco', 'escalar-truco',
+  ]);
 
   // ── API ───────────────────────────────────────────────────────────────────
   private delay(ms: number): Promise<void> {
@@ -433,10 +464,19 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       && endpoint !== 'ganar-automatico-debug'
       && this.accionesBloqueadasPorHabilidadRival) return;
     this.loading = true;
+
+    const pensar = this.ENDPOINTS_PENSAR.has(endpoint);
+    // Tu carta aparece al instante en la mesa; la máquina "piensa" antes de mostrar su jugada.
+    if (endpoint === 'jugar-carta') this.colocarCartaHumanoOptimista(body);
+    // Tu canto aparece al instante en tu burbuja (la respuesta/tantos los muestra la secuencia).
+    this.feedbackCantoHumano(endpoint, body);
+
     try {
       const data = await firstValueFrom(
         this.http.post<ManoState>(`${API}/${endpoint}`, body)
       );
+      // Pausa que simula a la máquina pensando antes de revelar su jugada/respuesta.
+      if (pensar) await this.delay(this.delayMaquinaMs);
       this.mano = data;
       this.updateEventosHabilidad(data);
       this.updateUI(data);
@@ -444,10 +484,36 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     } catch (err: any) {
       const msg = (typeof err?.error === 'string' ? err.error : null) ?? err?.error?.message ?? err?.message ?? String(err);
       this.showToast(`Error en ${endpoint}: ${msg}`);
+      // Deshacer la jugada optimista: re-renderizar desde el último estado válido.
+      if (this.mano) this.updateUI(this.mano);
     } finally {
       this.loading = false;
       this.cdr.markForCheck();
     }
+  }
+
+  /**
+   * Coloca la carta que el humano acaba de jugar en la mesa de inmediato (sin esperar
+   * al backend), para que su propia jugada no se sienta lenta durante el delay.
+   * El estado autoritativo del backend se aplica después y reemplaza esta vista.
+   */
+  private colocarCartaHumanoOptimista(body: any): void {
+    const m = this.mano;
+    if (!m) return;
+
+    const idxHand = this.misCarts.findIndex(
+      mc => mc.carta?.numero === body?.numero && mc.carta?.palo === body?.palo
+    );
+    if (idxHand < 0) return;
+    const carta = this.misCarts[idxHand].carta;
+
+    this.misCarts = this.misCarts.map((mc, i) => i === idxHand ? { ...mc, visible: false } : mc);
+
+    const slotIdx = m.bazas?.length ?? 0;
+    if (carta && slotIdx >= 0 && slotIdx < this.slots.length) {
+      this.slots = this.slots.map((s, i) => i === slotIdx ? { ...s, jugador: carta, pending: true } : s);
+    }
+    this.cdr.markForCheck();
   }
 
   // Acumula los eventos de habilidad en el log
@@ -490,6 +556,18 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       };
       this.misCarts = this.misCarts.map(mc => ({ ...mc, seleccionada: false }));
       this.call('activar-habilidad', body);
+      return;
+    }
+
+    // No podés jugar una carta si hay un canto de la máquina sin responder.
+    if (this.mano.trucoPendienteRespuestaHumano || this.mano.envidoPendienteRespuestaHumano) {
+      this.showToast('No podés jugar: primero respondé el canto.', 'info');
+      return;
+    }
+
+    // Tampoco si todavía no es tu turno.
+    if (this.mano.turnoActual === 'Maquina' && !this.mano.cartaMaquinaEnMesa) {
+      this.showToast('Esperá tu turno para jugar.', 'info');
       return;
     }
 
@@ -601,7 +679,25 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   private updateUI(m: ManoState): void {
     this.redrawTally(m.puntosHumano, m.puntosMaquina);
 
+    const justResolvedEnvido = !!m.envidoResuelto && !this.prevEnvidoResuelto;
+
     if (m.ganadorPartida) {
+      // Si la partida se definió por el envido, primero se ven los tantos (¡Quiero!,
+      // los cantos de cada uno) y recién después aparece el overlay de fin de partida.
+      if (justResolvedEnvido) {
+        this.btns = []; // sin acciones mientras corre la animación de cierre
+        this.turnoBadge = '';
+        this.reproducirSecuenciaEnvido(m);
+        this.prevEnvidoResuelto = true;
+        if (this.gameOverTimer) clearTimeout(this.gameOverTimer);
+        this.gameOverTimer = setTimeout(() => {
+          this.gameOver    = true;
+          this.gameOverWon = m.ganadorPartida === 'Humano';
+          this.cdr.markForCheck();
+        }, this.duracionSecuenciaEnvido(m) + 800);
+        this.cdr.markForCheck();
+        return;
+      }
       this.gameOver    = true;
       this.gameOverWon = m.ganadorPartida === 'Humano';
       if (this.gameOverWon && this.rivalNivel !== null) {
@@ -879,29 +975,26 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── Burbuja ───────────────────────────────────────────────────────────────
   private updateBubble(m: ManoState, pendTru: boolean, pendEnv: boolean): void {
     const trucoChanged  = (m.estadoTruco  ?? '') !== this.prevEstadoTruco;
-    const envidoChanged = (m.estadoEnvido ?? '') !== this.prevEstadoEnvido;
+    const justResolvedEnvido = !!m.envidoResuelto && !this.prevEnvidoResuelto;
+
+    // El envido recién se resolvió → reproducir la secuencia de tantos (máquina/humano),
+    // como en 2v2/3v3. Si además quedó un truco pendiente, se muestra al final.
+    if (justResolvedEnvido) {
+      this.reproducirSecuenciaEnvido(m);
+      if (pendTru) {
+        const txt = this.cantoBubbleText(m, true, false);
+        const t = setTimeout(() => { if (txt) this.showBubble(txt); }, this.duracionSecuenciaEnvido(m));
+        this.envidoSeqTimers.push(t);
+      }
+      return;
+    }
 
     if (pendTru || pendEnv) {
-      if (pendTru && envidoChanged && m.envidoCantado && !this.prevPendEnv) {
-        const e = (m.estadoEnvido ?? '').toLowerCase();
-        let rsp = '';
-        const justResolved = !!m.envidoResuelto && !this.prevEnvidoResuelto;
-        if      (e.includes('no quiso') || e.includes('no quiere')) rsp = '¡No quiero!';
-        else if (justResolved && m.tantoCantadoMaquina != null)      rsp = this.prevPendEnv ? `Tengo ${m.tantoCantadoMaquina}.` : `¡Quiero! Tengo ${m.tantoCantadoMaquina}.`;
-        else if (e.includes('quiso')    || e.includes('quiere'))     rsp = m.tantoCantadoMaquina != null ? (this.prevPendEnv ? `Tengo ${m.tantoCantadoMaquina}.` : `¡Quiero! Tengo ${m.tantoCantadoMaquina}.`) : '¡Quiero!';
-        if (rsp) {
-          this.showTempBubble(rsp, 2000);
-          setTimeout(() => {
-            const trucotxt = this.cantoBubbleText(m, pendTru, false);
-            if (trucotxt) this.showBubble(trucotxt);
-          }, 2100);
-          return;
-        }
-      }
       if (this.bubbleTimer) { clearTimeout(this.bubbleTimer); this.bubbleTimer = null; }
       const txt = this.cantoBubbleText(m, pendTru, pendEnv);
       if (txt) this.showBubble(txt);
     } else {
+      // Acá solo manejamos la respuesta al TRUCO; el envido lo cubre la secuencia.
       let resp = '';
       if (trucoChanged && m.trucoCantado && !this.prevPendTru) {
         const t = (m.estadoTruco ?? '').toLowerCase();
@@ -909,29 +1002,93 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
           ? '¡No quiero!'
           : (t.includes('quiso') || t.includes('quiere') || t.includes('acepto'))
             ? '¡Quiero!' : '';
-      } else if (envidoChanged && m.envidoCantado) {
-        const e = (m.estadoEnvido ?? '').toLowerCase();
-        const justResolved = !!m.envidoResuelto && !this.prevEnvidoResuelto;
-        if (e.includes('no quiso') || e.includes('no quiere')) {
-          resp = '¡No quiero!';
-        } else if (justResolved && m.tantoCantadoMaquina != null) {
-          // Si el humano aceptó el envido de la máquina (prevPendEnv=true) → solo "Tengo X"
-          // Si la máquina aceptó la escalación del humano (prevPendEnv=false) → "¡Quiero! Tengo X"
-          resp = this.prevPendEnv
-            ? `Tengo ${m.tantoCantadoMaquina}.`
-            : `¡Quiero! Tengo ${m.tantoCantadoMaquina}.`;
-        } else if (e.includes('quiso') || e.includes('quiere') || e.includes('acepto')) {
-          resp = m.tantoCantadoMaquina != null
-            ? (this.prevPendEnv ? `Tengo ${m.tantoCantadoMaquina}.` : `¡Quiero! Tengo ${m.tantoCantadoMaquina}.`)
-            : '¡Quiero!';
-        }
       }
       if (resp) {
         this.showTempBubble(resp, 2500);
-      } else if (!this.bubbleTimer) {
+      } else if (!this.bubbleTimer && this.envidoSeqTimers.length === 0) {
         this.bubbleText = '';
       }
     }
+  }
+
+  /**
+   * Reproduce el intercambio del envido como una secuencia de diálogos (¡Quiero!,
+   * los tantos en orden de mano, o "Son buenas"), espejo de 2v2/3v3. En 1v1 el
+   * backend resuelve todo de una, así que reconstruimos la secuencia desde el estado.
+   */
+  private reproducirSecuenciaEnvido(m: ManoState): void {
+    this.limpiarEnvidoSeq();
+
+    const estado     = (m.estadoEnvido ?? '').toLowerCase();
+    const humanoCanto = m.cantorEnvido === 'Humano';
+    const maquinaCanto = m.cantorEnvido === 'Maquina';
+    const noQuiso    = estado.includes('no quis') || estado.includes('no quier');
+
+    const steps: { lado: 'maquina' | 'humano'; texto: string }[] = [];
+
+    if (m.sonBuenasDeclarado) {
+      // El humano reconoció el envido de la máquina sin mostrar cartas.
+      steps.push({ lado: 'humano', texto: '¡Son buenas!' });
+    } else if (noQuiso) {
+      // Quien rechazó: si cantó el humano, rechazó la máquina; si cantó la máquina, el humano.
+      steps.push({ lado: humanoCanto ? 'maquina' : 'humano', texto: '¡No quiero!' });
+    } else if (m.tantoHumano != null && m.tantoCantadoMaquina != null) {
+      // Hubo "quiero": primero la aceptación, después los tantos en orden de mano.
+      if (humanoCanto)       steps.push({ lado: 'maquina', texto: '¡Quiero!' });
+      else if (maquinaCanto) steps.push({ lado: 'humano',  texto: '¡Quiero!' });
+
+      const decls: { lado: 'maquina' | 'humano'; texto: string }[] = [
+        { lado: 'humano',  texto: `Tengo ${m.tantoHumano}` },
+        { lado: 'maquina', texto: `Tengo ${m.tantoCantadoMaquina}` },
+      ];
+      // El "mano" declara primero.
+      if (m.manoIniciadaPor === 'Maquina') decls.reverse();
+      steps.push(...decls);
+    }
+
+    const paso = this.pasoEnvidoMs;
+    let acc = 300; // pequeño respiro antes del primer diálogo
+    for (const s of steps) {
+      const at = acc;
+      const t = setTimeout(() => {
+        if (s.lado === 'maquina') this.showTempBubble(s.texto, paso + 600);
+        else                      this.showTempBubbleHumano(s.texto, paso + 600);
+      }, at);
+      this.envidoSeqTimers.push(t);
+      acc += paso;
+    }
+    // Marcar el fin de la secuencia para liberar el guard de limpieza de burbuja.
+    this.envidoSeqTimers.push(setTimeout(() => { this.envidoSeqTimers = []; }, acc + 700));
+  }
+
+  /** Ritmo entre diálogos del envido: sigue al delay de juego pero acotado (0.9–1.4s). */
+  private get pasoEnvidoMs(): number {
+    return Math.min(1400, Math.max(900, this.delayMaquinaMs));
+  }
+
+  /** Duración estimada de la secuencia de envido (para encadenar el truco después). */
+  private duracionSecuenciaEnvido(m: ManoState): number {
+    let n = 0;
+    const estado = (m.estadoEnvido ?? '').toLowerCase();
+    if (m.sonBuenasDeclarado) n = 1;
+    else if (estado.includes('no quis') || estado.includes('no quier')) n = 1;
+    else if (m.tantoHumano != null && m.tantoCantadoMaquina != null) n = 3;
+    return 300 + n * this.pasoEnvidoMs + 200;
+  }
+
+  private limpiarEnvidoSeq(): void {
+    this.envidoSeqTimers.forEach(t => clearTimeout(t));
+    this.envidoSeqTimers = [];
+  }
+
+  /** Muestra el canto del humano en su burbuja apenas lo hace (envido/truco). */
+  private feedbackCantoHumano(endpoint: string, body: any): void {
+    let txt = '';
+    if (endpoint === 'cantar-envido' || endpoint === 'cantar-envido-tipo')
+      txt = '¡' + (body?.tipo ?? 'Envido') + '!';
+    else if (endpoint === 'cantar-truco') txt = '¡Truco!';
+    else if (endpoint === 'escalar-truco') txt = '¡Quiero más!';
+    if (txt) this.showTempBubbleHumano(txt, 1800);
   }
 
   private cantoBubbleText(m: ManoState, pendTru: boolean, pendEnv: boolean): string {
@@ -965,16 +1122,29 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     }, ms);
   }
 
+  /** Burbuja del lado del jugador (para sus declaraciones de tanto / "son buenas"). */
+  private showTempBubbleHumano(txt: string, ms: number): void {
+    if (this.bubbleHumanoTimer) { clearTimeout(this.bubbleHumanoTimer); this.bubbleHumanoTimer = null; }
+    this.bubbleHumanoText = txt;
+    this.cdr.markForCheck();
+    this.bubbleHumanoTimer = setTimeout(() => {
+      this.bubbleHumanoText = '';
+      this.bubbleHumanoTimer = null;
+      this.cdr.markForCheck();
+    }, ms);
+  }
+
   // ── Toast ─────────────────────────────────────────────────────────────────
-  private showToast(msg: string): void {
+  private showToast(msg: string, tipo: 'error' | 'info' = 'error'): void {
     if (this.toastTimer) { clearTimeout(this.toastTimer); this.toastTimer = null; }
-    this.toastMsg = msg;
+    this.toastMsg  = msg;
+    this.toastTipo = tipo;
     this.cdr.markForCheck();
     this.toastTimer = setTimeout(() => {
       this.toastMsg = '';
       this.toastTimer = null;
       this.cdr.markForCheck();
-    }, 4000);
+    }, tipo === 'info' ? 2600 : 4000);
   }
 
   // ── Botones ───────────────────────────────────────────────────────────────
