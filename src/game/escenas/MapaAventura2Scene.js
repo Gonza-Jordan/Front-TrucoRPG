@@ -18,6 +18,7 @@ export default class MapaAventura2Scene extends BaseScene {
     preload() {
         this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
         this.load.spritesheet('lobizon', './assets/sprites/lobizon.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('luzmala', './assets/sprites/luzmala.png', { frameWidth: 32, frameHeight: 32 });
     }
 
     create() {
@@ -77,15 +78,7 @@ export default class MapaAventura2Scene extends BaseScene {
         this.keys = this.input.keyboard.createCursorKeys();
         this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-        // TODO: agregar portales según el diseño del mapa
-        // this.portalDeVuelta = new Portal(
-        //   this,
-        //   X, Y,
-        //   'MapaPrincipal',
-        //   false,
-        //   { x: 1917, y: 323 },
-        // );
-        // this.physics.add.overlap(this.JugadorPrincipal, this.portalDeVuelta.zone);
+
 
         //portal mapa aventura 3
         this.portalMapaAventura3 = new Portal(this, 1109, 35, 'MapaAventura3', false, {
@@ -102,8 +95,11 @@ export default class MapaAventura2Scene extends BaseScene {
         this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura1.zone);
 
 
-        this.oponente = new Oponente(this, 475, 445, 'lobizon').setDepth(0);
-        this.oponente.setScale(3);
+        this.oponenteLobizon = new Oponente(this, 475, 445, 'lobizon').setDepth(0);
+        this.oponenteLobizon.setScale(3);
+
+        this.oponenteLuzMala = new Oponente(this, 1086, 139, 'luzmala').setDepth(0);
+        this.oponenteLuzMala.setScale(2);
     }
 
     update() {

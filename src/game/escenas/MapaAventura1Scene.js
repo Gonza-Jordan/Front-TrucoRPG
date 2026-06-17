@@ -1,6 +1,7 @@
 import BaseScene from './BaseScene.js';
 import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
 import Portal from '../objetos/Portal.js';
+import Oponente from '../personajes/Oponente.js';
 
 export default class MapaAventura1Scene extends BaseScene {
   constructor() {
@@ -15,6 +16,8 @@ export default class MapaAventura1Scene extends BaseScene {
 
   preload() {
     this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
+    this.load.spritesheet('nahuelito', './assets/sprites/nahuelito.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('pomberito', './assets/sprites/pomberito.png', { frameWidth: 64, frameHeight: 64 });
   }
 
   create() {
@@ -113,6 +116,15 @@ export default class MapaAventura1Scene extends BaseScene {
       y: 352,
     });
     this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaPrincipal.zone);
+
+
+    //oponentes
+
+    this.oponenteNahuelito = new Oponente(this, 937, 499, 'nahuelito').setDepth(0);
+    this.oponenteNahuelito.setScale(2);
+
+    this.oponentePomberito = new Oponente(this, 1085, 200, 'pomberito').setDepth(0);
+    this.oponentePomberito.setScale(1);
   }
 
 

@@ -17,7 +17,7 @@ export default class MapaAventura3Scene extends BaseScene {
 
     preload() {
         this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
-        //this.load.spritesheet('lobizon', './assets/sprites/lobizon.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('mandinga', './assets/sprites/mandinga.png', { frameWidth: 64, frameHeight: 64 });
     }
 
     create() {
@@ -85,6 +85,12 @@ export default class MapaAventura3Scene extends BaseScene {
             y: 35,
         });
         this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura2.zone);
+
+
+
+        //mandinga
+        this.oponenteMandinga = new Oponente(this, 1068, 325, 'mandinga').setDepth(0);
+        this.oponenteMandinga.setScale(1.3);
     }
 
     update() {
