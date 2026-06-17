@@ -87,11 +87,19 @@ export default class MapaAventura2Scene extends BaseScene {
         // );
         // this.physics.add.overlap(this.JugadorPrincipal, this.portalDeVuelta.zone);
 
+        //portal mapa aventura 3
         this.portalMapaAventura3 = new Portal(this, 1109, 35, 'MapaAventura3', false, {
-            x: 35,
-            y: 488,
+            x: 94,
+            y: 447,
         });
         this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura3.zone);
+
+        //portal volver mapa aventura 1
+        this.portalMapaAventura1 = new Portal(this, 1106, 669, 'MapaAventura1', false, {
+            x: 1092,
+            y: 131,
+        });
+        this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura1.zone);
 
 
         this.oponente = new Oponente(this, 475, 445, 'lobizon').setDepth(0);
@@ -116,6 +124,7 @@ export default class MapaAventura2Scene extends BaseScene {
         const interactuoMobile = this.botonInteractuarPresionado;
 
         this.portalMapaAventura3.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+        this.portalMapaAventura1.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
 
         if (this.botonInteractuarPresionado) {
             this.botonInteractuarPresionado = false;

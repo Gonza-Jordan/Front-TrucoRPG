@@ -78,18 +78,13 @@ export default class MapaAventura3Scene extends BaseScene {
         this.keys = this.input.keyboard.createCursorKeys();
         this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-        // TODO: agregar portales según el diseño del mapa
-        // this.portalDeVuelta = new Portal(
-        //   this,
-        //   X, Y,
-        //   'MapaPrincipal',
-        //   false,
-        //   { x: 1917, y: 323 },
-        // );
-        // this.physics.add.overlap(this.JugadorPrincipal, this.portalDeVuelta.zone);
 
-        // this.oponente = new Oponente(this, 475, 445, 'lobizon').setDepth(0);
-        //this.oponente.setScale(3);
+        //volver mapa aventura 2
+        this.portalMapaAventura2 = new Portal(this, 35, 492, 'MapaAventura2', false, {
+            x: 1109,
+            y: 35,
+        });
+        this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura2.zone);
     }
 
     update() {
@@ -107,6 +102,13 @@ export default class MapaAventura3Scene extends BaseScene {
             this.estabaMoviendose = false;
         }
 
-        // this.portalDeVuelta.update(this.JugadorPrincipal, this.teclaE);
+        t
+        const interactuoMobile = this.botonInteractuarPresionado;
+
+        this.portalMapaAventura2.update(this.JugadorPrincipal, this.teclaE);
+        if (this.botonInteractuarPresionado) {
+            this.botonInteractuarPresionado = false;
+        }
+
     }
 }
