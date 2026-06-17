@@ -49,7 +49,7 @@ export default class MapaAventura3Scene extends BaseScene {
 
         //colisiones
         const colisionesLayer = map.createLayer('Colisiones', cuevaTileset);
-        //colisionesLayer.setCollisionByExclusion([-1]);
+        colisionesLayer.setCollisionByExclusion([-1]);
 
 
         //player
