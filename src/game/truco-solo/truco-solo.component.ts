@@ -208,6 +208,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   private bubbleTimer: ReturnType<typeof setTimeout> | null = null;
   private bubbleHumanoTimer: ReturnType<typeof setTimeout> | null = null;
   private envidoSeqTimers: ReturnType<typeof setTimeout>[] = [];
+  private gameOverTimer: ReturnType<typeof setTimeout> | null = null;
   private toastTimer:  ReturnType<typeof setTimeout> | null = null;
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngAfterViewInit(): void {
@@ -239,6 +240,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.bubbleTimer) clearTimeout(this.bubbleTimer);
     if (this.bubbleHumanoTimer) clearTimeout(this.bubbleHumanoTimer);
+    if (this.gameOverTimer) clearTimeout(this.gameOverTimer);
     this.limpiarEnvidoSeq();
     if (this.toastTimer)  clearTimeout(this.toastTimer);
     this.cancelarCountdown();
@@ -456,7 +458,25 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   private updateUI(m: ManoState): void {
     this.redrawTally(m.puntosHumano, m.puntosMaquina);
 
+    const justResolvedEnvido = !!m.envidoResuelto && !this.prevEnvidoResuelto;
+
     if (m.ganadorPartida) {
+      // Si la partida se definió por el envido, primero se ven los tantos (¡Quiero!,
+      // los cantos de cada uno) y recién después aparece el overlay de fin de partida.
+      if (justResolvedEnvido) {
+        this.btns = []; // sin acciones mientras corre la animación de cierre
+        this.turnoBadge = '';
+        this.reproducirSecuenciaEnvido(m);
+        this.prevEnvidoResuelto = true;
+        if (this.gameOverTimer) clearTimeout(this.gameOverTimer);
+        this.gameOverTimer = setTimeout(() => {
+          this.gameOver    = true;
+          this.gameOverWon = m.ganadorPartida === 'Humano';
+          this.cdr.markForCheck();
+        }, this.duracionSecuenciaEnvido(m) + 800);
+        this.cdr.markForCheck();
+        return;
+      }
       this.gameOver    = true;
       this.gameOverWon = m.ganadorPartida === 'Humano';
       this.cdr.markForCheck();
@@ -671,7 +691,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       steps.push(...decls);
     }
 
-    const paso = Math.max(900, this.delayMaquinaMs);
+    const paso = this.pasoEnvidoMs;
     let acc = 300; // pequeño respiro antes del primer diálogo
     for (const s of steps) {
       const at = acc;
@@ -686,6 +706,11 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     this.envidoSeqTimers.push(setTimeout(() => { this.envidoSeqTimers = []; }, acc + 700));
   }
 
+  /** Ritmo entre diálogos del envido: sigue al delay de juego pero acotado (0.9–1.4s). */
+  private get pasoEnvidoMs(): number {
+    return Math.min(1400, Math.max(900, this.delayMaquinaMs));
+  }
+
   /** Duración estimada de la secuencia de envido (para encadenar el truco después). */
   private duracionSecuenciaEnvido(m: ManoState): number {
     let n = 0;
@@ -693,7 +718,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     if (m.sonBuenasDeclarado) n = 1;
     else if (estado.includes('no quis') || estado.includes('no quier')) n = 1;
     else if (m.tantoHumano != null && m.tantoCantadoMaquina != null) n = 3;
-    return 300 + n * Math.max(900, this.delayMaquinaMs) + 200;
+    return 300 + n * this.pasoEnvidoMs + 200;
   }
 
   private limpiarEnvidoSeq(): void {
