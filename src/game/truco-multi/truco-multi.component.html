@@ -148,7 +148,7 @@
   }
 
   @if (toastMsg) {
-  <div class="toast">{{ toastMsg }}</div>
+  <div class="toast" [class.toast-info]="toastTipo === 'info'">{{ toastMsg }}</div>
   }
 
   @if (mostrarConfirmSalir) {

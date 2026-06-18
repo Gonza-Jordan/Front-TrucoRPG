@@ -111,6 +111,7 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
   mostrarMenuSenias = false;
 
   toastMsg = '';
+  toastTipo: 'error' | 'info' = 'error';
   mostrarConfirmSalir = false;
   gameOver = false;
   gameOverGanamos = false;
@@ -364,8 +365,15 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
     const e = this.estado;
     if (!e) return;
     if (e.manoTerminada || e.ganadorMano || e.partidaTerminada) return;
-    if (e.turnoActual !== this.miRol) { this.showToast('No es tu turno.'); return; }
-    if (e.trucoPendienteRespuestaDe || e.envidoPendienteRespuestaDe) return;
+    if (e.trucoPendienteRespuestaDe === this.miRol || e.envidoPendienteRespuestaDe === this.miRol) {
+      this.showToast('No podés jugar: primero respondé el canto.', 'info');
+      return;
+    }
+    if (e.turnoActual !== this.miRol) { this.showToast('Esperá tu turno para jugar.', 'info'); return; }
+    if (e.trucoPendienteRespuestaDe || e.envidoPendienteRespuestaDe) {
+      this.showToast('Esperá la respuesta del canto.', 'info');
+      return;
+    }
     this.hub('JugarCarta2v2', carta.numero, carta.palo);
   }
 
@@ -535,11 +543,12 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
     this.router.navigate(['/home']);
   }
 
-  private showToast(msg: string): void {
-    this.toastMsg = msg;
+  private showToast(msg: string, tipo: 'error' | 'info' = 'error'): void {
+    this.toastMsg  = msg;
+    this.toastTipo = tipo;
     this.cdr.markForCheck();
     if (this.toastTimer) clearTimeout(this.toastTimer);
-    this.toastTimer = setTimeout(() => { this.toastMsg = ''; this.cdr.markForCheck(); }, 4000);
+    this.toastTimer = setTimeout(() => { this.toastMsg = ''; this.cdr.markForCheck(); }, tipo === 'info' ? 2600 : 4000);
   }
 
   abrirMenuSenias() {

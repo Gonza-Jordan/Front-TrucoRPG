@@ -6,6 +6,7 @@ import InteriorCasaScene from './escenas/InteriorCasaScene.js';
 import InteriorPulperiaScene from './escenas/InteriorPulperiaScene.js';
 import MapaAventura1Scene from './escenas/MapaAventura1Scene.js';
 import MapaAventura2Scene from './escenas/MapaAventura2Scene.js';
+import MapaAventura3Scene from './escenas/MapaAventura3Scene.js';
 
 export function initHistoria(parent = 'historia-container') {
   const esTactil = navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
@@ -17,7 +18,7 @@ export function initHistoria(parent = 'historia-container') {
     callbacks: {
       postBoot: (game) => {
         if (esTactil && screen.orientation?.lock) {
-          screen.orientation.lock('landscape').catch(() => {});
+          screen.orientation.lock('landscape').catch(() => { });
         }
         if (esTactil) {
           try {
@@ -26,13 +27,13 @@ export function initHistoria(parent = 'historia-container') {
               if (ctx) ctx.imageSmoothingEnabled = false;
               game.canvas.style.imageRendering = 'pixelated';
             }
-          } catch (err) {}
+          } catch (err) { }
         } else {
           try {
             if (game && game.canvas) {
               game.canvas.style.imageRendering = 'auto';
             }
-          } catch (err) {}
+          } catch (err) { }
         }
       },
     },
@@ -55,6 +56,7 @@ export function initHistoria(parent = 'historia-container') {
       InteriorPulperiaScene,
       MapaAventura1Scene,
       MapaAventura2Scene,
+      MapaAventura3Scene,
     ],
     parent,
   };

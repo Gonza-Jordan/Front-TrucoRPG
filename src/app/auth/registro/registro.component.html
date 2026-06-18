@@ -24,7 +24,20 @@
         <label for="password">Ingresar Contraseña:</label>
         <input id="password" type="password" formControlName="password" placeholder="Mínimo 6 caracteres" />
         <span class="error" *ngIf="password.touched && password.errors?.['required']">Campo obligatorio</span>
-        <span class="error" *ngIf="password.touched && password.errors?.['minlength']">Mínimo 6 caracteres</span>
+        <ul class="requisitos">
+          <li [class.ok]="tieneLongitud">
+            <span class="check">{{ tieneLongitud ? '✔' : '○' }}</span> Mínimo 6 caracteres
+          </li>
+          <li [class.ok]="tieneMayuscula">
+            <span class="check">{{ tieneMayuscula ? '✔' : '○' }}</span> Al menos una mayúscula
+          </li>
+          <li [class.ok]="tieneMinuscula">
+            <span class="check">{{ tieneMinuscula ? '✔' : '○' }}</span> Al menos una minúscula
+          </li>
+          <li [class.ok]="tieneNumero">
+            <span class="check">{{ tieneNumero ? '✔' : '○' }}</span> Al menos un número
+          </li>
+        </ul>
       </div>
 
       <div class="campo">

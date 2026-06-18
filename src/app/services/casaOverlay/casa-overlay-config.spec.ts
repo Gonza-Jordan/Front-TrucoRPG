@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { OverlayConfig } from './overlay-config';
+import { CasaOverlayConfig } from './casa-overlay-config';
 
-describe('OverlayConfig', () => {
-  let service: OverlayConfig;
+describe('CasaOverlayConfig', () => {
+  let service: CasaOverlayConfig;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(OverlayConfig);
+    service = TestBed.inject(CasaOverlayConfig);
   });
 
   it('should be created', () => {

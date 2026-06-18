@@ -550,6 +550,17 @@
   text-align: center;
 }
 
+/* Aviso amigable (reglas del juego) — lado izquierdo, tono verde en vez de error. */
+.toast-2v2.toast-info {
+  left: 14px;
+  transform: none;
+  background: rgba(20, 51, 26, 0.95);
+  border-color: #4a8a3a;
+  color: #c8efc0;
+  white-space: normal;
+  max-width: 230px;
+}
+
 /* ─── Overlays (confirm/game over) ───────────────────────────── */
 .confirm-overlay, .game-over-overlay {
   position: absolute;

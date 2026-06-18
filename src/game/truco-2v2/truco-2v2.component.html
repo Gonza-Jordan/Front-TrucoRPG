@@ -254,7 +254,7 @@
 
   <!-- ── TOAST ──────────────────────────────────────────────────── -->
   @if (toastMsg) {
-    <div class="toast-2v2">{{ toastMsg }}</div>
+    <div class="toast-2v2" [class.toast-info]="toastTipo === 'info'">{{ toastMsg }}</div>
   }
 
 </div>
