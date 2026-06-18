@@ -154,7 +154,7 @@ export default class MapaPrincipalScene extends BaseScene {
 
       // CARTEL
       {
-        texto: 'Junto a la pulpería está el cartel de aventuras.',
+        texto: 'Junto a la pulpería está un cartel con flecha roja, ese es el cartel de aventura.',
         enfoqueNpc: this.npcTutorial,
       },
       {
@@ -189,6 +189,11 @@ export default class MapaPrincipalScene extends BaseScene {
   }
 
   update() {
+    if (this.tutorial && this.tutorial.activo) {
+      this.tutorial.update();
+      return;
+    }
+
     this.JugadorPrincipal.update(this.keys, this.teclaE);
 
     const seMueve =
@@ -210,14 +215,6 @@ export default class MapaPrincipalScene extends BaseScene {
 
     if (this.botonInteractuarPresionado) {
       this.botonInteractuarPresionado = false;
-    }
-
-    //tutorial
-
-    if (this.tutorial && this.tutorial.activo) {
-      this.tutorial.update();
-    } else {
-      // update normal del mapa
     }
   }
 }

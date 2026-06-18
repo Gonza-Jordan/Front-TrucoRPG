@@ -22,6 +22,7 @@ import { PartidaSoloComponent } from './components/juego/partida-solo/partida-so
 import { Tutorial } from './pages/tutorial/tutorial';
 import { ReglasTruco } from './pages/reglas-truco/reglas-truco';
 import { ValoresCarta } from './pages/valores-carta/valores-carta';
+import { Oponentes } from './pages/oponentes/oponentes';
 import { Historia } from './components/juego/historia/historia';
 import { PracticaComponent } from './pages/practica/practica';
 import { UnirseQrComponent } from './pages/unirse-qr/unirse-qr';
@@ -42,6 +43,7 @@ export const routes: Routes = [
   { path: 'tutorial', component: Tutorial, data: { header: 'tutorial' }},
   { path: 'reglas-truco', component: ReglasTruco, data: { header: 'reglas-truco' }},
   { path: 'valores-carta', component: ValoresCarta, data: { header: 'valores-carta' }},
+  { path: 'oponentes', component: Oponentes, data: { header: 'oponentes' }},
 
   { path: 'maquina', component: TrucoSoloComponent },
   { path: 'juego/multi', component: TrucoMultiComponent },
