@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../auth/auth.service';
 
@@ -30,6 +31,7 @@ export interface LobbyListos {
 @Injectable({ providedIn: 'root' })
 export class SalaService {
   private hub: signalR.HubConnection;
+  private seniaRecibidaSource = new Subject<string>();
 
   // ── 1v1 observables ─────────────────────────────────────────
   codigoSala$          = new BehaviorSubject<string>('');
@@ -55,6 +57,9 @@ export class SalaService {
   /** Estado del juego 3v3 multijugador (para Truco3v3Component) */
   trucoEstado3v3$    = new BehaviorSubject<unknown>(null);
   juegoIniciado3v3$  = new BehaviorSubject<boolean>(false);
+
+  // ── Señas observable ─────────────────────────────────────────
+  seniaRecibida$ = this.seniaRecibidaSource.asObservable();
 
   constructor(private auth: AuthService) {
     this.hub = new signalR.HubConnectionBuilder()
@@ -113,6 +118,11 @@ export class SalaService {
       if (!this.juegoIniciado3v3$.value) this.juegoIniciado3v3$.next(true);
       if (!this.juegoIniciado$.value) this.juegoIniciado$.next(true);
       this.trucoEstado3v3$.next(data);
+    });
+
+    // ── Señas evento ────────────────────────────────────────
+    this.hub.on('RecibirSenia2v2', (tipo: string) => {
+      this.seniaRecibidaSource.next(tipo);
     });
   }
 

@@ -108,6 +108,7 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
   mesa: MesaJugadas = { yo: [], compa: [], izq: [], der: [] };
   tallySticksNosotros: any[] = [];
   tallySticksEllos:    any[] = [];
+  mostrarMenuSenias = false;
 
   toastMsg = '';
   mostrarConfirmSalir = false;
@@ -138,12 +139,22 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subs.push(
+
       this.sala.trucoEstado2v2$.subscribe(data => {
         if (data) this.onEstado(data as Msg2v2);
       }),
+
       this.sala.jugadorDesconectado$.subscribe(v => {
         if (v) this.showToast('Un jugador se desconectó de la partida.');
       }),
+
+      this.sala.seniaRecibida$.subscribe(tipo => {
+        if (!tipo) return;
+        this.mostrarDialogo(
+          'compa',
+          `👁 ${tipo}`
+        );
+      })
     );
   }
 
@@ -530,4 +541,28 @@ export class TrucoMulti2v2Component implements OnInit, OnDestroy {
     if (this.toastTimer) clearTimeout(this.toastTimer);
     this.toastTimer = setTimeout(() => { this.toastMsg = ''; this.cdr.markForCheck(); }, 4000);
   }
+
+  abrirMenuSenias() {
+    this.mostrarMenuSenias = true;
+  }
+
+  enviarSenia(tipo: string): void {
+    this.hub('EnviarSenia2v2', tipo);
+    this.mostrarMenuSenias = false;
+  }
+
+  /* c#
+  public async Task EnviarSenia2v2(string tipo)
+  {
+      var jugador = ObtenerJugadorActual();
+      var companero = ObtenerCompanero(jugador);
+
+      await Clients.Client(companero.ConnectionId)
+          .SendAsync("RecibirSenia", tipo);
+  }
+
+  var companero = ObtenerCompanero(jugadorActual);
+  await Clients.Client(companero.ConnectionId)
+    .SendAsync("RecibirSena", sena);
+  */
 }
