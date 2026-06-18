@@ -60,8 +60,16 @@ export class App implements OnInit, OnDestroy {
     }
   };
 
-  solicitarPantallaCompleta(): void {
-    document.documentElement.requestFullscreen().catch(() => {});
+  async solicitarRotacion(): Promise<void> {
+    // 1. Fullscreen (requerido por la mayoría de browsers antes de lock)
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen().catch(() => {});
+    }
+    // 2. Forzar orientación landscape
+    const orientation = screen.orientation as any;
+    if (orientation?.lock) {
+      await orientation.lock('landscape').catch(() => {});
+    }
   }
 
   private _onOrientationChange = () => {
