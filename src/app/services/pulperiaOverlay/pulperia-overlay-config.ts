@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 
 export interface PulperiaOverlayConfig {
   tipoVista: 'tienda' | 'partida-solo' | 'multijugador' | null;
-  subVista?: 'menu' | 'tipo' | 'tradicional' | 'sala' | null;
+  subVista?: 'menu' | 'tipo' | 'tradicional' | 'sala' | 'equipos' | null;
   datos?: any;
 }
 
@@ -11,20 +11,25 @@ export interface PulperiaOverlayConfig {
   providedIn: 'root',
 })
 export class PulperiaUiService {
-  private fuenteOverlay = new BehaviorSubject<PulperiaOverlayConfig>({ tipoVista: null, subVista: null });
+  private fuenteOverlay = new BehaviorSubject<PulperiaOverlayConfig>({
+    tipoVista: null,
+    subVista: null,
+  });
   estadoOverlay$ = this.fuenteOverlay.asObservable();
 
-  // Cambiamos el nombre para que sea ultra claro y seguro
   get esFlujoPhaser(): boolean {
     return this.fuenteOverlay.value.tipoVista !== null;
   }
 
-  // Getter específico para saber si el flujo actual de Phaser es el multijugador
   get esMultijugadorPhaser(): boolean {
     return this.fuenteOverlay.value.tipoVista === 'multijugador';
   }
 
-  abrirOverlay(tipoVista: PulperiaOverlayConfig['tipoVista'], subVista: PulperiaOverlayConfig['subVista'] = 'menu', datos?: any) {
+  abrirOverlay(
+    tipoVista: PulperiaOverlayConfig['tipoVista'],
+    subVista: PulperiaOverlayConfig['subVista'] = 'menu',
+    datos?: any,
+  ) {
     this.fuenteOverlay.next({ tipoVista, subVista, datos });
   }
 
@@ -33,7 +38,7 @@ export class PulperiaUiService {
     this.fuenteOverlay.next({
       ...estadoActual,
       subVista,
-      datos: { ...estadoActual.datos, ...nuevosDatos }
+      datos: { ...estadoActual.datos, ...nuevosDatos },
     });
   }
 

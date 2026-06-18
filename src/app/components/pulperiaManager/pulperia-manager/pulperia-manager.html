@@ -1,7 +1,6 @@
 @if (vistaActiva) {
   <div class="contenedor-overlay-principal">
     <div class="contenedor-modal" [class.modal-ancho]="vistaActiva === 'multijugador'">
-      
       <button class="botonCerrar" (click)="cerrar()">X</button>
 
       @if (vistaActiva === 'tienda') {
@@ -25,6 +24,9 @@
           }
           @case ('sala') {
             <app-menu-multijugador-tradicional-sala></app-menu-multijugador-tradicional-sala>
+          }
+          @case ('equipos') {
+            <app-menu-2v2-equipos></app-menu-2v2-equipos>
           }
         }
       }

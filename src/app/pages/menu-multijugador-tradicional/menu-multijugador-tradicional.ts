@@ -34,17 +34,22 @@ export class MenuMultijugadorTradicional implements OnInit, OnDestroy {
   private subService?: Subscription;
 
   constructor(
-    private sala: SalaService, 
-    private router: Router, 
+    private sala: SalaService,
+    private router: Router,
     private route: ActivatedRoute,
-    private uiService: PulperiaUiService
+    private uiService: PulperiaUiService,
   ) {}
 
   ngOnInit(): void {
     if (this.uiService.esMultijugadorPhaser) {
-      this.subService = this.uiService.estadoOverlay$.subscribe(config => {
+      this.subService = this.uiService.estadoOverlay$.subscribe((config) => {
         if (config?.datos?.gameMode) {
           this.gameMode = config.datos.gameMode;
+        }
+
+        if (config?.datos?.codigoSugerido) {
+          const codigoMesa = config.datos.codigoSugerido;
+          this.unirseConCodigo(codigoMesa);
         }
       });
     } else {
@@ -68,7 +73,11 @@ export class MenuMultijugadorTradicional implements OnInit, OnDestroy {
   confirmarCrear() {
     this.modalCrearAbierto = false;
     if (this.uiService.esMultijugadorPhaser) {
-      this.uiService.cambiarSubVista('sala', { mode: 'crear', gameMode: this.gameMode, publica: this.salaPublica });
+      this.uiService.cambiarSubVista('sala', {
+        mode: 'crear',
+        gameMode: this.gameMode,
+        publica: this.salaPublica,
+      });
     } else {
       this.router.navigate(['/menu-multijugador-tradicional-sala'], {
         queryParams: { mode: 'crear', gameMode: this.gameMode, publica: this.salaPublica },
@@ -148,15 +157,20 @@ export class MenuMultijugadorTradicional implements OnInit, OnDestroy {
       this.sala.reset();
       await this.sala.conectar();
       const ok = await this.sala.unirseASala(codigo);
+
       if (!ok) {
         this.errorUnirse = 'Sala no encontrada o llena.';
         this.cargando = false;
         if (onError) onError();
         return;
       }
-      
+
       if (this.uiService.esMultijugadorPhaser) {
-        this.uiService.cambiarSubVista('sala', { mode: 'unirse', gameMode: this.gameMode });
+        this.uiService.cambiarSubVista('sala', {
+          mode: 'unirse',
+          gameMode: this.gameMode,
+          codigoSugerido: null,
+        });
       } else {
         this.router.navigate(['/menu-multijugador-tradicional-sala'], {
           queryParams: { mode: 'unirse', gameMode: this.gameMode },
@@ -173,7 +187,9 @@ export class MenuMultijugadorTradicional implements OnInit, OnDestroy {
     if (this.uiService.esMultijugadorPhaser) {
       this.uiService.cambiarSubVista('tipo');
     } else {
-      this.router.navigate(['/menu-multijugador-tipo'], { queryParams: { gameMode: this.gameMode } });
+      this.router.navigate(['/menu-multijugador-tipo'], {
+        queryParams: { gameMode: this.gameMode },
+      });
     }
   }
 }

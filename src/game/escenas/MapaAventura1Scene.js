@@ -16,7 +16,7 @@ export default class MapaAventura1Scene extends BaseScene {
 
   preload() {
     this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
-    this.load.spritesheet('nahuelito', './assets/sprites/nahuelito.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('nahuelito', './assets/sprites/nahuelito.png', { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('pomberito', './assets/sprites/pomberito.png', { frameWidth: 64, frameHeight: 64 });
   }
 
@@ -120,8 +120,8 @@ export default class MapaAventura1Scene extends BaseScene {
 
     //oponentes
 
-    this.oponenteNahuelito = new Oponente(this, 937, 499, 'nahuelito').setDepth(0);
-    this.oponenteNahuelito.setScale(2);
+    this.oponenteNahuelito = new Oponente(this, 980, 499, 'nahuelito').setDepth(0);
+    this.oponenteNahuelito.setScale(1.3);
 
     this.oponentePomberito = new Oponente(this, 1085, 200, 'pomberito').setDepth(0);
     this.oponentePomberito.setScale(1);

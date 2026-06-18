@@ -7,6 +7,7 @@ import { MenuMultijugador } from '../../../pages/menu-multijugador/menu-multijug
 import { MenuMultijugadorTipo } from '../../../pages/menu-multijugador-tipo/menu-multijugador-tipo';
 import { MenuMultijugadorTradicional } from '../../../pages/menu-multijugador-tradicional/menu-multijugador-tradicional';
 import { MenuMultijugadorTradicionalSala } from '../../../pages/menu-multijugador-tradicional-sala/menu-multijugador-tradicional-sala';
+import { Menu2v2EquiposComponent } from '../../../pages/menu-2v2-equipos/menu-2v2-equipos';
 
 @Component({
   selector: 'app-pulperia-manager',
@@ -19,13 +20,14 @@ import { MenuMultijugadorTradicionalSala } from '../../../pages/menu-multijugado
     MenuMultijugadorTipo,
     MenuMultijugadorTradicional,
     MenuMultijugadorTradicionalSala,
+    Menu2v2EquiposComponent
   ],
   templateUrl: './pulperia-manager.html',
   styleUrls: ['./pulperia-manager.css'],
 })
 export class PulperiaManager implements OnInit {
   vistaActiva: 'tienda' | 'partida-solo' | 'multijugador' | null = null;
-  subVistaActiva: 'menu' | 'tipo' | 'tradicional' | 'sala' = 'menu';
+  subVistaActiva: 'menu' | 'tipo' | 'tradicional' | 'sala' | 'equipos' = 'menu';
   datosRecibidos: any = null;
 
   private vistasValidas = ['tienda', 'partida-solo', 'multijugador'];

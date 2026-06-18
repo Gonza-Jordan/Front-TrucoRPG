@@ -82,7 +82,7 @@ export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
         if (completa) {
           setTimeout(() => {
             if (this.uiService.esMultijugadorPhaser) {
-              this.uiService.cambiarSubVista('sala');
+              this.uiService.cambiarSubVista('equipos', { gameMode: this.gameMode });
             } else {
               this.router.navigate(['/menu-2v2-equipos'], {
                 queryParams: { gameMode: this.gameMode },
@@ -94,12 +94,20 @@ export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
 
       this.sala.juegoIniciado$.subscribe((v) => {
         if (v) {
-          if (this.uiService.esMultijugadorPhaser) {
-            this.uiService.cerrarOverlay();
-            window.dispatchEvent(new CustomEvent('start-multiplayer-match'));
-          } else {
-            this.router.navigate(['/juego/multi']);
+          let rutaDestino = '/juego/multi';
+          if (this.gameMode === '2v2') {
+            rutaDestino = '/juego/2v2-multi';
+          } else if (this.gameMode === '3v3') {
+            rutaDestino = '/juego/3v3';
           }
+
+          this.uiService.cerrarOverlay();
+
+          this.router.navigate([rutaDestino], {
+            queryParams: {
+              sala: this.codigoSala || this.sala.codigoSala$.value,
+            },
+          });
         }
       }),
 
@@ -123,7 +131,9 @@ export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
     }
 
     if (this.esPorEquipos && this.sala.salaCompleta$.value) {
-      if (!this.uiService.esMultijugadorPhaser) {
+      if (this.uiService.esMultijugadorPhaser) {
+        this.uiService.cambiarSubVista('menu', { gameMode: this.gameMode });
+      } else {
         this.router.navigate(['/menu-2v2-equipos'], { queryParams: { gameMode: this.gameMode } });
       }
     }
