@@ -44,7 +44,7 @@ export default class MesaManager {
 
   crearMesaDeJuego(x, y, sala) {
     const mesa = this.mesasPublicasGroup.create(x, y, 'mesa_juego');
-    mesa.setScale(0.09).setImmovable(true);
+    mesa.setScale(1).setImmovable(true);
 
     const textoContador = this.scene.add
       .text(x, y - 45, `SALA: ${sala.codigo}\n${sala.jugadores}/${sala.maxJugadores}`, {
