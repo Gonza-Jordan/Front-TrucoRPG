@@ -161,7 +161,7 @@ export default class Tutorial {
     this.textoGlobo = this.escena.add
       .text(0, ry + rh / 2, mensaje, {
         fontFamily: 'Jersey 20',
-        fontSize: '11px',
+        fontSize: '15px',
         color: '#2d1910',
         align: 'center',
         wordWrap: { width: ancho },
