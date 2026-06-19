@@ -109,6 +109,9 @@ export default class SalaMultijugadorScene extends BaseScene {
       }),
     );
 
+    // Portal de salida
+    this._crearPortal(460, 430);
+
     // Texto de ayuda fijo (no sigue la cámara)
     this.add
       .text(10, 690, '[ ESC ] Volver al menú', {
@@ -165,12 +168,27 @@ export default class SalaMultijugadorScene extends BaseScene {
 
     // ESC: salir al menú Angular
     if (Phaser.Input.Keyboard.JustDown(this.teclaEsc)) {
-      window.dispatchEvent(new CustomEvent('multi-room:exit'));
+      this._salirAlMenu();
       return;
     }
 
     this.JugadorPrincipal.update(this.keys, this.teclaE);
     const interactuoMobile = this.botonInteractuarPresionado;
+
+    // Portal: mostrar tooltip y detectar interacción
+    if (this._portalZona) {
+      const dx = this.JugadorPrincipal.x - this._portalZona.x;
+      const dy = this.JugadorPrincipal.y - this._portalZona.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const cerca = dist < 90;
+
+      if (this._portalTooltip) this._portalTooltip.setVisible(cerca);
+
+      if (cerca && (Phaser.Input.Keyboard.JustDown(this.teclaE) || interactuoMobile)) {
+        this._salirAlMenu();
+        return;
+      }
+    }
 
     const seMueve =
       this.JugadorPrincipal.body.velocity.x !== 0 ||
@@ -185,7 +203,114 @@ export default class SalaMultijugadorScene extends BaseScene {
       punto.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
     });
 
+    // Partículas del portal orbitando
+    if (this._portalParticulas && this._portalZona) {
+      this._portalAngle = (this._portalAngle || 0) + 0.035;
+      const { x, y } = this._portalZona;
+      this._portalParticulas.forEach(({ dot, fase }) => {
+        const angle = this._portalAngle + fase;
+        const r = 34;
+        dot.setPosition(x + Math.cos(angle) * r, y + Math.sin(angle) * r * 0.45);
+      });
+    }
+
     this.botonInteractuarPresionado = false;
+  }
+
+  _salirAlMenu() {
+    this.cameras.main.fadeOut(400, 0, 0, 0);
+    this.time.delayedCall(420, () => {
+      window.dispatchEvent(new CustomEvent('multi-room:exit'));
+    });
+  }
+
+  /**
+   * Crea un portal animado en (x, y) que al interactuar sale al menú.
+   */
+  _crearPortal(x, y) {
+    // ── Suelo del portal (óvalo oscuro) ──────────────────────────
+    const sombra = this.add.ellipse(x, y + 36, 80, 20, 0x000000, 0.35).setDepth(1);
+
+    // ── Glow exterior (anillo animado) ────────────────────────────
+    const glowOuter = this.add.graphics().setDepth(2);
+    const glowInner = this.add.graphics().setDepth(2);
+    const core      = this.add.graphics().setDepth(2);
+
+    const drawPortal = (alpha) => {
+      glowOuter.clear();
+      glowOuter.lineStyle(6, 0x4400cc, alpha * 0.4);
+      glowOuter.strokeCircle(x, y, 44);
+      glowOuter.lineStyle(4, 0x6622ff, alpha * 0.55);
+      glowOuter.strokeCircle(x, y, 38);
+
+      glowInner.clear();
+      glowInner.lineStyle(5, 0x9944ff, alpha * 0.75);
+      glowInner.strokeCircle(x, y, 30);
+      glowInner.lineStyle(3, 0xcc88ff, alpha * 0.9);
+      glowInner.strokeCircle(x, y, 22);
+
+      core.clear();
+      core.fillStyle(0x220055, alpha * 0.85);
+      core.fillCircle(x, y, 18);
+      core.fillStyle(0x6600cc, alpha * 0.5);
+      core.fillCircle(x, y, 12);
+      core.fillStyle(0xccaaff, alpha * 0.3);
+      core.fillCircle(x, y, 6);
+    };
+
+    drawPortal(1);
+
+    // Pulso de brillo
+    this.tweens.add({
+      targets: { v: 1 },
+      v: 0.55,
+      duration: 900,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+      onUpdate: (tween, target) => drawPortal(target.v),
+    });
+
+    // Partículas que orbitan (usando círculos gráficos pequeños)
+    this._portalParticulas = [];
+    const N = 6;
+    for (let i = 0; i < N; i++) {
+      const dot = this.add.graphics().setDepth(3);
+      dot.fillStyle(0xddbbff, 1);
+      dot.fillCircle(0, 0, 3);
+      this._portalParticulas.push({ dot, fase: (i / N) * Math.PI * 2 });
+    }
+
+    // ── Label "SALIDA" ────────────────────────────────────────────
+    this.add
+      .text(x, y - 60, 'SALIDA', {
+        fontFamily: 'Jersey 20',
+        fontSize: '18px',
+        color: '#cc99ff',
+        stroke: '#000000',
+        strokeThickness: 3,
+      })
+      .setOrigin(0.5)
+      .setDepth(5);
+
+    // ── Tooltip (oculto hasta que el jugador se acerque) ──────────
+    this._portalTooltip = this.add
+      .text(x, y - 78, '[ E ] Salir al menú', {
+        fontFamily: 'Jersey 20',
+        fontSize: '14px',
+        color: '#ffffff',
+        backgroundColor: '#00000099',
+        stroke: '#000000',
+        strokeThickness: 2,
+        padding: { x: 6, y: 3 },
+      })
+      .setOrigin(0.5)
+      .setDepth(5)
+      .setVisible(false);
+
+    // Animación de las partículas en el update
+    this._portalZona = { x, y };
+    this._portalAngle = 0;
   }
 
   /** Genera dos texturas reutilizables: silla mirando al norte y al sur */
