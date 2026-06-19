@@ -40,7 +40,7 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
     private sala: SalaService,
     private router: Router,
     private route: ActivatedRoute,
-    private uiService: PulperiaUiService,
+    public uiService: PulperiaUiService,
   ) {}
 
   ngOnInit(): void {

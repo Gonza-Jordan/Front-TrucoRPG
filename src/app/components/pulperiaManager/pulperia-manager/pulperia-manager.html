@@ -1,8 +1,6 @@
 @if (vistaActiva) {
   <div class="contenedor-overlay-principal">
     <div class="contenedor-modal" [class.modal-ancho]="vistaActiva === 'multijugador'">
-      <button class="botonCerrar" (click)="cerrar()">X</button>
-
       @if (vistaActiva === 'tienda') {
         <app-tienda-overlay></app-tienda-overlay>
       }
@@ -30,6 +28,7 @@
           }
         }
       }
+      <button class="botonCerrar" (click)="cerrar()">X</button>
     </div>
   </div>
 }

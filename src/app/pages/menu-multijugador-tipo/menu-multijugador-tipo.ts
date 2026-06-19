@@ -13,7 +13,7 @@ import { PulperiaUiService } from '../../services/pulperiaOverlay/pulperia-overl
 export class MenuMultijugadorTipo {
   constructor(
     private router: Router,
-    public uiService: PulperiaUiService,
+    protected uiService: PulperiaUiService,
   ) {}
 
   seleccionarModo(modo: '1v1' | '2v2' | '3v3'): void {

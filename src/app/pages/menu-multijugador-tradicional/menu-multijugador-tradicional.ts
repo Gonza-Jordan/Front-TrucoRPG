@@ -37,7 +37,7 @@ export class MenuMultijugadorTradicional implements OnInit, OnDestroy {
     private sala: SalaService,
     private router: Router,
     private route: ActivatedRoute,
-    public uiService: PulperiaUiService,
+    protected uiService: PulperiaUiService,
   ) {}
 
   ngOnInit(): void {
