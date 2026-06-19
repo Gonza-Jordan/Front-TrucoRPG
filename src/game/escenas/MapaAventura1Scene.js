@@ -1,6 +1,7 @@
 import BaseScene from './BaseScene.js';
 import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
 import Portal from '../objetos/Portal.js';
+import Oponente from '../personajes/Oponente.js';
 
 export default class MapaAventura1Scene extends BaseScene {
   constructor() {
@@ -15,6 +16,8 @@ export default class MapaAventura1Scene extends BaseScene {
 
   preload() {
     this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
+    this.load.spritesheet('nahuelito', './assets/sprites/nahuelito.png', { frameWidth: 128, frameHeight: 128 });
+    this.load.spritesheet('pomberito', './assets/sprites/pomberito.png', { frameWidth: 64, frameHeight: 64 });
   }
 
   create() {
@@ -99,23 +102,33 @@ export default class MapaAventura1Scene extends BaseScene {
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-    // TODO: agregar portales según el diseño del mapa
-    // this.portalDeVuelta = new Portal(
-    //   this,
-    //   X, Y,
-    //   'MapaPrincipal',
-    //   false,
-    //   { x: 1917, y: 323 },
-    // );
-    // this.physics.add.overlap(this.JugadorPrincipal, this.portalDeVuelta.zone);
 
-    // TODO: agregar portales según el diseño del mapa
+    //portal mapa aventura 2
     this.portalMapaAventura2 = new Portal(this, 1092, 131, 'MapaAventura2', false, {
       x: 1078,
       y: 611,
     });
     this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura2.zone);
+
+    //portal volver al mapa princ
+    this.portalMapaPrincipal = new Portal(this, 35, 552, 'MapaPrincipal', false, {
+      x: 1917,
+      y: 352,
+    });
+    this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaPrincipal.zone);
+
+
+    //oponentes
+
+    this.oponenteNahuelito = new Oponente(this, 980, 499, 'nahuelito').setDepth(0);
+    this.oponenteNahuelito.setScale(1.3);
+
+    this.oponentePomberito = new Oponente(this, 1085, 200, 'pomberito').setDepth(0);
+    this.oponentePomberito.setScale(1);
   }
+
+
+
 
   update() {
     this.JugadorPrincipal.update(this.keys, this.teclaE);
@@ -135,6 +148,7 @@ export default class MapaAventura1Scene extends BaseScene {
     const interactuoMobile = this.botonInteractuarPresionado;
 
     this.portalMapaAventura2.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+    this.portalMapaPrincipal.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
 
     if (this.botonInteractuarPresionado) {
       this.botonInteractuarPresionado = false;

@@ -1,11 +1,16 @@
 @if (vistaActual === 'seleccion-heroe') {
-  <app-seleccion-personaje-historia (heroeConfirmado)="alConfirmarHeroe($event)">
-  </app-seleccion-personaje-historia>
+<app-seleccion-personaje-historia (heroeConfirmado)="alConfirmarHeroe($event)">
+</app-seleccion-personaje-historia>
+}
+
+@if (vistaActual === 'prologo') {
+<app-prologo (prologoTerminado)="alTerminarPrologo()"></app-prologo>
 }
 
 @if (vistaActual === 'en-juego') {
-  <div class="contenedor-juego-wrapper">
-    <div id="historia-container"></div>
-    <app-historia-overlay-manager></app-historia-overlay-manager>
-  </div>
+<div class="contenedor-juego-wrapper">
+  <div id="historia-container"></div>
+  <app-casa-manager></app-casa-manager>
+  <app-pulperia-manager></app-pulperia-manager>
+</div>
 }

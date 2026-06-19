@@ -6,11 +6,14 @@
 <router-outlet />
 <app-footer></app-footer>
 
-<!-- Overlay global: rotá el dispositivo (solo portrait en mobile) -->
+<!-- Overlay: rotá el dispositivo (solo portrait en mobile, el CSS lo oculta en landscape) -->
 <div class="rotate-device-overlay">
   <div class="rotate-device-content">
     <div class="rotate-device-icon">📱</div>
     <div class="rotate-device-title">Rotá el dispositivo</div>
     <div class="rotate-device-sub">El juego se ve mejor en horizontal</div>
+    <button class="rotate-fullscreen-btn" (click)="solicitarRotacion()">
+      ⟳ Girar pantalla
+    </button>
   </div>
 </div>

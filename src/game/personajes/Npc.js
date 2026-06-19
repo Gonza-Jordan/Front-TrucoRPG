@@ -7,16 +7,17 @@ export default class Npc extends Phaser.Physics.Arcade.Sprite {
         this.nombre = nombre;
 
         escena.add.existing(this);
+
         escena.physics.add.existing(this);
 
-        this.setScale(1.4);
+        this.setScale(1.8);
 
         this.body.setAllowGravity(false);
 
         escena.anims.create({
             key: `${this.nombre}-quieto`,
-            frames: escena.anims.generateFrameNumbers(this.nombre, { start: 312, end: 313 }),
-            frameRate: 5,
+            frames: escena.anims.generateFrameNumbers(this.nombre, { start: 0, end: 3 }),
+            frameRate: 4,
             repeat: -1
         });
 

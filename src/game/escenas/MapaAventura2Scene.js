@@ -17,7 +17,8 @@ export default class MapaAventura2Scene extends BaseScene {
 
     preload() {
         this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
-        this.load.spritesheet('lobizon','./assets/sprites/lobizon.png',{frameWidth:32,frameHeight:32});
+        this.load.spritesheet('lobizon', './assets/sprites/lobizon.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('luzmala', './assets/sprites/luzmala.png', { frameWidth: 32, frameHeight: 32 });
     }
 
     create() {
@@ -77,18 +78,28 @@ export default class MapaAventura2Scene extends BaseScene {
         this.keys = this.input.keyboard.createCursorKeys();
         this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-        // TODO: agregar portales según el diseño del mapa
-        // this.portalDeVuelta = new Portal(
-        //   this,
-        //   X, Y,
-        //   'MapaPrincipal',
-        //   false,
-        //   { x: 1917, y: 323 },
-        // );
-        // this.physics.add.overlap(this.JugadorPrincipal, this.portalDeVuelta.zone);
 
-        this.oponente = new Oponente(this, 475, 445, 'lobizon').setDepth(0);
-        this.oponente.setScale(3);
+
+        //portal mapa aventura 3
+        this.portalMapaAventura3 = new Portal(this, 1109, 35, 'MapaAventura3', false, {
+            x: 94,
+            y: 447,
+        });
+        this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura3.zone);
+
+        //portal volver mapa aventura 1
+        this.portalMapaAventura1 = new Portal(this, 1106, 669, 'MapaAventura1', false, {
+            x: 1092,
+            y: 131,
+        });
+        this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura1.zone);
+
+
+        this.oponenteLobizon = new Oponente(this, 475, 445, 'lobizon').setDepth(0);
+        this.oponenteLobizon.setScale(3);
+
+        this.oponenteLuzMala = new Oponente(this, 1086, 139, 'luzmala').setDepth(0);
+        this.oponenteLuzMala.setScale(2);
     }
 
     update() {
@@ -106,6 +117,14 @@ export default class MapaAventura2Scene extends BaseScene {
             this.estabaMoviendose = false;
         }
 
-        // this.portalDeVuelta.update(this.JugadorPrincipal, this.teclaE);
+        const interactuoMobile = this.botonInteractuarPresionado;
+
+        this.portalMapaAventura3.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+        this.portalMapaAventura1.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+
+        if (this.botonInteractuarPresionado) {
+            this.botonInteractuarPresionado = false;
+        }
     }
 }
+

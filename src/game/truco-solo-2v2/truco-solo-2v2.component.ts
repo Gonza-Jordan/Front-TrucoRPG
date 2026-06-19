@@ -85,6 +85,8 @@ export interface ManoTruco2v2 {
   compaConsultaTruco: boolean;
   compaTrucoConsultado: boolean;
   compaPista: string | null;
+  // Orden del humano: el compañero bot debe jugar su carta más alta en su próximo turno.
+  ordenJugarMayor: string | null;
 }
 
 // ── Tipos de UI ───────────────────────────────────────────────────
@@ -132,9 +134,16 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
   tantoInput = 0;
   mostrarInputTanto = false;
   mostrarConfirmSalir = false;
+  mostrarAcciones = false;
   toastMsg = '';
+  toastTipo: 'error' | 'info' = 'error';
   gameOver = false;
   gameOverGanamos = false;
+
+  // Compañeros a los que el humano puede dar órdenes (en 2v2 solo J3).
+  readonly companerosAcciones = [
+    { id: 'J3', nombre: 'J3 · Compañero' },
+  ];
 
   // Nueva mano automática con cuenta regresiva (como en el solitario)
   countdown: number | null = null;
@@ -195,7 +204,13 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
       this.showToast('La mano ha sido terminada.');
       return;
     }
-    if (this.mano.turnoActual !== 'J1') return;
+    if (this.mano.trucoPendienteRespuestaDe === 'J1' ||
+        (this.mano.envidoPendienteRespuestaDe === 'J1' &&
+         (this.mano.faseEnvido === 'pendiente_respuesta' || this.mano.faseEnvido === 'declarando_tantos'))) {
+      this.showToast('No podés jugar: primero respondé el canto.', 'info');
+      return;
+    }
+    if (this.mano.turnoActual !== 'J1') { this.showToast('Esperá tu turno para jugar.', 'info'); return; }
     await this.call('jugar-carta', { manoId: this.mano.id, numero: carta.numero, palo: carta.palo });
   }
 
@@ -463,7 +478,7 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     }
   }
 
-  private mostrarDialogo(jugador: string, texto: string): void {
+  private mostrarDialogo(jugador: string, texto: string, duracionMs = 2400): void {
     if (!texto) return;
     this.dialogos[jugador] = { texto };
     this.cdr.markForCheck();
@@ -472,7 +487,7 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     this.dialogoTimers[jugador] = setTimeout(() => {
       this.dialogos[jugador] = null;
       this.cdr.markForCheck();
-    }, 2400);
+    }, duracionMs);
   }
 
   // ── Actualizar todo el estado de UI ──────────────────────────
@@ -730,10 +745,85 @@ export class TrucoSolo2v2Component implements OnInit, OnDestroy {
     this.router.navigate(['/home']);
   }
 
-  private showToast(msg: string): void {
-    this.toastMsg = msg;
+  // ── Acciones del humano hacia su compañero ────────────────────
+  abrirAcciones():  void { this.mostrarAcciones = true;  this.cdr.markForCheck(); }
+  cerrarAcciones(): void { this.mostrarAcciones = false; this.cdr.markForCheck(); }
+
+  private jugadorDe(jugadorId: string): Jugador2v2 | null {
+    const m = this.mano; if (!m) return null;
+    switch (jugadorId) {
+      case 'J1': return m.posicion1; case 'J2': return m.posicion2;
+      case 'J3': return m.posicion3; case 'J4': return m.posicion4;
+      default: return null;
+    }
+  }
+
+  /** El jugador solo puede ordenar cuando no terminó la mano y el compañero tiene cartas. */
+  puedeOrdenarJugar(jugadorId: string): boolean {
+    if (!this.mano || this.mano.manoTerminada || this.mano.partidaTerminada) return false;
+    const j = this.jugadorDe(jugadorId);
+    return (j?.mano?.length ?? 0) > 0;
+  }
+
+  async ordenarJugarMayor(jugadorId: string): Promise<void> {
+    this.cerrarAcciones();
+    if (!this.mano) return;
+    const frases = [
+      '¡Pongo la más alta!',
+      '¡Voy con todo!',
+      '¡La mejor que tengo!',
+      '¡Ahí va la mía!',
+      '¡Tomo el mando!',
+    ];
+    const txt = frases[Math.floor(Math.random() * frases.length)];
+    this.mostrarDialogo(jugadorId, txt);
+    // Registrar la orden en el backend; la máquina la ejecutará en su próximo turno.
+    try {
+      const res = await firstValueFrom(
+        this.http.post<ManoTruco2v2>(`${API}/ordenar-mayor`, { manoId: this.mano.id, jugadorId })
+      );
+      this.actualizarEstado(res);
+      await this.correrMaquinas();
+    } catch (e: any) {
+      this.showToast(e?.error?.detail ?? e?.error?.title ?? 'Error al enviar la orden.');
+    }
+  }
+
+  consultarMano(jugadorId: string): void {
+    this.cerrarAcciones();
+    const jugador = this.jugadorDe(jugadorId);
+    if (!jugador) return;
+
+    const cartas = jugador.mano; // solo las que tiene en mano (no jugadas)
+    if (cartas.length === 0) {
+      this.mostrarDialogo(jugadorId, '¡Sin cartas ya!');
+      return;
+    }
+
+    // valorTruco: 13=1esp, 12=1basto, 11=7esp, 10=7oro, 9=3s, 8=2s, 7=1copa/oro…
+    const excelentes = cartas.filter(c => c.valorTruco >= 11).length; // anchos o 7esp
+    const buenas     = cartas.filter(c => c.valorTruco >= 8 && c.valorTruco < 11).length; // 2s, 3s, 7oro
+    const medias     = cartas.filter(c => c.valorTruco >= 4 && c.valorTruco < 8).length;
+
+    let respuesta: string;
+    if (excelentes >= 2)                        respuesta = '¡Tengo dos anchos!';
+    else if (excelentes === 1 && buenas >= 1)   respuesta = '¡Ancho y algo más!';
+    else if (excelentes === 1)                  respuesta = 'Tengo un ancho';
+    else if (buenas >= 2)                       respuesta = '¡Dos buenas!';
+    else if (buenas === 1 && medias >= 1)       respuesta = 'Una buena y del medio';
+    else if (buenas === 1)                      respuesta = 'Tengo una buena';
+    else if (medias >= 2)                       respuesta = 'Dos del medio...';
+    else if (medias === 1)                      respuesta = 'Una del medio, nada más';
+    else                                        respuesta = 'Poco y nada...';
+
+    this.mostrarDialogo(jugadorId, respuesta, 3600);
+  }
+
+  private showToast(msg: string, tipo: 'error' | 'info' = 'error'): void {
+    this.toastMsg  = msg;
+    this.toastTipo = tipo;
     this.cdr.markForCheck();
     if (this.toastTimer) clearTimeout(this.toastTimer);
-    this.toastTimer = setTimeout(() => { this.toastMsg = ''; this.cdr.markForCheck(); }, 4000);
+    this.toastTimer = setTimeout(() => { this.toastMsg = ''; this.cdr.markForCheck(); }, tipo === 'info' ? 2600 : 4000);
   }
 }

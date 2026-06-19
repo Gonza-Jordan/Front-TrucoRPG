@@ -45,11 +45,8 @@ export default class HeroSelectScene extends BaseScene {
             .setOrigin(0.5, 0);
 
         this._crearBoton(640, 620, 'JUGAR', '#ffffff', () => this._continuar());
-        this._crearBoton(640, 680, 'Volver', '#aa6633', () =>
-            this.scene.start('WeaponScene', {
-                player: this.playerSprite.startsWith('nena') ? 'nena' : 'nene',
-                modo: 'maquina',
-            }));
+        // El botón "Volver" apuntaba a WeaponScene (removida). La navegación previa
+        // ahora la maneja la app Angular, así que ya no hay escena anterior en Phaser.
 
         this._actualizarUI();
     }

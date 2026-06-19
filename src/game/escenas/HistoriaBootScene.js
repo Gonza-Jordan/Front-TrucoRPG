@@ -9,6 +9,14 @@ export default class HistoriaBootScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64,
     });
+    this.load.spritesheet('personaje1', './assets/sprites/personaje1.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('personaje2', './assets/sprites/personaje2.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
 
     this.load.tilemapTiledJSON('mapa', './assets/mapa-principal/mapa-principal.json');
 
@@ -28,9 +36,17 @@ export default class HistoriaBootScene extends Phaser.Scene {
     this.load.image('Vegetacion', './assets/mapa-principal/Vegetacion.png');
     this.load.image('Pulperia', './assets/mapa-principal/Pulperia.png');
 
+    //mapa pulperia
+    this.load.tilemapTiledJSON('mapaPulperia', './assets/mapa-pulperia/interiorPulperia.json');
+    this.load.image('PisoPulperia', './assets/mapa-pulperia/InteriorPulperia.png');
+    this.load.image('BarPulperia', './assets/mapa-pulperia/BarPulperia.png');
+    this.load.image('ParedesPulperia', './assets/mapa-pulperia/Paredes.png');
+    this.load.image('PartesPulperia', './assets/mapa-pulperia/Partes.png');
+    this.load.image('RackPulperia', './assets/mapa-pulperia/RackPulperia.png');
+
     //mapa casa
     this.load.image('InteriorCasa', './assets/mapa-casa/InteriorCasa.png');
-    this.load.image('Paredes', './assets/mapa-casa/Paredes.png');
+    this.load.image('ParedesCasa', './assets/mapa-casa/Paredes.png');
     this.load.tilemapTiledJSON('mapa-casa', './assets/mapa-casa/InteriorCasa.json');
     this.load.image('cartel', './assets/mapa-principal/Cartel.png');
 
@@ -52,6 +68,13 @@ export default class HistoriaBootScene extends Phaser.Scene {
     this.load.tilemapTiledJSON('mapa-aventura-2', './assets/mapa-aventura-2/mapa-aventura-2.json');
     this.load.image('Cueva Av2', './assets/mapa-aventura-2/Cueva.png');
     this.load.image('CuevaDecoracion Av2', './assets/mapa-aventura-2/CuevaDecoracion.png');
+
+
+    //mapa aventura 3
+    this.load.tilemapTiledJSON('mapa-aventura-3', './assets/mapa-aventura-3/mapa-aventura-3.json');
+    this.load.image('Cueva Av3', './assets/mapa-aventura-3/Cueva.png');
+    this.load.image('CuevaDecoracion Av3', './assets/mapa-aventura-3/CuevaDecoracion.png');
+    this.load.image('Trono Av3', './assets/mapa-aventura-3/Trono.png');
 
     this.load.plugin(
       'rexvirtualjoystickplugin',

@@ -1,8 +1,5 @@
 import Phaser from 'phaser';
 import BootScene from './escenas/BootScene.js';
-import MenuScene from './escenas/MenuScene.js';
-import CharacterScene from './escenas/CharacterScene.js';
-import WeaponScene from './escenas/WeaponScene.js';
 import LobbyScene from './escenas/LobbyScene.js';
 import GameScene from './escenas/GameScene.js';
 import GameScene2 from './escenas/GameScene2.js';
@@ -39,9 +36,6 @@ export function initGame(parent = 'contenedor-juego', modo = 'maquina') {
     },
     scene: [
       BootScene,
-      MenuScene,
-      CharacterScene,
-      WeaponScene,
       HeroSelectScene,
       LobbyScene,
       GameScene,
