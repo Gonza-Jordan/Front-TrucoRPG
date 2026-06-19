@@ -83,8 +83,21 @@ export default class InteriorPulperiaScene extends BaseScene {
     this.puntosDeInteraccion = [
       new PuntoInteraccion(this, 536, 378, 'tienda', false, {}),
       new PuntoInteraccion(this, 1600, 180, 'partida-solo', 'mesa_juego',1, {}),
-      new PuntoInteraccion(this, 1400, 180, 'multijugador', 'mesa_juego',1, {}),
+      new PuntoInteraccion(this, 1400, 180, 'multijugador', 'mesa_juego',1, { subVista: 'tipo' }),
     ];
+
+    // Viñetas encima de las mesas
+    const estiloVineta = {
+      fontFamily: 'Jersey 20',
+      fontSize: '14px',
+      color: '#ffe8a0',
+      backgroundColor: '#3a1e00cc',
+      stroke: '#000000',
+      strokeThickness: 2,
+      padding: { x: 10, y: 5 },
+    };
+    this.add.text(1400, 128, 'Multijugador', estiloVineta).setOrigin(0.5).setDepth(5);
+    this.add.text(1600, 128, 'Solitario',    estiloVineta).setOrigin(0.5).setDepth(5);
 
     const salaService = this.game.registry.get('salaService');
     const uiService = this.game.registry.get('uiService');

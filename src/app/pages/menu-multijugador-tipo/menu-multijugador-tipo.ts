@@ -13,7 +13,7 @@ import { PulperiaUiService } from '../../services/pulperiaOverlay/pulperia-overl
 export class MenuMultijugadorTipo {
   constructor(
     private router: Router,
-    private uiService: PulperiaUiService,
+    public uiService: PulperiaUiService,
   ) {}
 
   seleccionarModo(modo: '1v1' | '2v2' | '3v3'): void {
@@ -28,7 +28,8 @@ export class MenuMultijugadorTipo {
 
   volver() {
     if (this.uiService.esMultijugadorPhaser) {
-      this.uiService.cambiarSubVista('menu');
+      this.uiService.cerrarOverlay();
+      window.dispatchEvent(new CustomEvent('resume-game'));
     } else {
       this.router.navigate(['/menu-multijugador']);
     }
