@@ -60,6 +60,39 @@ export class HistoriaService {
     this.juegoInstance?.scene.resume(key);
   }
 
+  private readonly escenasMapa = [
+    'MapaPrincipal',
+    'MapaAventura1',
+    'MapaAventura2',
+    'MapaAventura3',
+    'InteriorCasa',
+    'InteriorPulperia',
+  ];
+
+  obtenerEscenaMapaActiva(): string {
+    if (this.juegoInstance) {
+      for (const key of this.escenasMapa) {
+        const scene = this.juegoInstance.scene.getScene(key);
+        if (scene?.scene?.isActive()) {
+          return key;
+        }
+      }
+    }
+    return localStorage.getItem('historiaMapaEscena') ?? 'MapaAventura1';
+  }
+
+  pausarEscenaMapaActiva(): void {
+    const key = this.obtenerEscenaMapaActiva();
+    localStorage.setItem('historiaMapaEscena', key);
+    this.pausarEscena(key);
+  }
+
+  reanudarEscenaMapaTrasCombate(): void {
+    const key = localStorage.getItem('historiaMapaEscena') ?? this.obtenerEscenaMapaActiva();
+    this.reanudarEscena(key);
+    window.dispatchEvent(new Event('resize'));
+  }
+
   destruirJuego(): void {
     if (this.juegoInstance) {
       this.juegoInstance.destroy(true);

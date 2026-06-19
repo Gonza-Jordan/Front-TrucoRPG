@@ -45,12 +45,12 @@ export class Historia implements OnInit, OnDestroy {
 
   abrirMesaTruco = (): void => {
     this.mostrarTrucoSolo = true;
-    this.historiaService.pausarEscena('MapaAventura1');
+    this.historiaService.pausarEscenaMapaActiva();
   };
 
   cerrarMesaTruco = (): void => {
     this.mostrarTrucoSolo = false;
-    this.historiaService.reanudarEscena('MapaAventura1');
+    this.historiaService.reanudarEscenaMapaTrasCombate();
   };
 
   ngOnDestroy(): void {

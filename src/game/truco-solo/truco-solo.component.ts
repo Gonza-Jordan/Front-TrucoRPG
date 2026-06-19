@@ -277,6 +277,8 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   private travesuraManoId: string | null = null;
   private travesuraTimer: ReturnType<typeof setTimeout> | null = null;
   private travesuraInterval: ReturnType<typeof setInterval> | null = null;
+  private nuevaManoEnCurso = false;
+  private prevMensajeRival: string | null = null;
   private victoriaHistoriaRegistrada = false;
   private maquinaCorriendo = false;
 
@@ -464,14 +466,11 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       );
       // Pausa que simula a la máquina pensando antes de revelar su jugada/respuesta.
       if (pensar) await this.delay(this.delayMaquinaMs);
-      this.mano = data;
-      this.updateEventosHabilidad(data);
-      this.updateUI(data);
+      this.recibirMano(data);
       await this.correrMaquinas();
-    } catch (err: any) {
-      const msg = (typeof err?.error === 'string' ? err.error : null) ?? err?.error?.message ?? err?.message ?? String(err);
+    } catch (err: unknown) {
+      const msg = this.extraerErrorApi(err);
       this.showToast(`Error en ${endpoint}: ${msg}`);
-      // Deshacer la jugada optimista: re-renderizar desde el último estado válido.
       if (this.mano) this.updateUI(this.mano);
     } finally {
       this.loading = false;
@@ -519,6 +518,11 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
         lineas.push(`▶ ${v.ultimoMensajeHabilidad}`);
     }
 
+    const vr = m.vistaHabilidadesRival;
+    if (vr?.ultimoMensajeHabilidad) {
+      lineas.push(`🐺 ${vr.ultimoMensajeHabilidad}`);
+    }
+
     if (lineas.length > 0) {
       this.eventosHabilidad = lineas;
     }
@@ -526,7 +530,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Jugar carta ───────────────────────────────────────────────────────────
   jugarCarta(i: number): void {
-    if (this.maquinaCorriendo || this.accionesBloqueadasPorHabilidadRival) return;
+    if (this.loading || this.maquinaCorriendo || this.accionesBloqueadasPorHabilidadRival) return;
     const c = this.misCarts[i]?.carta;
     if (!c || !this.mano) return;
 
@@ -565,7 +569,8 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Usar habilidad ────────────────────────────────────────────────────────
   usarHabilidad(): void {
-    if (this.maquinaCorriendo || !this.mano || !this.habilidadDisponible || this.accionesBloqueadasPorHabilidadRival) return;
+    if (this.loading || this.maquinaCorriendo || !this.mano || !this.habilidadDisponible
+      || this.accionesBloqueadasPorHabilidadRival) return;
 
     // Manipulador: activar modo selección (si ya está activo, ignorar)
     if (this.heroe?.id === 0) {
@@ -607,6 +612,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     this.modoSeleccionCarta = false;
     this.salpicaduraManoId = null;
     this.travesuraManoId = null;
+    this.prevMensajeRival = null;
     this.salpicaduraCartasOriginales = [];
     this.cancelarSalpicaduraTimer();
     this.cancelarTravesuraTimer();
@@ -699,11 +705,8 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       this.rivalLabel = m.ganadorMano === 'Humano' ? '¡Perdí la mano!' : '¡Gané la mano!';
       this.habilidadCartaIdx = null;
       this.modoSeleccionCarta = false;
-      if (m.ganadorMano !== this.prevGanadorMano && !m.partidaTerminada) {
-        this.iniciarCountdown(() => {
-          if (this.mano?.ganadorMano && !this.mano?.partidaTerminada)
-            this.call('nueva-mano', { manoAnteriorId: this.mano.id });
-        });
+      if (!m.partidaTerminada && m.ganadorMano !== this.prevGanadorMano) {
+        this.iniciarCountdown(() => this.solicitarNuevaMano());
       }
     } else {
       this.rivalLabel = m.turnoActual === 'Maquina' ? 'Pensando...' : '...';
@@ -751,26 +754,15 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.manejarSalpicadura(m);
     this.manejarTravesura(m);
-
-    const manoVisible = this.salpicaduraRevelando && this.salpicaduraCartasOriginales.length > 0
-      ? this.salpicaduraCartasOriginales
-      : (m.humano?.mano ?? []);
-
-    this.misCarts = [0, 1, 2].map(i => {
-      const carta = manoVisible[i] ?? null;
-      return {
-        carta,
-        visible: !!carta && !m.ganadorMano,
-        seleccionada: this.habilidadCartaIdx === i,
-        oculta: !!carta && this.cartaEsOculta(carta, m),
-      };
-    });
+    this.actualizarCartasMano(m);
 
     this.buildBtns(m, esMiTurno, pendEnv, pendTru);
 
     if (this.escenarioPractica !== null) {
       this.actualizarTutorial(m);
     }
+
+    this.cdr.markForCheck();
   }
 
   private cancelarSalpicaduraTimer(): void {
@@ -820,7 +812,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       this.salpicaduraSegundos = 0;
       this.cdr.markForCheck();
       if (this.mano?.id === m.id) {
-        this.call('confirmar-salpicadura', { manoId: m.id });
+        this.confirmarHabilidadRival('confirmar-salpicadura', m.id);
       }
     }, SALPICADURA_REVEAL_SEG * 1000);
 
@@ -882,11 +874,111 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       this.travesuraSegundos = 0;
       this.cdr.markForCheck();
       if (this.mano?.id === m.id) {
-        this.call('confirmar-travesura', { manoId: m.id });
+        this.confirmarHabilidadRival('confirmar-travesura', m.id);
       }
     }, TRAVESURA_REVEAL_SEG * 1000);
 
     this.cdr.markForCheck();
+  }
+
+  private confirmarHabilidadRival(
+    endpoint: 'confirmar-salpicadura' | 'confirmar-travesura',
+    manoId: string,
+  ): void {
+    firstValueFrom(
+      this.http.post<ManoState>(`${API}/${endpoint}`, { manoId }),
+    ).then(data => {
+      this.recibirMano(data);
+      return this.correrMaquinas();
+    }).catch(err => {
+      this.showToast(`Error en ${endpoint}: ${this.extraerErrorApi(err)}`);
+    }).finally(() => this.cdr.markForCheck());
+  }
+
+  private recibirMano(data: ManoState): void {
+    if (!this.mano || data.id !== this.mano.id) {
+      this.cancelarCountdown();
+    }
+    this.mano = data;
+    this.updateEventosHabilidad(data);
+    this.updateUI(data);
+  }
+
+  private mensajeHabilidadRival(m: ManoState): string {
+    const raw = m as Record<string, unknown>;
+    return String(
+      m.vistaHabilidadesRival?.ultimoMensajeHabilidad
+      ?? raw['ultimoMensajeHabilidadRival']
+      ?? raw['UltimoMensajeHabilidadRival']
+      ?? '',
+    );
+  }
+
+  private actualizarCartasMano(m: ManoState): void {
+    const manoVisible = this.cartasParaAbanico(m);
+    this.misCarts = [0, 1, 2].map(i => {
+      const carta = manoVisible[i] ?? null;
+      return {
+        carta,
+        visible: !!carta,
+        seleccionada: this.habilidadCartaIdx === i,
+        oculta: !!carta && this.cartaEsOculta(carta, m),
+      };
+    });
+    this.cdr.markForCheck();
+  }
+
+  private cartasParaAbanico(m: ManoState): Carta[] {
+    if (this.salpicaduraRevelando && this.salpicaduraCartasOriginales.length > 0) {
+      return this.salpicaduraCartasOriginales;
+    }
+    return this.cartasHumano(m);
+  }
+
+  private cartasHumano(m: ManoState): Carta[] {
+    const directo = m.humano?.mano;
+    if (directo?.length) return directo.map(c => this.normalizarCarta(c as Record<string, unknown>));
+
+    const raw = m as Record<string, unknown>;
+    const humano = (raw['humano'] ?? raw['Humano']) as Record<string, unknown> | undefined;
+    const mano = (humano?.['mano'] ?? humano?.['Mano']) as Record<string, unknown>[] | undefined;
+    return (mano ?? []).map(c => this.normalizarCarta(c));
+  }
+
+  private normalizarCarta(c: Carta | Record<string, unknown>): Carta {
+    const raw = c as Record<string, unknown>;
+    const numero = Number((c as Carta).numero ?? raw['numero'] ?? raw['Numero'] ?? 0);
+    const paloRaw = String((c as Carta).palo ?? raw['palo'] ?? raw['Palo'] ?? '');
+    const palos: Palo[] = ['Oro', 'Copa', 'Espada', 'Basto'];
+    const palo = palos.find(p => p.toLowerCase() === paloRaw.toLowerCase()) ?? (paloRaw as Palo);
+    const valorTruco = Number((c as Carta).valorTruco ?? raw['valorTruco'] ?? raw['ValorTruco'] ?? 0);
+    return { numero, palo, valorTruco, valorEnvido: Number(raw['valorEnvido'] ?? raw['ValorEnvido'] ?? 0) };
+  }
+
+  private solicitarNuevaMano(): void {
+    if (this.nuevaManoEnCurso || !this.mano?.ganadorMano || this.mano.partidaTerminada) return;
+    this.nuevaManoEnCurso = true;
+    const manoAnteriorId = this.mano.id;
+    firstValueFrom(
+      this.http.post<ManoState>(`${API}/nueva-mano`, { manoAnteriorId }),
+    ).then(data => {
+      this.recibirMano(data);
+      return this.correrMaquinas();
+    }).catch(err => {
+      this.showToast(`Error en nueva-mano: ${this.extraerErrorApi(err)}`);
+    }).finally(() => {
+      this.nuevaManoEnCurso = false;
+      this.cdr.markForCheck();
+    });
+  }
+
+  private extraerErrorApi(err: unknown): string {
+    const e = err as { error?: string | { error?: string; message?: string }; message?: string };
+    if (typeof e?.error === 'string') return e.error;
+    if (e?.error && typeof e.error === 'object') {
+      return e.error.error ?? e.error.message ?? '';
+    }
+    return e?.message ?? String(err);
   }
 
   // ── Tutorial práctica ──────────────────────────────────────────────────────
@@ -1149,7 +1241,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (m.ganadorMano) {
       raw.push(['Nueva mano', '#cc8800', () => {
         this.cancelarCountdown();
-        this.call('nueva-mano', { manoAnteriorId: m.id });
+        this.solicitarNuevaMano();
       }]);
 
     } else if (pendEnv) {

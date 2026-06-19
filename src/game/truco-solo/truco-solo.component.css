@@ -765,7 +765,7 @@
 }
 
 .nueva-mano-countdown {
-  position: absolute;
+  position: fixed;
   bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
@@ -777,19 +777,19 @@
   letter-spacing: 2px;
   padding: 7px 24px;
   border-radius: 4px;
-  z-index: 199;
+  z-index: 9998;
   pointer-events: none;
 }
 
 .salpicadura-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: rgba(0, 20, 40, 0.45);
+  background: rgba(0, 20, 40, 0.55);
   display: flex;
   align-items: flex-start;
   justify-content: center;
   padding-top: 80px;
-  z-index: 210;
+  z-index: 9999;
   pointer-events: all;
 }
 
@@ -801,6 +801,7 @@
   border-radius: 8px;
   text-align: center;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  max-width: min(92vw, 640px);
 }
 
 .salpicadura-titulo {
@@ -813,8 +814,9 @@
 .salpicadura-sub {
   margin-top: 8px;
   font-family: var(--font-data);
-  font-size: 20px;
-  letter-spacing: 1px;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+  line-height: 1.35;
 }
 
 .fan-card-back {

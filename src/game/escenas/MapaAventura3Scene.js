@@ -108,7 +108,6 @@ export default class MapaAventura3Scene extends BaseScene {
             this.estabaMoviendose = false;
         }
 
-        t
         const interactuoMobile = this.botonInteractuarPresionado;
 
         this.portalMapaAventura2.update(this.JugadorPrincipal, this.teclaE);
