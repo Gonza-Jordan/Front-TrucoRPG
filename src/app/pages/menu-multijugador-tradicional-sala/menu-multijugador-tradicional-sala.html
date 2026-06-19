@@ -1,8 +1,10 @@
 
 <main>
-  <div class="connection-container">
-    <app-connection-status></app-connection-status>
-  </div>
+  @if (!uiService.esMultijugadorPhaser) {
+    <div class="connection-container">
+      <app-connection-status></app-connection-status>
+    </div>
+  }
   <div class="menu-wrapper">
     <div class="contenedor-menu">
 

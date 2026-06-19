@@ -28,6 +28,7 @@ import { PracticaComponent } from './pages/practica/practica';
 import { UnirseQrComponent } from './pages/unirse-qr/unirse-qr';
 import { SeleccionPersonajeHistoria } from './pages/seleccion-personaje-historia/seleccion-personaje-historia';
 import { PerfilComponent } from './pages/perfil/perfil';
+import { MultijugadorMapaComponent } from './components/multijugadorMapa/multijugador-mapa';
 
 export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
@@ -51,6 +52,7 @@ export const routes: Routes = [
   { path: 'juego/3v3', component: Truco3v3Component },
   { path: 'juego/:modo', component: GameComponent },
   { path: 'menu-multijugador', component: MenuMultijugador, data: { header: 'home' } },
+  { path: 'multijugador-mapa', component: MultijugadorMapaComponent },
   { path: 'menu-multijugador-tipo', component: MenuMultijugadorTipo, data: { header: 'home' } },
   { path: 'menu-multijugador-tradicional', component: MenuMultijugadorTradicional, data: { header: 'home' } },
   { path: 'menu-multijugador-tradicional-sala', component: MenuMultijugadorTradicionalSala, data: { header: 'home' } },

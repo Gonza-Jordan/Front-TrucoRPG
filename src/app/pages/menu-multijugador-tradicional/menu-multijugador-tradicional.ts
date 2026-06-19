@@ -37,7 +37,7 @@ export class MenuMultijugadorTradicional implements OnInit, OnDestroy {
     private sala: SalaService,
     private router: Router,
     private route: ActivatedRoute,
-    private uiService: PulperiaUiService,
+    public uiService: PulperiaUiService,
   ) {}
 
   ngOnInit(): void {
@@ -181,6 +181,11 @@ export class MenuMultijugadorTradicional implements OnInit, OnDestroy {
       this.cargando = false;
       if (onError) onError();
     }
+  }
+
+  cerrar() {
+    this.uiService.cerrarOverlay();
+    window.dispatchEvent(new CustomEvent('resume-game'));
   }
 
   volver() {

@@ -57,9 +57,10 @@ export class PulperiaManager implements OnInit {
     }
 
     this.zone.run(() => {
+      const subVista = customEvent.detail.datos?.subVista || 'menu';
       this.uiService.abrirOverlay(
         vista as 'tienda' | 'partida-solo' | 'multijugador',
-        'menu',
+        subVista,
         customEvent.detail.datos,
       );
       this.cdr.detectChanges();

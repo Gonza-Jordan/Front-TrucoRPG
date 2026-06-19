@@ -131,6 +131,7 @@ export class SalaService {
   async crearSala(modo: '1v1' | '2v2' | '3v3' = '1v1', publica = false): Promise<string> {
     const codigo = await this.hub.invoke<string>('CrearSala', modo, publica);
     this.codigoSala$.next(codigo);
+    window.dispatchEvent(new CustomEvent('sala-lista-actualizada'));
     return codigo;
   }
 
@@ -162,6 +163,7 @@ export class SalaService {
 
   async abandonar(): Promise<void> {
     this.reset();
+    window.dispatchEvent(new CustomEvent('sala-lista-actualizada'));
     try { await this.hub.stop(); } catch { /* ignore */ }
   }
 
