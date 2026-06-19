@@ -22,7 +22,7 @@ export default class MesaManager {
   }
 
   async actualizarMesas() {
-    if (!this.salaService) return;
+    if (!this.salaService || this._destroyed) return;
 
     try {
       // Reconectar si el hub fue desconectado (ej: después de abandonar una sala)
@@ -117,6 +117,7 @@ export default class MesaManager {
   }
 
   destroy() {
+    this._destroyed = true;
     window.removeEventListener('sala-lista-actualizada', this._onSalaActualizada);
     if (this.mesasPublicasGroup) {
       this.mesasPublicasGroup.clear(true, true);
