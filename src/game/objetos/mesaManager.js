@@ -25,6 +25,9 @@ export default class MesaManager {
     if (!this.salaService) return;
 
     try {
+      // Reconectar si el hub fue desconectado (ej: después de abandonar una sala)
+      await this.salaService.conectar();
+
       const [s1, s2, s3] = await Promise.all([
         this.salaService.listarSalasPublicas('1v1'),
         this.salaService.listarSalasPublicas('2v2'),

@@ -1,6 +1,7 @@
 import { Component, OnInit, HostListener, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PulperiaUiService } from '../../../services/pulperiaOverlay/pulperia-overlay-config';
+import { SalaService } from '../../../services/sala.service';
 import { TiendaOverlayComponent } from '../../overlays/tienda-overlay/tienda-overlay';
 import { PartidaSoloComponent } from '../../juego/partida-solo/partida-solo';
 import { MenuMultijugador } from '../../../pages/menu-multijugador/menu-multijugador';
@@ -34,6 +35,7 @@ export class PulperiaManager implements OnInit {
 
   constructor(
     private uiService: PulperiaUiService,
+    private salaService: SalaService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
   ) {}
@@ -67,7 +69,11 @@ export class PulperiaManager implements OnInit {
     });
   }
 
-  cerrar() {
+  async cerrar() {
+    // Si el jugador está en una sala activa, abandonarla antes de cerrar
+    if (this.subVistaActiva === 'sala' && this.salaService.codigoSala$.value) {
+      await this.salaService.abandonar();
+    }
     this.uiService.cerrarOverlay();
     window.dispatchEvent(new CustomEvent('resume-game'));
   }

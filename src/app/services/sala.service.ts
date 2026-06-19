@@ -162,9 +162,12 @@ export class SalaService {
   }
 
   async abandonar(): Promise<void> {
+    // Avisar al servidor explícitamente antes de desconectar
+    try { await this.hub.invoke('AbandonarSala'); } catch { /* ignore */ }
     this.reset();
-    window.dispatchEvent(new CustomEvent('sala-lista-actualizada'));
     try { await this.hub.stop(); } catch { /* ignore */ }
+    // Disparar DESPUÉS de stop para que el servidor ya haya limpiado la sala
+    window.dispatchEvent(new CustomEvent('sala-lista-actualizada'));
   }
 
   reset(): void {
