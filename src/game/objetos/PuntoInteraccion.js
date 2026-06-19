@@ -52,13 +52,15 @@ export default class PuntoInteraccion {
         this.escena.physics.world.resume();
       }
 
-      if (this.sprite && this.datosExtra && this.datosExtra.animCerrar) {
-        this.sprite.play(this.datosExtra.animCerrar);
-        this.sprite.once('animationcomplete', () => {
+      if (this.interactuando) {
+        if (this.sprite && this.datosExtra && this.datosExtra.animCerrar) {
+          this.sprite.play(this.datosExtra.animCerrar);
+          this.sprite.once('animationcomplete', () => {
+            this.interactuando = false;
+          });
+        } else {
           this.interactuando = false;
-        });
-      } else {
-        this.interactuando = false;
+        }
       }
     });
   }
