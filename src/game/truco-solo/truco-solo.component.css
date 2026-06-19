@@ -20,6 +20,7 @@
   height: 100%;
   flex: 1;
   min-height: 0;
+  position: relative;
 }
 
 /* ── Root layout ──────────────────────────────────────────────────────────── */
@@ -789,7 +790,7 @@
   align-items: flex-start;
   justify-content: center;
   padding-top: 80px;
-  z-index: 9999;
+  z-index: 100000;
   pointer-events: all;
 }
 

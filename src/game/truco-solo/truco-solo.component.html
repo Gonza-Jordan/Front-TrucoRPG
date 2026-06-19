@@ -238,25 +238,36 @@
   <div class="nueva-mano-countdown">Nueva mano en {{ countdown }}</div>
   }
 
-  @if (salpicaduraRevelando) {
-  <div class="salpicadura-overlay">
-    <div class="salpicadura-box">
-      <div class="salpicadura-titulo">¡{{ rival?.nombre ?? 'Nahuelito' }} usa Salpicadura!</div>
-      <div class="salpicadura-sub">Mirá tus cartas originales... {{ salpicaduraSegundos || 1 }}s</div>
-    </div>
-  </div>
-  }
+</div>
 
-  @if (travesuraRevelando) {
-  <div class="salpicadura-overlay">
-    <div class="salpicadura-box">
-      <div class="salpicadura-titulo">¡{{ rival?.nombre ?? 'El Pomberito' }} usa Travesura!</div>
-      <div class="salpicadura-sub">¡Recordá las cartas antes que las oculte! {{ travesuraSegundos || 1 }}s</div>
-    </div>
+@if (salpicaduraRevelando) {
+<div class="salpicadura-overlay">
+  <div class="salpicadura-box">
+    <div class="salpicadura-titulo">¡{{ rival?.nombre ?? 'Nahuelito' }} usa Salpicadura!</div>
+    <div class="salpicadura-sub">Mirá tus cartas originales... {{ salpicaduraSegundos || 1 }}s</div>
   </div>
-  }
+</div>
+}
 
-  <!-- Toast -->
+@if (rasgunoRevelando) {
+<div class="salpicadura-overlay">
+  <div class="salpicadura-box">
+    <div class="salpicadura-titulo">¡{{ rival?.nombre ?? 'El Lobizón' }} usa Rasguño!</div>
+    <div class="salpicadura-sub">Te va a bajar el valor de 1 carta aleatoria... {{ rasgunoSegundos || 1 }}s</div>
+  </div>
+</div>
+}
+
+@if (travesuraRevelando) {
+<div class="salpicadura-overlay">
+  <div class="salpicadura-box">
+    <div class="salpicadura-titulo">¡{{ rival?.nombre ?? 'El Pomberito' }} usa Travesura!</div>
+    <div class="salpicadura-sub">¡Recordá las cartas antes que las oculte! {{ travesuraSegundos || 1 }}s</div>
+  </div>
+</div>
+}
+
+<!-- Toast -->
   @if (toastMsg) {
   <div class="toast" [class.toast-info]="toastTipo === 'info'">{{ toastMsg }}</div>
   }
@@ -274,5 +285,3 @@
     </div>
   </div>
   }
-
-</div>
