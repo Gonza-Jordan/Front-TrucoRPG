@@ -27,7 +27,7 @@ export class PulperiaUiService {
 
   abrirOverlay(
     tipoVista: PulperiaOverlayConfig['tipoVista'],
-    subVista: PulperiaOverlayConfig['subVista'] = 'menu',
+    subVista: PulperiaOverlayConfig['subVista'] = 'tipo',
     datos?: any,
   ) {
     this.fuenteOverlay.next({ tipoVista, subVista, datos });
