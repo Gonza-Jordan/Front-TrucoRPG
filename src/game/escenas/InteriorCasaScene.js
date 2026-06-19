@@ -15,12 +15,33 @@ export default class InteriorCasaScene extends BaseScene {
   }
 
   preload() {
+    this.load.spritesheet('baul_spritesheet', '/assets/sprites/baul_spritesheet.png', {
+      frameWidth: 128,
+      frameHeight: 160,
+    });
   }
 
   create() {
     this.botonPantallaCompleta();
     this.crearControlesMobile();
     this.cameras.main.fadeIn(1000, 0, 0, 0);
+
+    if (!this.anims.exists('abrir_baul')) {
+      this.anims.create({
+        key: 'abrir_baul',
+        frames: this.anims.generateFrameNumbers('baul_spritesheet', { start: 0, end: 5 }),
+        frameRate: 10,
+        repeat: 0,
+      });
+    }
+    if (!this.anims.exists('cerrar_baul')) {
+      this.anims.create({
+        key: 'cerrar_baul',
+        frames: this.anims.generateFrameNumbers('baul_spritesheet', { start: 5, end: 0 }),
+        frameRate: 14,
+        repeat: 0,
+      });
+    }
 
     const map = this.make.tilemap({ key: 'mapa-casa' });
     const paredesTileset = map.addTilesetImage('Paredes', 'ParedesCasa');
@@ -51,13 +72,15 @@ export default class InteriorCasaScene extends BaseScene {
     this.puntosDeInteraccion = [];
 
     this.puntosDeInteraccion.push(
-      new PuntoInteraccion(this, 1025, 224, 'inventario', false, {}));
+      new PuntoInteraccion(this, 1025, 190, 'inventario', 'baul_spritesheet', 0.8, {
+        animAbrir: 'abrir_baul',
+        animCerrar: 'cerrar_baul',
+      }),
+    );
 
-    this.puntosDeInteraccion.push(
-      new PuntoInteraccion(this, 247, 224, 'armario', false, {}));
+    this.puntosDeInteraccion.push(new PuntoInteraccion(this, 247, 224, 'armario', false, {}));
 
-    this.puntosDeInteraccion.push(
-      new PuntoInteraccion(this, 703, 192, 'logros', false, {}));
+    this.puntosDeInteraccion.push(new PuntoInteraccion(this, 703, 192, 'logros', false, {}));
 
     this.salirAfuera = new Portal(this, 644, 656, 'MapaPrincipal', false, { x: 444, y: 195 });
     this.physics.add.overlap(this.JugadorPrincipal, this.salirAfuera.zone);
@@ -67,7 +90,7 @@ export default class InteriorCasaScene extends BaseScene {
     this.JugadorPrincipal.update(this.keys, this.teclaE);
 
     const interactuoMobile = this.botonInteractuarPresionado;
-    
+
     this.puntosDeInteraccion.forEach((punto) => {
       punto.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
     });
