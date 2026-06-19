@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ConnectionStatusComponent } from '../../components/connection-status/connection-status';
 import { SalaService, EstadoEquipos, LobbyListos } from '../../services/sala.service';
+import { PulperiaUiService } from '../../services/pulperiaOverlay/pulperia-overlay-config';
 
 interface Slot {
   posicion: number;
@@ -26,44 +27,82 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
   errorMsg = '';
 
   gameMode: '2v2' | '3v3' = '2v2';
-  get cupoPorEquipo(): number { return this.gameMode === '3v3' ? 3 : 2; }
+  get cupoPorEquipo(): number {
+    return this.gameMode === '3v3' ? 3 : 2;
+  }
 
   slotsSanMartin: Slot[] = [];
   slotsBelgrano: Slot[] = [];
 
   private subs: Subscription[] = [];
 
-  constructor(private sala: SalaService, private router: Router, private route: ActivatedRoute) {}
+  constructor(
+    private sala: SalaService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private uiService: PulperiaUiService,
+  ) {}
 
   ngOnInit(): void {
-    this.gameMode = (this.route.snapshot.queryParamMap.get('gameMode') as any) === '3v3' ? '3v3' : '2v2';
-    this.slotsSanMartin = this.slotsVacios();
-    this.slotsBelgrano  = this.slotsVacios();
+    if (this.uiService.esMultijugadorPhaser) {
+      this.subs.push(
+        this.uiService.estadoOverlay$.subscribe((config) => {
+          if (config?.datos?.gameMode) {
+            this.gameMode = config.datos.gameMode;
+          }
+        }),
+      );
+    } else {
+      this.gameMode =
+        (this.route.snapshot.queryParamMap.get('gameMode') as any) === '3v3' ? '3v3' : '2v2';
+    }
 
-    // Si no hay conexión (acceso directo a la URL), volver al menú
+    this.slotsSanMartin = this.slotsVacios();
+    this.slotsBelgrano = this.slotsVacios();
+
     if (!this.sala.codigoSala$.value) {
-      this.router.navigate(['/menu-multijugador-tipo']);
+      if (this.uiService.esMultijugadorPhaser) {
+        this.uiService.cambiarSubVista('tipo');
+      } else {
+        this.router.navigate(['/menu-multijugador-tipo']);
+      }
       return;
     }
 
     this.subs.push(
-      this.sala.estadoEquipos$.subscribe(estado => {
+      this.sala.estadoEquipos$.subscribe((estado) => {
         if (!estado) return;
         this.estadoEquipos = estado;
         this.actualizarSlots(estado);
       }),
 
-      this.sala.lobbyListos$.subscribe(ll => {
+      this.sala.lobbyListos$.subscribe((ll) => {
         this.lobbyListos = ll;
       }),
 
-      this.sala.miListo$.subscribe(v => (this.miListo = v)),
+      this.sala.miListo$.subscribe((v) => (this.miListo = v)),
 
-      this.sala.juegoIniciado$.subscribe(v => {
-        if (v) this.router.navigate([this.gameMode === '3v3' ? '/juego/3v3' : '/juego/2v2-multi']);
+      this.sala.juegoIniciado$.subscribe((v) => {
+        if (v) {
+          let rutaDestino = '/juego/multi';
+
+          if (this.gameMode === '2v2') {
+            rutaDestino = '/juego/2v2-multi';
+          } else if (this.gameMode === '3v3') {
+            rutaDestino = '/juego/3v3';
+          }
+
+          this.uiService.cerrarOverlay();
+
+          this.router.navigate([rutaDestino], {
+            queryParams: {
+              sala: this.sala.codigoSala$.value,
+            },
+          });
+        }
       }),
 
-      this.sala.jugadorDesconectado$.subscribe(v => {
+      this.sala.jugadorDesconectado$.subscribe((v) => {
         if (v) {
           this.errorMsg = 'Un jugador se desconectó de la sala.';
           this.miListo = false;
@@ -74,29 +113,36 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subs.forEach(s => s.unsubscribe());
+    this.subs.forEach((s) => s.unsubscribe());
   }
 
   private actualizarSlots(estado: EstadoEquipos): void {
     const miPosicion = estado.miPosicion;
 
     // Reconstruir slots por equipo
-    const jugadoresSanMartin = estado.jugadores.filter(j => j.equipo === 'sanMartin');
-    const jugadoresBelgrano  = estado.jugadores.filter(j => j.equipo === 'belgrano');
+    const jugadoresSanMartin = estado.jugadores.filter((j) => j.equipo === 'sanMartin');
+    const jugadoresBelgrano = estado.jugadores.filter((j) => j.equipo === 'belgrano');
 
     this.slotsSanMartin = this.construirSlots(jugadoresSanMartin, miPosicion);
-    this.slotsBelgrano  = this.construirSlots(jugadoresBelgrano, miPosicion);
+    this.slotsBelgrano = this.construirSlots(jugadoresBelgrano, miPosicion);
 
     // Actualizar mi equipo
-    const yo = estado.jugadores.find(j => j.posicion === miPosicion);
+    const yo = estado.jugadores.find((j) => j.posicion === miPosicion);
     this.miEquipo = yo?.equipo ?? null;
   }
 
   private slotsVacios(): Slot[] {
-    return Array.from({ length: this.cupoPorEquipo }, () => ({ posicion: 0, ocupado: false, esYo: false }));
+    return Array.from({ length: this.cupoPorEquipo }, () => ({
+      posicion: 0,
+      ocupado: false,
+      esYo: false,
+    }));
   }
 
-  private construirSlots(jugadores: { posicion: number; equipo: string | null }[], miPosicion: number): Slot[] {
+  private construirSlots(
+    jugadores: { posicion: number; equipo: string | null }[],
+    miPosicion: number,
+  ): Slot[] {
     const slots: Slot[] = this.slotsVacios();
     jugadores.forEach((j, idx) => {
       if (idx < this.cupoPorEquipo) {
@@ -114,18 +160,20 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
   equipoDeshabilitado(equipo: string): boolean {
     if (this.miListo) return true;
     if (this.miEquipo === equipo) return false; // ya estoy en él → siempre habilitado para mostrar estado
-    const count = equipo === 'sanMartin'
-      ? (this.estadoEquipos?.countSanMartin ?? 0)
-      : (this.estadoEquipos?.countBelgrano ?? 0);
+    const count =
+      equipo === 'sanMartin'
+        ? (this.estadoEquipos?.countSanMartin ?? 0)
+        : (this.estadoEquipos?.countBelgrano ?? 0);
     return count >= this.cupoPorEquipo;
   }
 
   async elegirEquipo(equipo: string): Promise<void> {
     if (this.miListo) return;
     if (this.equipoDeshabilitado(equipo) && this.miEquipo !== equipo) {
-      this.errorMsg = equipo === 'sanMartin'
-        ? 'El Equipo San Martín ya está completo.'
-        : 'El Equipo Belgrano ya está completo.';
+      this.errorMsg =
+        equipo === 'sanMartin'
+          ? 'El Equipo San Martín ya está completo.'
+          : 'El Equipo Belgrano ya está completo.';
       setTimeout(() => (this.errorMsg = ''), 2500);
       return;
     }
@@ -157,6 +205,10 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
 
   async abandonar(): Promise<void> {
     await this.sala.abandonar();
-    this.router.navigate(['/menu-multijugador-tipo']);
+    if (this.uiService.esMultijugadorPhaser) {
+      this.uiService.cambiarSubVista('tipo');
+    } else {
+      this.router.navigate(['/menu-multijugador-tipo']);
+    }
   }
 }

@@ -1,4 +1,3 @@
-
 @if (vistaActual === 'menu-principal') {
   <main class="contenedor-config">
     <div class="menu-wrapper">
@@ -11,8 +10,11 @@
         <a (click)="vistaActual = 'seleccion-modo-tradicional'">
           <span>PARTIDA TRADICIONAL</span>
         </a>
-        <div class="menu-sep"></div>
-        <a routerLink="/home"><span>VOLVER</span></a>
+        
+        @if (!esOverlay) {
+          <div class="menu-sep"></div>
+          <a routerLink="/home"><span>VOLVER</span></a>
+        }
       </div>
     </div>
   </main>
@@ -33,14 +35,17 @@
         <a (click)="jugarTradicional('3v3')">
           <span>3 VS 3</span>
         </a>
-        <div class="menu-sep"></div>
-        <a (click)="vistaActual = 'menu-principal'"><span>VOLVER</span></a>
+          <div class="menu-sep"></div>
+          <a (click)="vistaActual = 'menu-principal'"><span>VOLVER</span></a>
       </div>
     </div>
   </main>
 }
 
 @if (vistaActual === 'seleccion-heroe') {
-  <app-seleccion-personaje [standalone]="false" (heroeConfirmado)="alConfirmarHeroe($event)" (solicitarVolver)="vistaActual = 'menu-principal'"></app-seleccion-personaje>
+  <app-seleccion-personaje 
+    [standalone]="false" 
+    (heroeConfirmado)="alConfirmarHeroe($event)" 
+    (solicitarVolver)="vistaActual = 'menu-principal'">
+  </app-seleccion-personaje>
 }
-

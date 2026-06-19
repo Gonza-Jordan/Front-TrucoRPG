@@ -3,13 +3,12 @@ import { initHistoria } from '../../../game/historiaConfig.js';
 import { personajePorId } from '../../../game/data/personaje.js';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HistoriaService {
   private juegoInstance: any = null;
   private heroeIdSeleccionado: number | null = null;
-  private habilidadSeleccionada: string | null = null; 
-
+  private habilidadSeleccionada: string | null = null;
   constructor() {}
 
   setHeroeSeleccionado(id: number): void {
@@ -27,15 +26,15 @@ export class HistoriaService {
         return heroe.spriteKey;
       }
     }
-    return 'nene-hacha';
+    return 'personaje';
   }
 
-  iniciarJuego(contenedorId: string): void {
+  iniciarJuego(contenedorId: string, salaService: any, uiService: any): void {
     if (this.juegoInstance) {
       this.destruirJuego();
     }
 
-    this.juegoInstance = initHistoria(contenedorId);
+    this.juegoInstance = initHistoria(contenedorId, salaService, uiService);
 
     const spriteKey = this.obtenerSpriteKey();
     this.juegoInstance.registry.set('playerSprite', spriteKey);

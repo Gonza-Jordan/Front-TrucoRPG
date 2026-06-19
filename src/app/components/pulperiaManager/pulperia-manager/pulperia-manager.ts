@@ -1,18 +1,33 @@
-import { Component, OnInit, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, HostListener, ChangeDetectorRef, NgZone } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { PulperiaUiService } from '../../../services/pulperiaOverlay/pulperia-overlay-config';
-import { MenuMultijugador } from '../../../pages/menu-multijugador/menu-multijugador';
 import { TiendaOverlayComponent } from '../../overlays/tienda-overlay/tienda-overlay';
 import { PartidaSoloComponent } from '../../juego/partida-solo/partida-solo';
+import { MenuMultijugador } from '../../../pages/menu-multijugador/menu-multijugador';
+import { MenuMultijugadorTipo } from '../../../pages/menu-multijugador-tipo/menu-multijugador-tipo';
+import { MenuMultijugadorTradicional } from '../../../pages/menu-multijugador-tradicional/menu-multijugador-tradicional';
+import { MenuMultijugadorTradicionalSala } from '../../../pages/menu-multijugador-tradicional-sala/menu-multijugador-tradicional-sala';
+import { Menu2v2EquiposComponent } from '../../../pages/menu-2v2-equipos/menu-2v2-equipos';
 
 @Component({
   selector: 'app-pulperia-manager',
   standalone: true,
-  imports: [MenuMultijugador, PartidaSoloComponent, TiendaOverlayComponent],
+  imports: [
+    CommonModule,
+    TiendaOverlayComponent,
+    PartidaSoloComponent,
+    MenuMultijugador,
+    MenuMultijugadorTipo,
+    MenuMultijugadorTradicional,
+    MenuMultijugadorTradicionalSala,
+    Menu2v2EquiposComponent
+  ],
   templateUrl: './pulperia-manager.html',
-  styleUrl: './pulperia-manager.css',
+  styleUrls: ['./pulperia-manager.css'],
 })
 export class PulperiaManager implements OnInit {
   vistaActiva: 'tienda' | 'partida-solo' | 'multijugador' | null = null;
+  subVistaActiva: 'menu' | 'tipo' | 'tradicional' | 'sala' | 'equipos' = 'menu';
   datosRecibidos: any = null;
 
   private vistasValidas = ['tienda', 'partida-solo', 'multijugador'];
@@ -20,11 +35,13 @@ export class PulperiaManager implements OnInit {
   constructor(
     private uiService: PulperiaUiService,
     private cdr: ChangeDetectorRef,
+    private zone: NgZone,
   ) {}
 
   ngOnInit(): void {
     this.uiService.estadoOverlay$.subscribe((config) => {
       this.vistaActiva = config.tipoVista;
+      this.subVistaActiva = config.subVista || 'menu';
       this.datosRecibidos = config.datos;
       this.cdr.detectChanges();
     });
@@ -39,10 +56,14 @@ export class PulperiaManager implements OnInit {
       return;
     }
 
-    this.uiService.abrirOverlay(
-      vista as 'tienda' | 'partida-solo' | 'multijugador',
-      customEvent.detail.datos,
-    );
+    this.zone.run(() => {
+      this.uiService.abrirOverlay(
+        vista as 'tienda' | 'partida-solo' | 'multijugador',
+        'menu',
+        customEvent.detail.datos,
+      );
+      this.cdr.detectChanges();
+    });
   }
 
   cerrar() {

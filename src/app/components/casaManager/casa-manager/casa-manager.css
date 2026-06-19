@@ -20,8 +20,9 @@
 }
 
 .contenedor-modal {
+    position: relative;
     color: #ffffff;
-    padding: 25px;
+    padding: 45px 25px 25px 25px;
     width: 100%;
     max-width: 600px;
     max-height: 90vh;
@@ -31,39 +32,36 @@
     display: flex;
     flex-direction: column;
     row-gap: 1.2rem;
-
     border: #6a4a20 solid 4px;
     overflow-y: auto;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+    transition: max-width 0.3s ease;
 }
 
 .botonCerrar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
     font-family: 'Jersey 20', monospace;
-    font-size: 1.2rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    text-decoration: none;
+    font-size: 1.1rem;
     color: #e8aa40;
     background: #2e1e08;
     border: 2px solid #6a4a20;
-    padding: 12px 24px;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
-    transition: background-color 0.1s, color 0.1s, border-color 0.1s;
-    white-space: nowrap;
-
-
-    width: auto;
-    align-self: center;
+    transition: all 0.1s ease;
+    z-index: 10;
 }
 
 .botonCerrar:hover {
-    background: #2e1f0e;
+    background: #412b0c;
     color: #f0b050;
     border-color: #8a6030;
-    box-shadow: 0 0 10px rgba(200, 144, 48, 0.25);
+    box-shadow: 0 0 10px rgba(200, 144, 48, 0.4);
 }
 
 @media screen and (max-width: 768px) {
