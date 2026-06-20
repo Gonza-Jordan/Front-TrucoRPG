@@ -92,11 +92,19 @@ export default class MapaAventura2Scene extends BaseScene {
     this._crearJefeLobizon();
     this._crearJefeLuzMala();
 
+    this.puedePelearLobizon = false;
     this.puedePelearLuzMala = false;
+    this.cargarPuedePelearLobizon();
     this.cargarPuedePelearLuzMala();
 
-    this._onProgresoActualizado = () => this.cargarPuedePelearLuzMala();
-    this._onTrucoEnd = () => this.cargarPuedePelearLuzMala();
+    this._onProgresoActualizado = () => {
+      this.cargarPuedePelearLobizon();
+      this.cargarPuedePelearLuzMala();
+    };
+    this._onTrucoEnd = () => {
+      this.cargarPuedePelearLobizon();
+      this.cargarPuedePelearLuzMala();
+    };
     window.addEventListener('historia:progreso-actualizado', this._onProgresoActualizado);
     window.addEventListener('truco-solo:end', this._onTrucoEnd);
   }
@@ -109,6 +117,16 @@ export default class MapaAventura2Scene extends BaseScene {
   _crearJefeLobizon() {
     new Oponente(this, JEFE1_X, JEFE1_Y, 'lobizon').setDepth(0).setScale(3);
     this.zonaJefe1 = new ZonaInteraccionNpc(this, JEFE1_X, JEFE1_Y);
+    this.etiquetaBloqueoLobizon = this.add
+      .text(JEFE1_X, JEFE1_Y - 55, 'Derrotá al Pomberito antes', {
+        fontFamily: '"Jersey 10"',
+        fontSize: '14px',
+        color: '#ffffff',
+        backgroundColor: '#573a04',
+        padding: { x: 8, y: 4 },
+      })
+      .setOrigin(0.5)
+      .setDepth(10);
   }
 
   _crearJefeLuzMala() {
@@ -124,6 +142,28 @@ export default class MapaAventura2Scene extends BaseScene {
       })
       .setOrigin(0.5)
       .setDepth(10);
+  }
+
+  async cargarPuedePelearLobizon() {
+    try {
+      const res = await fetch(
+        `/api/historia/rivales/${RIVAL_LOBIZON_NIVEL}/puede-pelear`,
+        { headers: authHeaders() },
+      );
+      if (!res.ok) return;
+
+      const data = await res.json();
+      this.puedePelearLobizon = !!data.puedePelear;
+      this._actualizarEtiquetaBloqueoLobizon();
+    } catch {
+      this.puedePelearLobizon = false;
+      this._actualizarEtiquetaBloqueoLobizon();
+    }
+  }
+
+  _actualizarEtiquetaBloqueoLobizon() {
+    if (!this.etiquetaBloqueoLobizon) return;
+    this.etiquetaBloqueoLobizon.setVisible(!this.puedePelearLobizon);
   }
 
   async cargarPuedePelearLuzMala() {
@@ -165,7 +205,10 @@ export default class MapaAventura2Scene extends BaseScene {
     this.portalMapaAventura3.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
     this.portalMapaAventura1.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
 
-    const enZonaJefe1 = this.zonaJefe1.update(this.JugadorPrincipal);
+    const enZonaJefe1 = this.zonaJefe1.update(
+      this.JugadorPrincipal,
+      this.puedePelearLobizon,
+    );
     const enZonaJefe2 = this.zonaJefe2.update(
       this.JugadorPrincipal,
       this.puedePelearLuzMala,
@@ -175,11 +218,11 @@ export default class MapaAventura2Scene extends BaseScene {
       Phaser.Input.Keyboard.JustDown(this.teclaE) ||
       this.botonInteractuarPresionado;
 
-    if (enZonaJefe1 && interactuar) {
+    if (enZonaJefe1 && interactuar && this.puedePelearLobizon) {
       this.iniciarPelea(RIVAL_LOBIZON_NIVEL);
     }
 
-    if (enZonaJefe2 && interactuar) {
+    if (enZonaJefe2 && interactuar && this.puedePelearLuzMala) {
       this.iniciarPelea(RIVAL_LUZMALA_NIVEL);
     }
 

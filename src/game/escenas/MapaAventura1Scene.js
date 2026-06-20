@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import BaseScene from './BaseScene.js';
 import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
-import Npc from '../personajes/Npc.js';
 import Portal from '../objetos/Portal.js';
 import Oponente from '../personajes/Oponente.js';
 import ZonaInteraccionNpc from '../objetos/ZonaInteraccionNpc.js';
@@ -10,12 +9,12 @@ const RIVAL_NAHUELITO_NIVEL = 1;
 const RIVAL_POMBERITO_NIVEL = 2;
 
 // Coordenadas del jefe Nahuelito
-const JEFE1_X = 816;
-const JEFE1_Y = 368;
+const JEFE1_X = 937;
+const JEFE1_Y = 499;
 
 // Coordenadas del jefe Pomberito
-const JEFE2_X = 1060;
-const JEFE2_Y = 155;
+const JEFE2_X = 1085;
+const JEFE2_Y = 200;
 
 function authHeaders() {
   const headers = { 'Content-Type': 'application/json' };
@@ -113,7 +112,12 @@ export default class MapaAventura1Scene extends BaseScene {
       x: 1078,
       y: 611,
     });
-    this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura2.zone);
+
+    // portal volver al mapa principal
+    this.portalMapaPrincipal = new Portal(this, 35, 552, 'MapaPrincipal', false, {
+      x: 1917,
+      y: 352,
+    });
 
     this._crearJefeNahuelito();
     this._crearJefePomberito();
@@ -133,15 +137,15 @@ export default class MapaAventura1Scene extends BaseScene {
   }
 
   _crearJefeNahuelito() {
-    this.jefe1 = new Npc(this, JEFE1_X, JEFE1_Y, 'troll').setDepth(0);
-    this.zonaJefe1 = new ZonaInteraccionNpc(this, this.jefe1.x, this.jefe1.y);
+    new Oponente(this, JEFE1_X, JEFE1_Y, 'nahuelito').setDepth(0).setScale(2);
+    this.zonaJefe1 = new ZonaInteraccionNpc(this, JEFE1_X, JEFE1_Y);
   }
 
   _crearJefePomberito() {
-    this.jefe2 = new Npc(this, JEFE2_X, JEFE2_Y, 'troll').setDepth(0);
-    this.zonaJefe2 = new ZonaInteraccionNpc(this, this.jefe2.x, this.jefe2.y);
+    new Oponente(this, JEFE2_X, JEFE2_Y, 'pomberito').setDepth(0).setScale(1);
+    this.zonaJefe2 = new ZonaInteraccionNpc(this, JEFE2_X, JEFE2_Y);
     this.etiquetaBloqueoPomberito = this.add
-      .text(this.jefe2.x, this.jefe2.y - 55, 'Derrotá al Nahuelito antes', {
+      .text(JEFE2_X, JEFE2_Y - 55, 'Derrotá al Nahuelito antes', {
         fontFamily: '"Jersey 10"',
         fontSize: '14px',
         color: '#ffffff',
@@ -182,18 +186,7 @@ export default class MapaAventura1Scene extends BaseScene {
     localStorage.setItem('rivalNivel', String(rivalNivel));
     localStorage.setItem('historiaPartida', '1');
     window.dispatchEvent(new CustomEvent('truco-solo:start'));
-
-    //portal volver al mapa princ
-    this.portalMapaPrincipal = new Portal(this, 35, 552, 'MapaPrincipal', false, {
-      x: 1917,
-      y: 352,
-    });
-    this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaPrincipal.zone);
-
   }
-
-
-
 
   update() {
     this.JugadorPrincipal.update(this.keys, this.teclaE);
