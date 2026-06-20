@@ -5,8 +5,6 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  /* Fondo en el host para que main y botones compartan el mismo fondo */
-  background: url('/assets/home.png') center center / cover no-repeat;
 }
 
 :host([standalone="false"]),

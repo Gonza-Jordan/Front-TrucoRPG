@@ -1,22 +1,94 @@
-// src/app/components/overlays/tienda-overlay/tienda-overlay.component.ts
 import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-tienda-overlay',
   standalone: true,
-  imports: [], // Aquí van otros subcomponentes o módulos si los necesitás
+  imports: [CommonModule],
   templateUrl: './tienda-overlay.html',
-  styleUrls: ['./tienda-overlay.css']
+  styleUrls: ['./tienda-overlay.css'],
 })
 export class TiendaOverlayComponent {
-  @Input() datos: any; 
-
-  itemsTienda = [
-    { id: 1, nombre: 'Poción de Vida', precio: 50 },
-    { id: 2, nombre: 'Espada de Madera', precio: 150 }
+  @Input() datos: any[] = [
+    {
+      categoria: 'HABILIDADES',
+      objetos: [
+        {
+          id: 1,
+          nombre: 'BOLEADORAS',
+          descripcion: 'Te otorga la habilidad del manipulador en una partida',
+          precio: 150,
+          img: '/assets/objetos/objeto.png',
+        },
+        {
+          id: 2,
+          nombre: 'BOLEADORAS',
+          descripcion: 'Te otorga la habilidad del timbero en una partida',
+          precio: 150,
+          img: '/assets/objetos/objeto.png',
+        },
+        {
+          id: 3,
+          nombre: 'BOLEADORAS',
+          descripcion: 'Te otorga la habilidad del fanfarron en una partida',
+          precio: 150,
+          img: '/assets/objetos/objeto.png',
+        },
+        {
+          id: 4,
+          nombre: 'BOLEADORAS',
+          descripcion: 'Te otorga la habilidad del mentiroso en una partida',
+          precio: 150,
+          img: '/assets/objetos/objeto.png',
+        },
+      ],
+    },
+    {
+      categoria: 'ARMARIO',
+      objetos: [
+        {
+          id: 5,
+          nombre: 'Poncho rosa',
+          descripcion: 'Cambia el color de tu Poncho a rosa',
+          precio: 150,
+          img: '/assets/objetos/GotaRosa.png',
+        },
+        {
+          id: 6,
+          nombre: 'Poncho marrón',
+          descripcion: 'Cambia el color de tu Poncho a marrón',
+          precio: 150,
+          img: '/assets/objetos/GotaMarron.png',
+        },
+        {
+          id: 7,
+          nombre: 'Poncho rojo',
+          descripcion: 'Cambia el color de tu Poncho a rojo',
+          precio: 150,
+          img: '/assets/objetos/GotaRoja.png',
+        },
+        {
+          id: 8,
+          nombre: 'Poncho azul',
+          descripcion: 'cambia el color de tu Poncho a azul',
+          precio: 150,
+          img: '/assets/objetos/GotaAzul.png',
+        },
+      ],
+    },
   ];
 
-  comprarItem(item: any) {
-    console.log(`Compraste: ${item.nombre}`);
+  objetoActivo: any = null;
+
+  mostrarInfo(objeto: any) {
+    this.objetoActivo = objeto;
+  }
+
+  ocultarInfo() {
+    this.objetoActivo = null;
+  }
+
+  comprar(objeto: any) {
+    console.log(`Compraste: ${objeto.nombre}`);
   }
 }

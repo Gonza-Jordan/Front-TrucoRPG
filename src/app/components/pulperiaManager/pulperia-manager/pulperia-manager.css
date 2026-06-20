@@ -15,68 +15,60 @@
     justify-content: center;
     align-items: center;
     pointer-events: auto;
-    overflow: hidden;
+    overlay: hidden;
     padding: 15px;
 }
 
 .contenedor-modal {
+    position: relative;
     color: #ffffff;
-    padding: 25px;
-    width: 100%;
-    max-width: 600px;
+    padding: 50px 25px 60px 25px;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+    max-width: 150vw;
     max-height: 90vh;
-    background-color: #362711;
     text-align: center;
     font-family: 'Jersey 20', sans-serif;
     display: flex;
     flex-direction: column;
     row-gap: 1.2rem;
-    border: #6a4a20 solid 4px;
     overflow-y: auto;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    transition: max-width 0.3s ease;
-}
-
-.contenedor-modal.modal-ancho {
-    max-width: 800px;
-    width: 95vw;
+    transition: all 0.3s ease;
 }
 
 .botonCerrar {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
     display: inline-flex;
     justify-content: center;
     align-items: center;
     font-family: 'Jersey 20', monospace;
-    font-size: 1.2rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    text-decoration: none;
+    font-size: 1.1rem;
     color: #e8aa40;
     background: #2e1e08;
     border: 2px solid #6a4a20;
-    padding: 12px 24px;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
-    transition: background-color 0.1s, color 0.1s, border-color 0.1s;
-    white-space: nowrap;
-
-
-    width: auto;
-    align-self: center;
+    transition: all 0.1s ease;
+    z-index: 10;
 }
 
 .botonCerrar:hover {
-    background: #2e1f0e;
+    background: #412b0c;
     color: #f0b050;
     border-color: #8a6030;
-    box-shadow: 0 0 10px rgba(200, 144, 48, 0.25);
+    box-shadow: 0 0 10px rgba(200, 144, 48, 0.4);
 }
 
 @media screen and (max-width: 768px) {
     .contenedor-modal {
-        padding: 18px;
+        padding: 30px 18px 18px 18px;
         row-gap: 0.8rem;
     }
-
 
     .contenedor-modal h1,
     .contenedor-modal h2 {
@@ -90,7 +82,7 @@
     }
 
     .contenedor-modal {
-        padding: 12px;
+        padding: 25px 12px 12px 12px;
         row-gap: 0.5rem;
     }
 
@@ -101,23 +93,21 @@
 
     .botonCerrar {
         font-size: 0.9rem;
-        padding: 8px 16px;
+        width: 28px;
+        height: 28px;
+        top: 5px;
+        right: 5px;
     }
 }
 
 @media screen and (max-height: 500px) and (orientation: landscape) {
     .contenedor-modal {
-        padding: 10px;
+        padding: 25px 15px 10px 15px;
         row-gap: 0.4rem;
         max-height: 95vh;
     }
 
     .contenedor-modal h2 {
         font-size: 1.2rem;
-    }
-
-    .botonCerrar {
-        font-size: 0.85rem;
-        padding: 6px 12px;
     }
 }

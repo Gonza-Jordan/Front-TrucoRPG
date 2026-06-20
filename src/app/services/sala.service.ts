@@ -131,6 +131,7 @@ export class SalaService {
   async crearSala(modo: '1v1' | '2v2' | '3v3' = '1v1', publica = false): Promise<string> {
     const codigo = await this.hub.invoke<string>('CrearSala', modo, publica);
     this.codigoSala$.next(codigo);
+    window.dispatchEvent(new CustomEvent('sala-lista-actualizada'));
     return codigo;
   }
 
@@ -161,8 +162,12 @@ export class SalaService {
   }
 
   async abandonar(): Promise<void> {
+    // Avisar al servidor explícitamente antes de desconectar
+    try { await this.hub.invoke('AbandonarSala'); } catch { /* ignore */ }
     this.reset();
     try { await this.hub.stop(); } catch { /* ignore */ }
+    // Disparar DESPUÉS de stop para que el servidor ya haya limpiado la sala
+    window.dispatchEvent(new CustomEvent('sala-lista-actualizada'));
   }
 
   reset(): void {

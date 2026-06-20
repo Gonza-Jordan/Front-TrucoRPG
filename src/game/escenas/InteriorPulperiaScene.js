@@ -4,10 +4,14 @@ import Npc from '../personajes/Npc.js';
 import Tutorial from '../objetos/Tutorial.js';
 import Portal from '../objetos/Portal.js';
 import PuntoInteraccion from '../objetos/PuntoInteraccion.js';
+import MesaManager from '../objetos/mesaManager.js';
+import { TUTORIALES } from '../data/tutoriales.js';
 
 export default class InteriorPulperiaScene extends BaseScene {
   constructor() {
     super('InteriorPulperiaScene');
+    this.timerBuscarSalas = null;
+    this.mesaManager = null;
   }
 
   init(data) {
@@ -18,9 +22,10 @@ export default class InteriorPulperiaScene extends BaseScene {
 
   preload() {
     this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
+    this.load.image('mesa_juego', './assets/objetos/mesa-juego.png');
   }
 
-  create() {
+  async create() {
     this.botonPantallaCompleta();
     this.crearControlesMobile();
     this.cameras.main.fadeIn(1000, 0, 0, 0);
@@ -49,7 +54,6 @@ export default class InteriorPulperiaScene extends BaseScene {
       this.playerKey,
       this.pasos,
     ).setDepth(3);
-
     this.JugadorPrincipal.setCollideWorldBounds(true);
     this.physics.add.collider(this.JugadorPrincipal, colisionesLayer);
 
@@ -63,39 +67,71 @@ export default class InteriorPulperiaScene extends BaseScene {
 
     this.npc = new Npc(this, 536, 272, 'personaje').setDepth(1);
 
-    //partes de nuestro tutoriaal
-    const pasosPulperia = [
-      {
-        texto: '¡Hola, forastero! Bienvenido a la Pulpería del pueblo.',
-        enfoqueNpc: this.npc,
-      },
-      {
-        texto: 'Mirá, en aquella mesa del rincón podés jugar partidas en solitario.',
-        enfoqueNpc: this.npc,
-      },
-      {
-        camaraDestino: { x: 1602, y: 180 },
-        camaraTiempo: 1500,
-      },
-      {
-        texto: 'Tomate tu tiempo, explorá y divertite.',
-        enfoqueNpc: this.npc,
-        seguirJugador: true,
-      },
-    ];
+    const pasosCargados = TUTORIALES.pulperia.map((paso) => {
+      if (paso.enfoque === 'npc') {
+        return { ...paso, enfoqueNpc: this.npc };
+      }
+      return paso;
+    });
 
-    //mientras lo guardamos en el localStorage, después tendríamos que mandarlo a la base de datos!!!!!!!!!
-    this.tutorial = new Tutorial(this, 'tutorial_pulperia_v1', pasosPulperia, true);
+    this.tutorial = new Tutorial(this, 'tutorialPulperia', pasosCargados, true);
     this.tutorial.iniciar();
 
     this.salirAfuera = new Portal(this, 644, 656, 'MapaPrincipal', false, { x: 1600, y: 170 });
     this.physics.add.overlap(this.JugadorPrincipal, this.salirAfuera.zone);
 
-    this.puntosDeInteraccion = [];
+    this.puntosDeInteraccion = [
+      new PuntoInteraccion(this, 536, 378, 'tienda', false, {}),
+      new PuntoInteraccion(this, 1600, 180, 'partida-solo', 'mesa_juego',1, {}),
+      new PuntoInteraccion(this, 1400, 180, 'multijugador', 'mesa_juego',1, { subVista: 'tipo' }),
+    ];
 
-    this.puntosDeInteraccion.push(new PuntoInteraccion(this, 500, 290, 'tienda', false, {}));
+    // Viñetas encima de las mesas
+    const estiloVineta = {
+      fontFamily: 'Jersey 20',
+      fontSize: '14px',
+      color: '#ffe8a0',
+      backgroundColor: '#3a1e00cc',
+      stroke: '#000000',
+      strokeThickness: 2,
+      padding: { x: 10, y: 5 },
+    };
+    this.add.text(1400, 128, 'Multijugador', estiloVineta).setOrigin(0.5).setDepth(5);
+    this.add.text(1600, 128, 'Solitario',    estiloVineta).setOrigin(0.5).setDepth(5);
 
-    this.puntosDeInteraccion.push(new PuntoInteraccion(this, 1600, 180, 'partida-solo', false, {}));
+    const salaService = this.game.registry.get('salaService');
+    const uiService = this.game.registry.get('uiService');
+
+    this.mesaManager = new MesaManager(this, this.JugadorPrincipal, salaService, uiService);
+
+    if (salaService) {
+      try {
+        await salaService.conectar();
+        await this.mesaManager.actualizarMesas();
+
+        this.timerBuscarSalas = this.time.addEvent({
+          delay: 10000,
+          callback: this.mesaManager.actualizarMesas,
+          callbackScope: this.mesaManager,
+          loop: true,
+        });
+      } catch (error) {
+        console.error('No se pudo conectar al SalaService desde Phaser:', error);
+      }
+    }
+
+    this.onStartMatchBound = this.manejarInicioPartida.bind(this);
+    window.addEventListener('start-multiplayer-match', this.onStartMatchBound);
+  }
+
+  manejarInicioPartida() {
+    if (this.timerBuscarSalas) this.timerBuscarSalas.destroy();
+    this.cameras.main.fadeOut(500, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.route.navigate.start('TrucoPartidaMultiplayerScene', {
+        salaService: this.game.registry.get('salaService'),
+      });
+    });
   }
 
   update() {
@@ -103,7 +139,6 @@ export default class InteriorPulperiaScene extends BaseScene {
       this.tutorial.update();
     } else {
       this.JugadorPrincipal.update(this.keys, this.teclaE);
-
       const interactuoMobile = this.botonInteractuarPresionado;
 
       const seMueve =
@@ -122,8 +157,15 @@ export default class InteriorPulperiaScene extends BaseScene {
       });
 
       this.salirAfuera.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
-
       this.botonInteractuarPresionado = false;
+    }
+  }
+
+  shutdown() {
+    if (this.timerBuscarSalas) this.timerBuscarSalas.destroy();
+    if (this.mesaManager) this.mesaManager.destroy();
+    if (this.onStartMatchBound) {
+      window.removeEventListener('start-multiplayer-match', this.onStartMatchBound);
     }
   }
 }

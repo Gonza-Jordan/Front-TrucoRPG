@@ -1,18 +1,21 @@
 import Phaser from 'phaser';
 import BaseScene from './BaseScene.js';
 import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
-import Oponente from '../personajes/Oponente.js';
+import Npc from '../personajes/Npc.js';
 import Portal from '../objetos/Portal.js';
+import Oponente from '../personajes/Oponente.js';
 import ZonaInteraccionNpc from '../objetos/ZonaInteraccionNpc.js';
 
 const RIVAL_NAHUELITO_NIVEL = 1;
 const RIVAL_POMBERITO_NIVEL = 2;
 
-const JEFE1_X = 937;
-const JEFE1_Y = 499;
+// Coordenadas del jefe Nahuelito
+const JEFE1_X = 816;
+const JEFE1_Y = 368;
 
-const JEFE2_X = 1085;
-const JEFE2_Y = 200;
+// Coordenadas del jefe Pomberito
+const JEFE2_X = 1060;
+const JEFE2_Y = 155;
 
 function authHeaders() {
   const headers = { 'Content-Type': 'application/json' };
@@ -20,6 +23,7 @@ function authHeaders() {
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
 }
+
 
 export default class MapaAventura1Scene extends BaseScene {
   constructor() {
@@ -103,16 +107,13 @@ export default class MapaAventura1Scene extends BaseScene {
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
+
+    //portal mapa aventura 2
     this.portalMapaAventura2 = new Portal(this, 1092, 131, 'MapaAventura2', false, {
       x: 1078,
       y: 611,
     });
-
-    // portal volver al mapa principal
-    this.portalMapaPrincipal = new Portal(this, 35, 552, 'MapaPrincipal', false, {
-      x: 1917,
-      y: 352,
-    });
+    this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaAventura2.zone);
 
     this._crearJefeNahuelito();
     this._crearJefePomberito();
@@ -132,15 +133,15 @@ export default class MapaAventura1Scene extends BaseScene {
   }
 
   _crearJefeNahuelito() {
-    new Oponente(this, JEFE1_X, JEFE1_Y, 'nahuelito').setDepth(0).setScale(2);
-    this.zonaJefe1 = new ZonaInteraccionNpc(this, JEFE1_X, JEFE1_Y);
+    this.jefe1 = new Npc(this, JEFE1_X, JEFE1_Y, 'troll').setDepth(0);
+    this.zonaJefe1 = new ZonaInteraccionNpc(this, this.jefe1.x, this.jefe1.y);
   }
 
   _crearJefePomberito() {
-    new Oponente(this, JEFE2_X, JEFE2_Y, 'pomberito').setDepth(0).setScale(1);
-    this.zonaJefe2 = new ZonaInteraccionNpc(this, JEFE2_X, JEFE2_Y);
+    this.jefe2 = new Npc(this, JEFE2_X, JEFE2_Y, 'troll').setDepth(0);
+    this.zonaJefe2 = new ZonaInteraccionNpc(this, this.jefe2.x, this.jefe2.y);
     this.etiquetaBloqueoPomberito = this.add
-      .text(JEFE2_X, JEFE2_Y - 55, 'Derrotá al Nahuelito antes', {
+      .text(this.jefe2.x, this.jefe2.y - 55, 'Derrotá al Nahuelito antes', {
         fontFamily: '"Jersey 10"',
         fontSize: '14px',
         color: '#ffffff',
@@ -161,6 +162,7 @@ export default class MapaAventura1Scene extends BaseScene {
 
       const data = await res.json();
       this.puedePelearPomberito = !!data.puedePelear;
+      this.motivoBloqueoPomberito = data.motivo ?? null;
       this._actualizarEtiquetaBloqueoPomberito();
     } catch {
       this.puedePelearPomberito = false;
@@ -180,10 +182,30 @@ export default class MapaAventura1Scene extends BaseScene {
     localStorage.setItem('rivalNivel', String(rivalNivel));
     localStorage.setItem('historiaPartida', '1');
     window.dispatchEvent(new CustomEvent('truco-solo:start'));
+
+    //portal volver al mapa princ
+    this.portalMapaPrincipal = new Portal(this, 35, 552, 'MapaPrincipal', false, {
+      x: 1917,
+      y: 352,
+    });
+    this.physics.add.overlap(this.JugadorPrincipal, this.portalMapaPrincipal.zone);
+
   }
+
+
+
 
   update() {
     this.JugadorPrincipal.update(this.keys, this.teclaE);
+
+    const seMueve =
+      this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
+
+    if (seMueve) {
+      this.estabaMoviendose = true;
+    } else if (this.estabaMoviendose) {
+      this.estabaMoviendose = false;
+    }
 
     const interactuoMobile = this.botonInteractuarPresionado;
 
@@ -204,7 +226,7 @@ export default class MapaAventura1Scene extends BaseScene {
       this.iniciarPelea(RIVAL_NAHUELITO_NIVEL);
     }
 
-    if (enZonaJefe2 && interactuar) {
+    if (enZonaJefe2 && interactuar && this.puedePelearPomberito) {
       this.iniciarPelea(RIVAL_POMBERITO_NIVEL);
     }
 
