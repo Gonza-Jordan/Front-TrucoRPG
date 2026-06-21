@@ -21,7 +21,7 @@ export default class Tutorial {
 
     this.activo = true;
     this.pasoActual = 0;
-    this.subPasoCamaraPresentado = false; 
+    this.subPasoCamaraPresentado = false;
 
     if (this.escena.JugadorPrincipal && this.escena.JugadorPrincipal.body) {
       this.escena.JugadorPrincipal.setVelocity(0);
@@ -100,7 +100,7 @@ export default class Tutorial {
 
     if (paso && paso.camaraDestino && !this.subPasoCamaraPresentado) {
       this.moverCamaraHaciaObjetivo(paso);
-      return; 
+      return;
     }
 
     if (paso && paso.camaraDestino && this.subPasoCamaraPresentado) {
@@ -125,6 +125,7 @@ export default class Tutorial {
   }
 
   moverCamaraHaciaObjetivo(paso) {
+    this.escena.game.canvas.style.imageRendering = 'pixelated';
     const camara = this.escena.cameras.main;
     this.camaraEstabaSiguiendo = camara._follow;
     camara.stopFollow();
@@ -140,7 +141,7 @@ export default class Tutorial {
   regresarCamaraOriginal(onCompleteCallback = null) {
     const camara = this.escena.cameras.main;
     const paso = this.pasos[this.pasoActual];
-    
+
     const destinoX = paso?.enfoqueNpc ? paso.enfoqueNpc.x : this.escena.JugadorPrincipal.x;
     const destinoY = paso?.enfoqueNpc ? paso.enfoqueNpc.y : this.escena.JugadorPrincipal.y;
 
@@ -175,9 +176,9 @@ export default class Tutorial {
   }
 
   crearGloboTexto(posicion, mensaje) {
-    const ancho = 160;
-    const alto = 50;
-    const pad = 10;
+    const ancho = 180;
+    const alto = 70;
+    const pad = 15;
     this.globoContenedor = this.escena.add.container(posicion.x, posicion.y - 60).setDepth(100);
 
     const fondo = this.escena.add.graphics();
@@ -199,8 +200,8 @@ export default class Tutorial {
 
     this.textoGlobo = this.escena.add
       .text(0, ry + rh / 2, mensaje, {
-        fontFamily: 'Jersey 20',
-        fontSize: '15px',
+        fontFamily: "'Jersey 20'", 
+        fontSize: '18px',
         color: '#2d1910',
         align: 'center',
         wordWrap: { width: ancho },

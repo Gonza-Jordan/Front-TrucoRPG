@@ -25,15 +25,16 @@ export default class Portal {
     this.zone.body.moves = false;
 
     this.textoE = escena.add
-      .text(x, y - 50, 'E', {
-        fontFamily: '"Jersey 10"',
-        fontSize: '18px',
+      .text(x, y - 50, ' E ', {
+        fontFamily: '"Jersey 20"',
+        fontSize: '22px', 
         color: '#ffffff',
         fontStyle: 'bold',
         backgroundColor: '#573a04',
         stroke: '#000000',
-        strokeThickness: 3,
-        padding: { x: 8, y: 4 },
+        strokeThickness: 4,
+        padding: { x: 6, y: 4 },
+        shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 0, stroke: true, fill: true },
       })
       .setOrigin(0.5)
       .setDepth(10)

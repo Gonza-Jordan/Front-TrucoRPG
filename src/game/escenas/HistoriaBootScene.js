@@ -18,16 +18,29 @@ export default class HistoriaBootScene extends Phaser.Scene {
       frameHeight: 64,
     });
 
-
-        this.load.spritesheet('nena-arco', './assets/sprites/nena-arco.png', { frameWidth: 64, frameHeight: 64 });
-        this.load.spritesheet('nena-hacha', './assets/sprites/nena-hacha.png', { frameWidth: 64, frameHeight: 64 });
-        this.load.spritesheet('nene-arco', './assets/sprites/nene-arco.png', { frameWidth: 64, frameHeight: 64 });
-        this.load.spritesheet('nene-hacha', './assets/sprites/nene-hacha.png', { frameWidth: 64, frameHeight: 64 });
-        this.load.spritesheet('troll', './assets/sprites/troll.png', { frameWidth: 64, frameHeight: 64 });
-        this.load.tilemapTiledJSON('mapa', './assets/mapa-principal/mapa-principal.json');
-
+    this.load.spritesheet('nena-arco', './assets/sprites/nena-arco.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('nena-hacha', './assets/sprites/nena-hacha.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('nene-arco', './assets/sprites/nene-arco.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('nene-hacha', './assets/sprites/nene-hacha.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('troll', './assets/sprites/troll.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
     this.load.tilemapTiledJSON('mapa', './assets/mapa-principal/mapa-principal.json');
 
+    this.load.tilemapTiledJSON('mapa', './assets/mapa-principal/mapa-principal.json');
 
     //mapa lobby
     this.load.image('Arbol 1', './assets/mapa-principal/Arbol1.png');
@@ -52,6 +65,8 @@ export default class HistoriaBootScene extends Phaser.Scene {
     this.load.image('ParedesPulperia', './assets/mapa-pulperia/Paredes.png');
     this.load.image('PartesPulperia', './assets/mapa-pulperia/Partes.png');
     this.load.image('RackPulperia', './assets/mapa-pulperia/RackPulperia.png');
+    this.load.image('alfombra', './assets/mapa-pulperia/alfombra2.png');
+    this.load.image('percha', './assets/mapa-pulperia/perchero.png');
 
     //mapa casa
     this.load.image('InteriorCasa', './assets/mapa-casa/InteriorCasa.png');
@@ -77,7 +92,6 @@ export default class HistoriaBootScene extends Phaser.Scene {
     this.load.tilemapTiledJSON('mapa-aventura-2', './assets/mapa-aventura-2/mapa-aventura-2.json');
     this.load.image('Cueva Av2', './assets/mapa-aventura-2/Cueva.png');
     this.load.image('CuevaDecoracion Av2', './assets/mapa-aventura-2/CuevaDecoracion.png');
-
 
     //mapa aventura 3
     this.load.tilemapTiledJSON('mapa-aventura-3', './assets/mapa-aventura-3/mapa-aventura-3.json');
