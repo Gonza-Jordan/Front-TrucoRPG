@@ -55,7 +55,6 @@
       }
     </section>
   } @else {
-    <!-- MOBILE: lista estilo menú, sin gaucho -->
     <div class="lista-heroes">
       @for (heroe of heroes; track heroe.id) {
         <div
@@ -77,7 +76,6 @@
   }
 
   <div class="acciones-confirmar">
-    <button class="btn-volver" (click)="volver()">← VOLVER</button>
     @if (selectedHeroId !== null) {
       <button class="btn-elegir-otro" (click)="elegirOtro()">↺ ELEGIR OTRO</button>
     }
