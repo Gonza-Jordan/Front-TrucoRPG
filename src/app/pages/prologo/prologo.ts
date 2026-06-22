@@ -36,7 +36,6 @@ export class Prologo implements OnInit, OnDestroy {
     }, 38);
   }
 
-  /** Si el typewriter no terminó, lo completa. Si ya terminó, avanza. */
   siguiente() {
     if (!this.typewriterDone) {
       clearInterval(this.intervalo);
