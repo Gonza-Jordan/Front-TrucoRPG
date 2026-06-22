@@ -493,6 +493,12 @@
   border: 1px solid #882222;
 }
 
+.tag-pasiva {
+  background: #0a1a2a;
+  color: #66aadd;
+  border: 1px solid #224466;
+}
+
 .entrada-titulo {
   font-family: 'Jersey 10', monospace;
   font-size: clamp(0.68rem, 1.5vw, 0.9rem);

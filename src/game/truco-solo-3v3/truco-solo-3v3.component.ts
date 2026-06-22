@@ -593,7 +593,16 @@ export class TrucoSolo3v3Component implements OnInit, OnDestroy {
 
   salirPartida():    void { this.mostrarConfirmSalir = true; }
   cancelarSalir():   void { this.mostrarConfirmSalir = false; }
-  confirmarSalir():  void { this.mostrarConfirmSalir = false; this.router.navigate(['/home']); }
+  confirmarSalir(): void {
+    this.mostrarConfirmSalir = false;
+    const esPulperia = localStorage.getItem('origenPulperia') === '1';
+    localStorage.removeItem('origenPulperia');
+    if (esPulperia) {
+      window.dispatchEvent(new CustomEvent('truco-3v3:end'));
+    } else {
+      this.router.navigate(['/home']);
+    }
+  }
 
   // ── Acciones ──────────────────────────────────────────────────
   abrirAcciones():  void { this.mostrarAcciones = true;  this.cdr.markForCheck(); }

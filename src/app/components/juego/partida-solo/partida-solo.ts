@@ -24,7 +24,18 @@ export class PartidaSoloComponent {
     localStorage.removeItem('heroeId');
 
     if (this.esOverlay) {
+      // Desde la pulpería: cerrar el overlay y mostrar el juego como overlay
+      // dentro de la historia (sin navegar a otra ruta).
       this.uiService.cerrarOverlay();
+      localStorage.setItem('origenPulperia', '1');
+      if (modo === '2v2') {
+        window.dispatchEvent(new CustomEvent('truco-2v2:start'));
+      } else if (modo === '3v3') {
+        window.dispatchEvent(new CustomEvent('truco-3v3:start'));
+      } else {
+        window.dispatchEvent(new CustomEvent('truco-solo:start'));
+      }
+      return;
     }
 
     if (modo === '2v2') {
@@ -41,6 +52,9 @@ export class PartidaSoloComponent {
 
     if (this.esOverlay) {
       this.uiService.cerrarOverlay();
+      localStorage.setItem('origenPulperia', '1');
+      window.dispatchEvent(new CustomEvent('truco-solo:start'));
+      return;
     }
 
     this.router.navigate(['/jugar/solitario']);
