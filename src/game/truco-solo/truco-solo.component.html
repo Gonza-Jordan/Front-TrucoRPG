@@ -38,7 +38,8 @@
 
     <div class="rival-zone">
       <div class="rival-portrait">
-        <img src="assets/gaucho.png" alt="rival" class="rival-img" />
+        <img [src]="rivalImgSrc" alt="rival" class="rival-img"
+          (error)="$any($event.target).src = 'assets/gaucho.png'" />
       </div>
       @if (rival) {
       <div class="rival-nombre">{{ rival.nombre }}</div>
