@@ -70,7 +70,6 @@ export class PulperiaManager implements OnInit {
   }
 
   async cerrar() {
-    // Si el jugador está en una sala activa, abandonarla antes de cerrar
     if (this.subVistaActiva === 'sala' && this.salaService.codigoSala$.value) {
       await this.salaService.abandonar();
     }

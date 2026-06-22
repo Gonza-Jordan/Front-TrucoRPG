@@ -1,8 +1,9 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth-guard';
-import { GameComponent } from './game/game.component';
 import { RegistroComponent } from './auth/registro/registro.component';
 import { LoginComponent } from './auth/login/login.component';
+import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 import { Home } from './pages/home/home';
 import { LandingPage } from './pages/landing-page/landing-page';
 import { ConfiguracionComponent } from './pages/configuracion/configuracion';
@@ -34,6 +35,8 @@ export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
   { path: 'registro', component: RegistroComponent, data: { header: 'registro' } },
   { path: 'login', component: LoginComponent, data: { header: 'login' } },
+  { path: 'forgot-password', component: ForgotPasswordComponent, data: { header: 'login' } },
+  { path: 'reset-password', component: ResetPasswordComponent, data: { header: 'login' } },
 
   {
     path: '',
@@ -44,13 +47,12 @@ export const routes: Routes = [
   { path: 'tutorial', component: Tutorial, data: { header: 'tutorial' }},
   { path: 'reglas-truco', component: ReglasTruco, data: { header: 'reglas-truco' }},
   { path: 'valores-carta', component: ValoresCarta, data: { header: 'valores-carta' }},
-  { path: 'oponentes', component: Oponentes, data: { header: 'oponentes' }},
+  { path: 'oponentes', component: Oponentes, data: { header: 'home' }},
 
   { path: 'maquina', component: TrucoSoloComponent },
   { path: 'juego/multi', component: TrucoMultiComponent },
   { path: 'juego/2v2-multi', component: TrucoMulti2v2Component },
   { path: 'juego/3v3', component: Truco3v3Component },
-  { path: 'juego/:modo', component: GameComponent },
   { path: 'menu-multijugador', component: MenuMultijugador, data: { header: 'home' } },
   { path: 'multijugador-mapa', component: MultijugadorMapaComponent },
   { path: 'menu-multijugador-tipo', component: MenuMultijugadorTipo, data: { header: 'home' } },
