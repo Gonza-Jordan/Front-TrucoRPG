@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HistoriaService } from '../../../services/historia/historia-service';
+import { INVENTARIO } from '../../../../game/data/inventario';
 
 @Component({
   selector: 'app-inventario-overlay',
@@ -9,36 +11,25 @@ import { CommonModule } from '@angular/common';
   styleUrl: './inventario-overlay.css',
 })
 export class InventarioOverlay {
-  inventarioCompleto = [
-    {
-      id: 1,
-      nombre: 'Boleadoras de Manipulador',
-      categoria: 'HABILIDADES',
-      cantidad: 1,
-      img: '/assets/objetos/objeto.png',
-    },
-    {
-      id: 5,
-      nombre: 'Poncho rosa',
-      categoria: 'ARMARIO',
-      cantidad: 1,
-      img: '/assets/objetos/GotaRosa.png',
-    },
-    {
-      id: 6,
-      nombre: 'Poncho marrón',
-      categoria: 'ARMARIO',
-      cantidad: 1,
-      img: '/assets/objetos/GotaMarron.png',
-    },
-  ];
+
+  inventarioCompleto = INVENTARIO;
 
   categoriaActiva: string = 'TODO';
-
   totalSlots: number = 12;
+
+  constructor(private historiaService: HistoriaService) {}
 
   seleccionarCategoria(categoria: string) {
     this.categoriaActiva = categoria;
+  }
+
+  seleccionarItem(item: any) {
+    if (item.categoria === 'ARMARIO' && item.spriteKey) {
+      const quiereEquipar = confirm(`¿Querés equipar ${item.nombre}?`);
+      if (quiereEquipar) {
+        this.historiaService.equiparSkinDesdeArmario(item.spriteKey);
+      }
+    }
   }
 
   get itemsFiltrados() {

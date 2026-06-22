@@ -14,38 +14,42 @@ export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
       volume: 0.5,
     });
 
-    if (!escena.anims.exists(`${this.nombre}-quieto`)) {
+    this.verificarYCrearAnimaciones(escena, this.nombre);
+  }
+
+  verificarYCrearAnimaciones(escena, spriteKey) {
+    if (!escena.anims.exists(`${spriteKey}-quieto`)) {
       escena.anims.create({
-        key: `${this.nombre}-quieto`,
-        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 0, end: 3 }),
+        key: `${spriteKey}-quieto`,
+        frames: escena.anims.generateFrameNumbers(spriteKey, { start: 0, end: 3 }),
         frameRate: 4,
         repeat: -1,
       });
 
       escena.anims.create({
-        key: `${this.nombre}-caminando-arriba`,
-        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 8, end: 11 }),
+        key: `${spriteKey}-caminando-arriba`,
+        frames: escena.anims.generateFrameNumbers(spriteKey, { start: 8, end: 11 }),
         frameRate: 8,
         repeat: -1,
       });
 
       escena.anims.create({
-        key: `${this.nombre}-caminando-abajo`,
-        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 4, end: 7 }),
+        key: `${spriteKey}-caminando-abajo`,
+        frames: escena.anims.generateFrameNumbers(spriteKey, { start: 4, end: 7 }),
         frameRate: 8,
         repeat: -1,
       });
 
       escena.anims.create({
-        key: `${this.nombre}-caminando-izquierda`,
-        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 16, end: 19 }),
+        key: `${spriteKey}-caminando-izquierda`,
+        frames: escena.anims.generateFrameNumbers(spriteKey, { start: 16, end: 19 }),
         frameRate: 8,
         repeat: -1,
       });
 
       escena.anims.create({
-        key: `${this.nombre}-caminando-derecha`,
-        frames: escena.anims.generateFrameNumbers(this.nombre, { start: 12, end: 15 }),
+        key: `${spriteKey}-caminando-derecha`,
+        frames: escena.anims.generateFrameNumbers(spriteKey, { start: 12, end: 15 }),
         frameRate: 8,
         repeat: -1,
       });
@@ -85,16 +89,19 @@ export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
       }
     }
 
+    const currentSkin = this.texture.key;
+    this.verificarYCrearAnimaciones(this.scene, currentSkin);
+
     if (moverIzquierda) {
-      this.anims.play(`${this.nombre}-caminando-izquierda`, true);
+      this.anims.play(`${currentSkin}-caminando-izquierda`, true);
     } else if (moverDerecha) {
-      this.anims.play(`${this.nombre}-caminando-derecha`, true);
+      this.anims.play(`${currentSkin}-caminando-derecha`, true);
     } else if (moverArriba) {
-      this.anims.play(`${this.nombre}-caminando-arriba`, true);
+      this.anims.play(`${currentSkin}-caminando-arriba`, true);
     } else if (moverAbajo) {
-      this.anims.play(`${this.nombre}-caminando-abajo`, true);
+      this.anims.play(`${currentSkin}-caminando-abajo`, true);
     } else {
-      this.anims.play(`${this.nombre}-quieto`, true);
+      this.anims.play(`${currentSkin}-quieto`, true);
     }
   }
 }

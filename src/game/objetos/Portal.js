@@ -27,7 +27,7 @@ export default class Portal {
     this.textoE = escena.add
       .text(x, y - 50, ' E ', {
         fontFamily: '"Jersey 20"',
-        fontSize: '22px', 
+        fontSize: '18px', 
         color: '#ffffff',
         fontStyle: 'bold',
         backgroundColor: '#573a04',

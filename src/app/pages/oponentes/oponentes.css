@@ -1,14 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
 :host {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 
-/* ══════════════════════════════════════════════
-   ESCENA
-══════════════════════════════════════════════ */
 .grimorio-escena {
   display: flex;
   flex-direction: column;

@@ -1,6 +1,6 @@
 <app-page-wrapper>
+<main>
   <div class="grimorio-escena">
-
     <!-- Título sobre el libro -->
     <div class="grimorio-header">
       <span class="grimorio-deco">✦</span>
@@ -10,11 +10,9 @@
 
     <!-- El libro físico -->
     <div class="libro">
-
       <div class="libro-canto-top"></div>
 
       <div class="libro-paginas">
-
         <!-- Página izquierda: índice de oponentes -->
         <div class="pagina pagina-izq">
           <div class="margen-vert"></div>
@@ -28,7 +26,8 @@
               <button
                 class="cap-btn"
                 [class.activo]="oponenteActivo() === i"
-                (click)="seleccionar(i)">
+                (click)="seleccionar(i)"
+              >
                 <span class="cap-icono">{{ op.icono }}</span>
                 <div class="cap-info">
                   <span class="cap-titulo">{{ op.nombre }}</span>
@@ -66,7 +65,6 @@
           <div class="sep-libro"></div>
 
           <div class="entradas-scroll">
-
             <!-- Texto de introducción -->
             <p class="oponente-intro">{{ oponente.intro }}</p>
 
@@ -106,26 +104,33 @@
                 }
               </div>
             }
-
           </div>
 
           <!-- Navegación entre oponentes -->
           <div class="pagina-nav">
-            <button class="nav-btn" (click)="anterior()" [disabled]="oponenteActivo() === 0">❮ Ant.</button>
+            <button class="nav-btn" (click)="anterior()" [disabled]="oponenteActivo() === 0">
+              ❮ Ant.
+            </button>
             <span class="nav-indicador">{{ oponenteActivo() + 1 }} / {{ oponentes.length }}</span>
-            <button class="nav-btn" (click)="siguiente()" [disabled]="oponenteActivo() === oponentes.length - 1">Sig. ❯</button>
+            <button
+              class="nav-btn"
+              (click)="siguiente()"
+              [disabled]="oponenteActivo() === oponentes.length - 1"
+            >
+              Sig. ❯
+            </button>
           </div>
 
           <div class="clasp clasp-br"></div>
           <div class="page-curl"></div>
         </div>
-
-      </div><!-- /libro-paginas -->
+      </div>
+      <!-- /libro-paginas -->
 
       <div class="libro-canto-bottom"></div>
     </div>
 
     <a routerLink="/tutorial" class="volver-btn">← Volver al Tutorial</a>
-
   </div>
+</main>
 </app-page-wrapper>

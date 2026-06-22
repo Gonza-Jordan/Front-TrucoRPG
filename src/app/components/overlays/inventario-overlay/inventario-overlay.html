@@ -26,17 +26,17 @@
   </div>
 
   <div class="cuadricula-inventario">
-    @for (item of itemsFiltrados; track item.id) {
-      <div class="slot-item">
-        <img [src]="item.img" [alt]="item.nombre" class="item-icono" />
-        @if (item.cantidad > 1) {
-          <span class="cantidad-item">{{ item.cantidad }}</span>
-        }
-      </div>
-    }
+  @for (item of itemsFiltrados; track item.id) {
+    <div class="slot-item" (click)="seleccionarItem(item)" style="cursor: pointer;">
+      <img [src]="item.img" [alt]="item.nombre" class="item-icono" />
+      @if (item.cantidad > 1) {
+        <span class="cantidad-item">{{ item.cantidad }}</span>
+      }
+    </div>
+  }
 
-    @for (vacio of slotsVacios; track $index) {
-      <div class="slot-item vacio"></div>
-    }
-  </div>
+  @for (vacio of slotsVacios; track $index) {
+    <div class="slot-item vacio"></div>
+  }
+</div>
 </div>
