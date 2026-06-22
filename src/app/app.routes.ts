@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { authGuard } from './auth-guard';
 import { RegistroComponent } from './auth/registro/registro.component';
 import { LoginComponent } from './auth/login/login.component';
+import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 import { Home } from './pages/home/home';
 import { LandingPage } from './pages/landing-page/landing-page';
 import { ConfiguracionComponent } from './pages/configuracion/configuracion';
@@ -33,6 +35,8 @@ export const routes: Routes = [
   { path: '', component: LandingPage, data: { header: 'landing' } },
   { path: 'registro', component: RegistroComponent, data: { header: 'registro' } },
   { path: 'login', component: LoginComponent, data: { header: 'login' } },
+  { path: 'forgot-password', component: ForgotPasswordComponent, data: { header: 'login' } },
+  { path: 'reset-password', component: ResetPasswordComponent, data: { header: 'login' } },
 
   {
     path: '',

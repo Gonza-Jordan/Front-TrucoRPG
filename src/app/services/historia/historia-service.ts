@@ -80,8 +80,8 @@ export class HistoriaService {
     'MapaAventura1',
     'MapaAventura2',
     'MapaAventura3',
-    'InteriorCasa',
-    'InteriorPulperia',
+    'InteriorCasaScene',
+    'InteriorPulperiaScene',
   ];
 
   obtenerEscenaMapaActiva(): string {
@@ -104,8 +104,11 @@ export class HistoriaService {
 
   reanudarEscenaMapaTrasCombate(): void {
     const key = localStorage.getItem('historiaMapaEscena') ?? this.obtenerEscenaMapaActiva();
+    localStorage.removeItem('historiaMapaEscena');
     this.reanudarEscena(key);
-    window.dispatchEvent(new Event('resize'));
+    // Delay hasta que Angular muestre el canvas (#historia-container display:none → block)
+    // Si el resize se dispara con canvas oculto, Phaser redimensiona a 0×0 y rompe el input
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
   }
 
   destruirJuego(): void {

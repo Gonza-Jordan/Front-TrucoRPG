@@ -696,12 +696,15 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mostrarConfirmSalir = false;
     localStorage.removeItem('practicaEscenario');
     const esHistoria = localStorage.getItem('historiaPartida') === '1';
+    const esPulperia = localStorage.getItem('origenPulperia') === '1';
     if (esHistoria) {
       localStorage.removeItem('historiaPartida');
       localStorage.removeItem('rivalNivel');
     }
+    localStorage.removeItem('origenPulperia');
     window.dispatchEvent(new CustomEvent('truco-solo:end'));
-    if (!esHistoria) {
+    // No navegar si es historia (Phaser lo maneja) ni si vino de la pulpería (overlay)
+    if (!esHistoria && !esPulperia) {
       this.router.navigate(['/home']);
     }
   }
