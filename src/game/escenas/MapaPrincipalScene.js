@@ -3,8 +3,7 @@ import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
 import Portal from '../objetos/Portal.js';
 import Npc from '../personajes/Npc.js';
 import Tutorial from '../objetos/Tutorial.js';
-import PuntoInteraccion from '../objetos/PuntoInteraccion.js';
-
+import { TUTORIALES } from '../data/tutoriales.js';
 
 export default class MapaPrincipalScene extends BaseScene {
   constructor() {
@@ -106,84 +105,17 @@ export default class MapaPrincipalScene extends BaseScene {
       y: 552,
     });
 
+    this.npc = new Npc(this, 333, 438, 'personaje').setDepth(1);
+    this.npc.setScale(1.3);
 
+    const pasosCargados = TUTORIALES.mapaPrincipal.map((paso) => {
+      if (paso.enfoque === 'npc') {
+        return { ...paso, enfoqueNpc: this.npc };
+      }
+      return paso;
+    });
 
-    this.npcTutorial = new Npc(this, 333, 438, 'personaje').setDepth(1);
-    this.npcTutorial.setScale(1.3);
-
-    //tuto
-    const pasosTutorial = [
-      {
-        texto: '¡Bienvenido, gaucho! Antes de partir, dejame explicarte algunas cosas.',
-        enfoqueNpc: this.npcTutorial,
-      },
-      {
-        texto: 'Movete con las flechas del teclado, o el stick de tu dispositivo.',
-        enfoqueNpc: this.npcTutorial,
-      },
-      {
-        texto: 'Acercate a personas u objetos y presioná E para interactuar.',
-        enfoqueNpc: this.npcTutorial,
-      },
-
-      {
-        texto: 'Te podés hospedar en esta casa, en ella podés acceder a diferentes funciones.',
-        enfoqueNpc: this.npcTutorial,
-      },
-
-      // pulperia
-      {
-        texto: 'Visitá la pulpería para jugar partidas de Truco con otros bravos tahúres.',
-        enfoqueNpc: this.npcTutorial,
-      },
-      {
-        camaraDestino: { x: 1910, y: 330 },
-        camaraTiempo: 750,
-      },
-
-      // volver al npc
-      {
-        camaraDestino: { x: 333, y: 438 },
-        camaraTiempo: 750,
-        enfoqueNpc: this.npcTutorial,
-      },
-      {
-        texto: 'Allí encontrarás rivales para poner a prueba tus cartas.',
-        enfoqueNpc: this.npcTutorial,
-      },
-
-      // CARTEL
-      {
-        texto: 'Junto a la pulpería está un cartel con flecha roja, ese es el cartel de aventura.',
-        enfoqueNpc: this.npcTutorial,
-      },
-      {
-        camaraDestino: { x: 1910, y: 330 },
-        camaraTiempo: 750,
-      },
-
-      // volver al npc
-      {
-        camaraDestino: { x: 333, y: 438 },
-        camaraTiempo: 750,
-      },
-      {
-        texto: 'Interactuá con él cuando estés listo para partir.',
-        enfoqueNpc: this.npcTutorial,
-      },
-
-      {
-        texto: 'Ahora sí, el camino es tuyo. ¡Buena suerte!',
-        enfoqueNpc: this.npcTutorial,
-        seguirJugador: true,
-      },
-    ];
-
-    this.tutorial = new Tutorial(
-      this,
-      'tutorial_mapa_principal_v1',
-      pasosTutorial
-    );
+    this.tutorial = new Tutorial(this, 'tutorialLobby', pasosCargados,true);
 
     this.tutorial.iniciar();
   }

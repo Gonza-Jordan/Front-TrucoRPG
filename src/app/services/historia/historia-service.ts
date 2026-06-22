@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { initHistoria } from '../../../game/historiaConfig.js';
 import { personajePorId } from '../../../game/data/personaje.js';
 import { claseHeroePorHabilidadId } from '../../../game/data/habilidades.js';
+import { Subject } from 'rxjs'; 
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,10 @@ export class HistoriaService {
   private juegoInstance: any = null;
   private heroeIdSeleccionado: number | null = null;
   private habilidadSeleccionada: string | null = null;
+
+  private cambiarSkinSource = new Subject<string>();
+  cambiarSkin$ = this.cambiarSkinSource.asObservable();
+
   constructor() {}
 
   setHeroeSeleccionado(id: number): void {
@@ -18,6 +23,17 @@ export class HistoriaService {
 
   setHabilidadSeleccionada(habilidad: string): void {
     this.habilidadSeleccionada = habilidad;
+  }
+
+  equiparSkinDesdeArmario(spriteKey: string): void {
+    if (this.juegoInstance) {
+      this.juegoInstance.registry.set('playerSprite', spriteKey);
+    }
+
+    const evento = new CustomEvent('phaser:cambiarSkin', { detail: spriteKey });
+    window.dispatchEvent(evento);
+
+    this.cambiarSkinSource.next(spriteKey);
   }
 
   obtenerSpriteKey(): string {

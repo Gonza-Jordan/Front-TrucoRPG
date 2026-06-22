@@ -5,12 +5,7 @@ import { Subscription } from 'rxjs';
 import { ConnectionStatusComponent } from '../../components/connection-status/connection-status';
 import { SalaService, EstadoEquipos, LobbyListos } from '../../services/sala.service';
 import { PulperiaUiService } from '../../services/pulperiaOverlay/pulperia-overlay-config';
-
-interface Slot {
-  posicion: number;
-  ocupado: boolean;
-  esYo: boolean;
-}
+import { Slot } from '../../interfaces/slot';
 
 @Component({
   selector: 'app-menu-2v2-equipos',

@@ -6,10 +6,11 @@ import Portal from '../objetos/Portal.js';
 export default class InteriorCasaScene extends BaseScene {
   constructor() {
     super('InteriorCasaScene');
+    this.onCambiarSkin = null;
   }
 
   init(data) {
-    this.playerKey = data.playerSprite || 'player';
+    this.playerKey = this.registry.get('playerSprite') || data.playerSprite || 'personaje';
     this.startX = data.x || 85;
     this.startY = data.y || 470;
   }
@@ -69,6 +70,29 @@ export default class InteriorCasaScene extends BaseScene {
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
+    this.onCambiarSkin = (evento) => {
+      const nuevaSkin = evento.detail;
+
+     
+      if (!this.textures.exists(nuevaSkin)) {
+        console.error(`🚨 La skin de Phaser '${nuevaSkin}' no se encuentra cargada en la caché de texturas. Revisá HistoriaBootScene.`);
+        return;
+      }
+
+      if (this.JugadorPrincipal && this.JugadorPrincipal.active) {
+        this.JugadorPrincipal.setTexture(nuevaSkin);
+        this.playerKey = nuevaSkin;
+
+        if (this.JugadorPrincipal.anims && this.JugadorPrincipal.anims.isPlaying) {
+          this.JugadorPrincipal.anims.stop();
+        }
+
+        console.log("¡Skin cambiada en tiempo real sin recargar! Nueva key:", nuevaSkin);
+      }
+    };
+
+    window.addEventListener('phaser:cambiarSkin', this.onCambiarSkin);
+
     this.puntosDeInteraccion = [];
 
     this.puntosDeInteraccion.push(
@@ -79,11 +103,15 @@ export default class InteriorCasaScene extends BaseScene {
     );
 
     this.puntosDeInteraccion.push(new PuntoInteraccion(this, 247, 224, 'armario', false, {}));
-
     this.puntosDeInteraccion.push(new PuntoInteraccion(this, 703, 192, 'logros', false, {}));
 
     this.salirAfuera = new Portal(this, 644, 656, 'MapaPrincipal', false, { x: 444, y: 195 });
     this.physics.add.overlap(this.JugadorPrincipal, this.salirAfuera.zone);
+
+    this.events.once('shutdown', () => {
+      window.removeEventListener('phaser:cambiarSkin', this.onCambiarSkin);
+      console.log("Listener 'phaser:cambiarSkin' removido con éxito.");
+    });
   }
 
   update() {
