@@ -267,6 +267,15 @@
 </div>
 }
 
+@if (aullidoRevelando) {
+<div class="salpicadura-overlay">
+  <div class="salpicadura-box">
+    <div class="salpicadura-titulo">¡{{ rival?.nombre ?? 'El Lobizón' }} usa Aullido!</div>
+    <div class="salpicadura-sub">Te asustás y te vas al mazo... {{ aullidoSegundos || 1 }}s</div>
+  </div>
+</div>
+}
+
 <!-- Toast -->
   @if (toastMsg) {
   <div class="toast" [class.toast-info]="toastTipo === 'info'">{{ toastMsg }}</div>

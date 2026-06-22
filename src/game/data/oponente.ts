@@ -13,9 +13,16 @@ export const OPONENTES: Oponente[] = [
         {
           nombre: 'Salpicadura',
           texto:
-            'Cada 2 manos, Nahuelito salpica el mazo y cambia los palos de tus cartas (por ejemplo, una Espada puede transformarse en Copa). Tu jerarquía y tu Envido pueden verse alterados sin previo aviso.',
+            'Cada 2 manos, Nahuelito cambia el palo de 2 de tus cartas (por ejemplo, una Espada puede transformarse en Copa). Tu jerarquía y tu Envido pueden verse alterados sin previo aviso.',
           tag: 'HABILIDAD',
           nota: 'Revisá tus cartas después de cada salpicadura: lo que tenías puede no ser lo que tenés.',
+        },
+        {
+          nombre: 'Remolino',
+          texto:
+            'Al jugar la primera carta de la primera baza, hay un 50% de probabilidad de que Nahuelito cambie el palo de esa carta jugada en la mesa.',
+          tag: 'PASIVA',
+          nota: 'Podés ir ganando la baza y que el agua lo cambie todo.',
         },
       ],
     },
@@ -31,9 +38,16 @@ export const OPONENTES: Oponente[] = [
         {
           nombre: 'Travesura del monte',
           texto:
-            'Al repartir la mano, el Pombero te deja ver tus 3 cartas durante 5 segundos. Pasado ese tiempo, da vuelta 1 carta al azar, que permanece oculta (boca abajo) durante toda la ronda.',
+            'Cada 2 manos, el Pombero te muestra tus 3 cartas durante 5 segundos y luego oculta 2 al azar durante toda la ronda.',
           tag: 'HABILIDAD',
-          nota: 'Memorizá bien tu mano en esos 5 segundos: vas a jugar a ciegas con una de tus cartas.',
+          nota: 'Memorizá bien tu mano en esos 5 segundos: vas a jugar a ciegas con dos de tus cartas.',
+        },
+        {
+          nombre: 'Trampa del monte',
+          texto:
+            'Si nadie cantó envido ni truco en la mano, el Pomberito suma +1 punto extra al cerrarla (aunque hayas ganado vos o te hayas ido al mazo en silencio).',
+          tag: 'PASIVA',
+          nota: 'El silencio en la mesa también le juega a su favor.',
         },
       ],
     },
@@ -47,11 +61,25 @@ export const OPONENTES: Oponente[] = [
         'Bajo la luna llena cambia de forma. Su aullido no es solo una advertencia: es una sentencia para quien lo escuche en plena partida.',
       habilidades: [
         {
+          nombre: 'Rasguño',
+          texto:
+            'Cada 2 manos, debilita 1 carta aleatoria de tu mano bajando su valor en 1 (ej. un 3 pasa a un 2).',
+          tag: 'HABILIDAD',
+          nota: 'Revisá tu mano después del rasguño: una carta puede haber perdido fuerza.',
+        },
+        {
+          nombre: 'Luna llena',
+          texto:
+            'Si aceptás el truco, retruco o vale cuatro de la máquina, debilita 1 carta de tu mano en mitad de ronda (una vez por mano).',
+          tag: 'PASIVA',
+          nota: 'Aceptar un canto del Lobizón tiene un costo.',
+        },
+        {
           nombre: 'Aullido',
           texto:
-            'Al aullar, el Lobizón te manda directamente al mazo. No hay truco, no hay envido: la mano termina ahí mismo para vos.',
-          tag: 'HABILIDAD',
-          nota: 'No hay forma de bloquear el aullido. Solo queda esperar que no te toque a vos.',
+            'Si ganás la primera baza, hay un 20% de probabilidad de que el Lobizón te asuste y te mande al mazo automáticamente.',
+          tag: 'PASIVA',
+          nota: 'No aplica si la primera baza fue parda.',
         },
       ],
     },

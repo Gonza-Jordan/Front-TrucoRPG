@@ -50,6 +50,7 @@ export interface VistaHabilidadesRival {
   travesuraBloqueando: boolean;
   rasgunoActivo?: boolean;
   rasgunoBloqueando?: boolean;
+  aullidoBloqueando?: boolean;
   cartasOcultasTravesura?: { numero: number; palo: string }[];
   ultimoMensajeHabilidad?: string;
 }
@@ -94,6 +95,7 @@ export interface ManoState {
   travesuraBloqueando?: boolean;
   rasgunoActivo?: boolean;
   rasgunoBloqueando?: boolean;
+  aullidoBloqueando?: boolean;
   cartasOcultasTravesura?: { numero: number; palo: string }[];
 }
 
@@ -148,6 +150,7 @@ const FAN_X      = [-84, 0, 84];
 const SALPICADURA_REVEAL_SEG = 5;
 const TRAVESURA_REVEAL_SEG = 5;
 const RASGUNO_REVEAL_SEG = 3;
+const AULLIDO_REVEAL_SEG = 3;
 
 // ── Componente ───────────────────────────────────────────────────────────────
 
@@ -206,9 +209,11 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       || !!this.vistaRival?.salpicaduraBloqueando
       || !!this.vistaRival?.travesuraBloqueando
       || !!this.vistaRival?.rasgunoBloqueando
+      || !!this.vistaRival?.aullidoBloqueando
       || !!m?.salpicaduraBloqueando
       || !!m?.travesuraBloqueando
-      || !!m?.rasgunoBloqueando;
+      || !!m?.rasgunoBloqueando
+      || !!m?.aullidoBloqueando;
   }
 
   /** @deprecated usar accionesBloqueadasPorHabilidadRival */
@@ -222,6 +227,8 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   travesuraSegundos = 0;
   rasgunoRevelando = false;
   rasgunoSegundos = 0;
+  aullidoRevelando = false;
+  aullidoSegundos = 0;
   private salpicaduraCartasOriginales: Carta[] = [];
   private rasgunoCartasOriginales: Carta[] = [];
 
@@ -295,6 +302,9 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   private rasgunoManoId: string | null = null;
   private rasgunoTimer: ReturnType<typeof setTimeout> | null = null;
   private rasgunoInterval: ReturnType<typeof setInterval> | null = null;
+  private aullidoManoId: string | null = null;
+  private aullidoTimer: ReturnType<typeof setTimeout> | null = null;
+  private aullidoInterval: ReturnType<typeof setInterval> | null = null;
   private rasgunoWatchdog: ReturnType<typeof setInterval> | null = null;
   private rasgunoConfirmando = false;
   private nuevaManoEnCurso = false;
@@ -337,6 +347,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cancelarSalpicaduraTimer();
     this.cancelarTravesuraTimer();
     this.cancelarRasgunoTimer();
+    this.cancelarAullidoTimer();
     this.rasgunoManoId = null;
 
     this.call('nueva-partida', this.construirBodyPartida());
@@ -372,6 +383,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cancelarSalpicaduraTimer();
     this.cancelarTravesuraTimer();
     this.cancelarRasgunoTimer();
+    this.cancelarAullidoTimer();
     if (this.rasgunoWatchdog) {
       clearInterval(this.rasgunoWatchdog);
       this.rasgunoWatchdog = null;
@@ -452,6 +464,9 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
           if (this.mano?.id === m.id && this.rasgunoBloqueandoEn(m) && this.rasgunoManoId !== m.id) {
             this.manejarRasguno(m);
           }
+          if (this.mano?.id === m.id && this.aullidoBloqueandoEn(m) && this.aullidoManoId !== m.id) {
+            this.manejarAullido(m);
+          }
           break;
         }
         if (this.esperaAccionHumano(m)) break;
@@ -498,6 +513,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     if (endpoint !== 'confirmar-salpicadura'
       && endpoint !== 'confirmar-travesura'
       && endpoint !== 'confirmar-rasguno'
+      && endpoint !== 'confirmar-aullido'
       && endpoint !== 'ganar-automatico-debug'
       && this.accionesBloqueadasPorHabilidadRival) return;
     this.loading = true;
@@ -773,6 +789,8 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.rasgunoRevelando) {
       this.turnoBadge = 'Rasguño: el Lobizón va a debilitar una carta...';
+    } else if (this.aullidoRevelando) {
+      this.turnoBadge = 'Aullido: el Lobizón te asusta...';
     } else if (this.travesuraRevelando) {
       this.turnoBadge = 'Travesura: memorizá tus cartas...';
     } else if (this.salpicaduraRevelando) {
@@ -809,6 +827,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     this.manejarSalpicadura(m);
     this.manejarRasguno(m);
     this.manejarTravesura(m);
+    this.manejarAullido(m);
     this.actualizarCartasMano(m);
 
     this.buildBtns(m, esMiTurno, pendEnv, pendTru);
@@ -1001,8 +1020,69 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  private aullidoBloqueandoEn(m: ManoState): boolean {
+    return !!(
+      m.aullidoBloqueando
+      || m.vistaHabilidadesRival?.aullidoBloqueando
+    );
+  }
+
+  private cancelarAullidoTimer(): void {
+    if (this.aullidoTimer) {
+      clearTimeout(this.aullidoTimer);
+      this.aullidoTimer = null;
+    }
+    if (this.aullidoInterval) {
+      clearInterval(this.aullidoInterval);
+      this.aullidoInterval = null;
+    }
+    this.aullidoRevelando = false;
+    this.aullidoSegundos = 0;
+    this.aullidoManoId = null;
+  }
+
+  private manejarAullido(m: ManoState): void {
+    const bloqueando = this.aullidoBloqueandoEn(m);
+    if (!bloqueando) {
+      if (!this.aullidoTimer) {
+        this.aullidoRevelando = false;
+        this.aullidoSegundos = 0;
+        this.aullidoManoId = null;
+      }
+      return;
+    }
+
+    if (this.aullidoManoId === m.id) return;
+
+    if (this.aullidoTimer) clearTimeout(this.aullidoTimer);
+    if (this.aullidoInterval) clearInterval(this.aullidoInterval);
+
+    this.aullidoManoId = m.id;
+    this.aullidoRevelando = true;
+    this.aullidoSegundos = AULLIDO_REVEAL_SEG;
+
+    this.aullidoInterval = setInterval(() => {
+      this.aullidoSegundos = Math.max(0, this.aullidoSegundos - 1);
+      this.cdr.markForCheck();
+    }, 1000);
+
+    this.aullidoTimer = setTimeout(() => {
+      this.aullidoTimer = null;
+      if (this.aullidoInterval) clearInterval(this.aullidoInterval);
+      this.aullidoInterval = null;
+      this.aullidoRevelando = false;
+      this.aullidoSegundos = 0;
+      this.cdr.markForCheck();
+      if (this.mano?.id === m.id) {
+        this.confirmarHabilidadRival('confirmar-aullido', m.id);
+      }
+    }, AULLIDO_REVEAL_SEG * 1000);
+
+    this.cdr.detectChanges();
+  }
+
   private confirmarHabilidadRival(
-    endpoint: 'confirmar-salpicadura' | 'confirmar-travesura' | 'confirmar-rasguno',
+    endpoint: 'confirmar-salpicadura' | 'confirmar-travesura' | 'confirmar-rasguno' | 'confirmar-aullido',
     manoId: string,
   ): void {
     if (endpoint === 'confirmar-rasguno') this.rasgunoConfirmando = true;
@@ -1011,6 +1091,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     ).then(data => {
       this.rasgunoManoId = null;
       this.rasgunoConfirmando = false;
+      this.aullidoManoId = null;
       this.recibirMano(data);
       return this.correrMaquinas();
     }).catch(err => {
@@ -1027,12 +1108,18 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!this.rasgunoBloqueandoEn(data)) {
         this.cancelarRasgunoTimer();
       }
+      if (!this.aullidoBloqueandoEn(data)) {
+        this.cancelarAullidoTimer();
+      }
     }
     this.mano = data;
     this.updateEventosHabilidad(data);
     this.updateUI(data);
     if (this.rasgunoBloqueandoEn(data) && this.rasgunoManoId !== data.id) {
       this.manejarRasguno(data);
+    }
+    if (this.aullidoBloqueandoEn(data) && this.aullidoManoId !== data.id) {
+      this.manejarAullido(data);
     }
   }
 
