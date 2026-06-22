@@ -234,3 +234,13 @@
   transition: color 0.1s, border-color 0.1s;
 }
 .acciones-cerrar:hover { color: #c89030; border-color: #5a4020; }
+
+/* ── Responsive landscape mobile ─────────────────────────────── */
+/* Elimina el gap del panel izquierdo cuando hay pocos botones   */
+@media (max-height: 560px) {
+  .btn-list      { flex: 1; justify-content: center; }
+  .acciones-btn  { margin-top: 8px !important; font-size: 15px; padding: 5px 4px; }
+}
+@media (max-height: 440px) {
+  .acciones-btn  { font-size: 13px !important; padding: 4px 3px !important; }
+}
