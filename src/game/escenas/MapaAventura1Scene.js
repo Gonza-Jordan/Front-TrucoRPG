@@ -4,6 +4,7 @@ import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
 import Portal from '../objetos/Portal.js';
 import Oponente from '../personajes/Oponente.js';
 import ZonaInteraccionNpc from '../objetos/ZonaInteraccionNpc.js';
+import NpcDialogo from '../personajes/NpcDialogo.js';
 
 const RIVAL_NAHUELITO_NIVEL = 1;
 const RIVAL_POMBERITO_NIVEL = 2;
@@ -15,6 +16,10 @@ const JEFE1_Y = 499;
 // Coordenadas del jefe Pomberito
 const JEFE2_X = 1085;
 const JEFE2_Y = 200;
+
+// coords npc para hablar
+const NPC_ALDEANO_X = 442;
+const NPC_ALDEANO_Y = 195;
 
 function authHeaders() {
   const headers = { 'Content-Type': 'application/json' };
@@ -106,8 +111,7 @@ export default class MapaAventura1Scene extends BaseScene {
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-
-    //portal mapa aventura 2
+    // portal mapa aventura 2
     this.portalMapaAventura2 = new Portal(this, 1092, 131, 'MapaAventura2', false, {
       x: 1078,
       y: 611,
@@ -121,6 +125,17 @@ export default class MapaAventura1Scene extends BaseScene {
 
     this._crearJefeNahuelito();
     this._crearJefePomberito();
+
+    //npc para charlar
+    this.npcAldeano = new NpcDialogo(this, NPC_ALDEANO_X, NPC_ALDEANO_Y, 'personaje', [
+      '¡Hola, aventurero!\nBienvenido a estas tierras.',
+      'El Nahuelito merodea\npor el lago... tené cuidado.',
+      'Dicen que si lo derrotás,\nel Pomberito te dejará desafiarlo.',
+      'Ambos están al servicio,\nde mandinga.',
+      'Por favor ayudá,\na nuestro pueblo.',
+      'Mientras tanto yo ,\nvoy a seguir buscando inspiración.',
+      'Mi sueño es\ndibujar como Molina Campos\nsoy su gran fan!.',
+    ]);
 
     this.puedePelearPomberito = false;
     this.cargarPuedePelearPomberito();
@@ -189,6 +204,13 @@ export default class MapaAventura1Scene extends BaseScene {
   }
 
   update() {
+    // si el dialogo esta abierto bloquea el resto
+    if (this.npcAldeano.dialogoAbierto) {
+      this.npcAldeano.update(this.JugadorPrincipal, this.teclaE, this.botonInteractuarPresionado);
+      this.botonInteractuarPresionado = false;
+      return;
+    }
+
     this.JugadorPrincipal.update(this.keys, this.teclaE);
 
     const seMueve =
@@ -197,6 +219,9 @@ export default class MapaAventura1Scene extends BaseScene {
     if (seMueve) {
       this.estabaMoviendose = true;
     } else if (this.estabaMoviendose) {
+      const xActual = Math.round(this.JugadorPrincipal.x);
+      const yActual = Math.round(this.JugadorPrincipal.y);
+      console.log(`📍 Personaje parado en coordenadas -> X: ${xActual}, Y: ${yActual}`);
       this.estabaMoviendose = false;
     }
 
@@ -204,6 +229,9 @@ export default class MapaAventura1Scene extends BaseScene {
 
     this.portalMapaAventura2.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
     this.portalMapaPrincipal.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+
+
+    this.npcAldeano.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
 
     const enZonaJefe1 = this.zonaJefe1.update(this.JugadorPrincipal);
     const enZonaJefe2 = this.zonaJefe2.update(
