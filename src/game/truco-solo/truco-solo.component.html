@@ -38,12 +38,9 @@
 
     <div class="rival-zone">
       <div class="rival-portrait">
-        <img [src]="rivalImgSrc" alt="rival" class="rival-img"
+        <img [src]="rivalImgSrc" alt="rival" class="rival-img" [ngClass]="rivalImgClase"
           (error)="$any($event.target).src = 'assets/gaucho.png'" />
       </div>
-      @if (rival) {
-      <div class="rival-nombre">{{ rival.nombre }}</div>
-      }
       @if (bubbleText) {
       <div class="bubble">
         <span class="bubble-tail"></span>

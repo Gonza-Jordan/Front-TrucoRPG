@@ -314,15 +314,25 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Imagen del rival ──────────────────────────────────────────────────────
 
-  get rivalImgSrc(): string {
-    if (!this.rival?.nombre) return 'assets/gaucho.png';
-    const slug = this.rival.nombre
+  // Slug normalizado del rival (ej. "El Pomberito" -> "pomberito"). Vac\u00edo si no hay rival.
+  get rivalSlug(): string {
+    if (!this.rival?.nombre) return '';
+    return this.rival.nombre
       .toLowerCase()
       .replace(/^(el|la|los|las)\s+/i, '')
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '')
       .trim();
+  }
+
+  // Clase CSS por personaje para poder estilar cada uno por separado.
+  get rivalImgClase(): string {
+    return `rival-${this.rivalSlug || 'gaucho'}`;
+  }
+
+  get rivalImgSrc(): string {
+    const slug = this.rivalSlug;
     if (!slug) return 'assets/gaucho.png';
     return `assets/oponentes1v1/${slug}_batalla.png`;
   }

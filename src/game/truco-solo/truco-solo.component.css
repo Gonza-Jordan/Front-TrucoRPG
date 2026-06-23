@@ -118,7 +118,7 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  z-index: 20;
+  z-index: 1;
 }
 
 .rival-portrait {
@@ -213,6 +213,8 @@
   perspective: 860px;
   perspective-origin: 50% 5%;
   margin-top: 10px;
+  position: relative;
+  z-index: 2;
 }
 
 .table-surface {
@@ -888,14 +890,67 @@
 
 
 
-/* gaucho rival */
+/* ── Imagen del rival: base común (también la del gaucho por defecto) ───────── */
 .rival-img {
-  width: 420px;
+  width: auto;
   height: auto;
+  max-width: 300px;
+  max-height: 240px;
+  object-fit: contain;
+  object-position: bottom center;
   border-radius: 0;
   mask-image: none;
   -webkit-mask-image: none;
   filter: drop-shadow(0 8px 24px rgba(0,0,0,0.9));
+}
+
+/* ── Estilos por personaje ─────────────────────────────────────────────────
+   Cada lienzo tiene proporciones distintas, así que cada uno se calibra aparte.
+   - max-width / max-height: tamaño del personaje.
+   - translateY positivo = baja el personaje (la mesa le tapa más la parte baja).
+   --------------------------------------------------------------------------- */
+
+/* Nahuelito — lienzo cuadrado (1:1), llena el marco. Achicado y hundido para que
+   la mesa le tape la base y no quede "superpuesto". */
+.rival-img.rival-nahuelito {
+  max-width: 258px;
+  max-height: 258px;
+  transform: translateY(48px);
+}
+
+/* Mandinga — también cuadrado (1:1). */
+.rival-img.rival-mandinga {
+  max-width: 240px;
+  max-height: 250px;
+  transform: translateY(40px);
+}
+
+/* Pombero — lienzo ancho (1.83:1); necesita más ancho para no quedar bajito. */
+.rival-img.rival-pomberito {
+  max-width: 470px;
+  max-height: 320px;
+  transform: translateY(38px);
+}
+
+/* Lobizón — lienzo ancho (1.83:1) con márgenes laterales; necesita más ancho. */
+.rival-img.rival-lobizon {
+  max-width: 480px;
+  max-height: 320px;
+  transform: translateY(38px);
+}
+
+/* Luz Mala — figura vertical dentro de un lienzo muy ancho. */
+.rival-img.rival-luzmala {
+  max-width: 540px;
+  max-height: 300px;
+  transform: translateY(0);
+}
+
+/* Gaucho — rival por defecto; lienzo apaisado (1.83:1) con la figura centrada. */
+.rival-img.rival-gaucho {
+  max-width: 420px;
+  max-height: 300px;
+  transform: translateY(20px);
 }
 
 
