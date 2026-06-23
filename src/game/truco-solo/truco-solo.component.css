@@ -893,6 +893,7 @@
 
 .rival-panel-left .heroe-desc {
   margin-bottom: 0;
+  white-space: pre-line;
 }
 
 .rival-panel-left .rival-log-msg {

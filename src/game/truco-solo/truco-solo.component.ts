@@ -364,7 +364,10 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   private cargarRival(nivel: number): void {
     this.http.get<Rival>(`${API_HISTORIA}/rivales/${nivel}`).subscribe({
       next: (rival) => {
-        this.rival = rival;
+        this.rival = {
+          ...rival,
+          descripcionHabilidad: this.formatearDescripcionRival(rival.descripcionHabilidad),
+        };
         this.cdr.markForCheck();
       },
       error: () => {
@@ -413,6 +416,10 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   mensajeHabilidadLimpio(msg?: string | null): string {
     if (!msg) return '';
     return msg.replace(/\s*\(Truco\s+\d+\)/gi, '').trim();
+  }
+
+  private formatearDescripcionRival(desc: string): string {
+    return desc.replace(/\s+Aullido:/, '\nAullido:');
   }
 
   cardImg(carta: Carta): string {
