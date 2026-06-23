@@ -337,6 +337,22 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     return `assets/oponentes1v1/${slug}_batalla.png`;
   }
 
+  // ── Mini popups de info del panel derecho (habilidades) ───────────────────
+  infoPopupTitulo: string | null = null;
+  infoPopupLineas: string[] = [];
+
+  abrirInfoPopup(titulo: string, lineas: string[]): void {
+    this.infoPopupTitulo = titulo;
+    this.infoPopupLineas = (lineas || []).filter(l => !!l);
+    this.cdr.markForCheck();
+  }
+
+  cerrarInfoPopup(): void {
+    this.infoPopupTitulo = null;
+    this.infoPopupLineas = [];
+    this.cdr.markForCheck();
+  }
+
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngAfterViewInit(): void {
     const video = this.gauchoVideo?.nativeElement;

@@ -48,6 +48,8 @@
   padding: 12px 10px;
   gap: 8px;
   z-index: 10;
+  min-height: 0;
+  overflow-y: auto; /* en pantallas bajas permite scrollear hasta el botón Volver */
 }
 
 .left-panel {
@@ -118,7 +120,7 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  z-index: 1;
+  z-index: 1; /* el rival va detrás de la mesa (la mesa tiene z-index 2) */
 }
 
 .rival-portrait {
@@ -208,13 +210,13 @@
   width: 100%;
   flex: 1;
   display: flex;
-  align-items: flex-start;
+  align-items: center; /* mobile: mesa centrada verticalmente. Desktop la sube (media query). */
   justify-content: center;
   perspective: 860px;
   perspective-origin: 50% 5%;
   margin-top: 10px;
   position: relative;
-  z-index: 2;
+  z-index: 2; /* la mesa tapa la parte baja del rival -> efecto "sentado del otro lado" (desktop) */
 }
 
 .table-surface {
@@ -430,6 +432,7 @@
   width: 300px;
   margin-top: 8px;
   flex-shrink: 0;
+  z-index: 3; /* por encima de la mesa (z-index 2) para que las cartas sean clickeables */
 }
 
 .fan-card {
@@ -904,11 +907,17 @@
   filter: drop-shadow(0 8px 24px rgba(0,0,0,0.9));
 }
 
-/* ── Estilos por personaje ─────────────────────────────────────────────────
+/* ── Estilos por personaje (SOLO desktop) ──────────────────────────────────
    Cada lienzo tiene proporciones distintas, así que cada uno se calibra aparte.
    - max-width / max-height: tamaño del personaje.
    - translateY positivo = baja el personaje (la mesa le tapa más la parte baja).
+   Se limitan a desktop (ancho > 1050 y alto > 540) para no pisar el avatar
+   circular que usa el layout responsive en pantallas chicas.
    --------------------------------------------------------------------------- */
+@media (min-width: 1051px) and (min-height: 541px) {
+
+/* En desktop la mesa va arriba (en mobile se centra). El z-index "detrás" está en la base. */
+.table-wrap { align-items: flex-start; }
 
 /* Nahuelito — lienzo cuadrado (1:1), llena el marco. Achicado y hundido para que
    la mesa le tape la base y no quede "superpuesto". */
@@ -952,6 +961,8 @@
   max-height: 300px;
   transform: translateY(20px);
 }
+
+} /* fin estilos por personaje (solo desktop) */
 
 
 /* eeee cambios descripcion habilidad, falta */
@@ -1075,6 +1086,93 @@
   word-break: break-word;
 }
 
+/* ── Botones de info (abren mini popup) ──────────────────────────────────── */
+.info-btn {
+  font-family: var(--font-data);
+  font-size: var(--log-text-size);
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 6px;
+  border-radius: 3px;
+  border: 1px solid #5a4400;
+  background: #1a1400;
+  color: #ffdd88;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.info-btn:hover {
+  background: #251c00;
+}
+
+.info-btn-eventos {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+/* ── Mini popup de info ───────────────────────────────────────────────────── */
+.info-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000000aa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.info-popup {
+  background: #0d0b08;
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px #000c;
+  padding: 16px 18px;
+  max-width: 360px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-popup-titulo {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.info-popup-linea {
+  font-family: var(--font-data);
+  font-size: 16px;
+  color: #ffdd88;
+  background: #1a1400;
+  border: 1px solid #5a4400;
+  border-radius: 3px;
+  padding: 6px 8px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.info-popup-close {
+  font-family: var(--font-data);
+  font-size: 15px;
+  margin-top: 6px;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--gold);
+  background: #1a1206;
+  color: var(--gold);
+  cursor: pointer;
+}
+
+.info-popup-close:hover {
+  background: #2a1d0a;
+}
+
 /* Carta seleccionada (Manipulador) */
 .carta-seleccionada {
   filter: drop-shadow(0 0 8px #aa44ff) drop-shadow(0 0 3px #aa44ff);
@@ -1145,7 +1243,7 @@
     mask-image: none;
     -webkit-mask-image: none;
   }
-  .rival-zone { top: -10px; }
+  .rival-zone { top: 50%; left: 50%; transform: translate(-50%, -240px); z-index: 5; }
   .arena { padding-top: 75px; }
   .rival-hand { margin-top: 8px; }
   .scoreboard { padding: 6px 4px; }
@@ -1231,7 +1329,7 @@
 @media (max-height: 540px) {
   .side-panel { width: 110px; padding: 6px 5px; gap: 4px; }
   .action-btn { font-size: 13px; padding: 5px 3px; min-height: 36px; }
-  .arena { padding-top: 38px; }
+  .arena { padding-top: 40px; }
   .rival-portrait {
     width: 48px; height: 48px;
     border: 2px solid #aa4444;
@@ -1247,7 +1345,7 @@
     mask-image: none;
     -webkit-mask-image: none;
   }
-  .rival-zone { top: 10px; left: 22%; }
+  .rival-zone { top: 50%; left: 50%; transform: translate(-50%, -195px); z-index: 5; }
   .rival-hand { margin-top: 4px; }
   .bubble { top: 50px; left: calc(100% + 8px); font-size: 13px; }
   .table-wrap { perspective: 500px; margin-top: 2px; }
@@ -1275,8 +1373,9 @@
 @media (max-height: 400px) {
   .side-panel { width: 95px; padding: 4px; gap: 3px; }
   .action-btn { font-size: 12px; padding: 4px 2px; min-height: 30px; }
-  .arena { padding-top: 28px; }
+  .arena { padding-top: 30px; }
   .rival-portrait { width: 28px; height: 28px; font-size: 16px; }
+  .rival-zone { top: 50%; left: 50%; transform: translate(-50%, -150px); z-index: 5; }
   .rival-label { display: none; }
   .table-wrap { margin-top: 1px; }
   .table-surface { width: 260px; height: 180px; }
@@ -1298,7 +1397,7 @@
   :host { --log-text-size: 13px; }
 
   /* Gaucho: avatar pequeño en mobile */
-  .rival-zone { top: -10px; }
+  .rival-zone { top: 50%; left: 50%; transform: translate(-50%, -215px); z-index: 5; }
   .rival-portrait {
     width: 56px;
     height: 56px;
