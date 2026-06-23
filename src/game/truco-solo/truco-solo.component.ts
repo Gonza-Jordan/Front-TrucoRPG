@@ -337,6 +337,12 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     return `assets/oponentes1v1/${slug}_batalla.png`;
   }
 
+  get fondoStyle(): { [key: string]: string } {
+    const slug = this.rivalSlug;
+    const img = slug ? `assets/fondos1v1/${slug}_fondo.png` : 'assets/multijugador.png';
+    return { 'background-image': `url('${img}')` };
+  }
+
   // ── Mini popups de info del panel derecho (habilidades) ───────────────────
   infoPopupTitulo: string | null = null;
   infoPopupLineas: string[] = [];
