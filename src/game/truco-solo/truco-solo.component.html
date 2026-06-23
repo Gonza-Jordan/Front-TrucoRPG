@@ -1,4 +1,4 @@
-<div class="root" [style]="fondoStyle">
+<div class="root" [ngStyle]="fondoStyle">
 
   <!-- ── PANEL IZQUIERDO: botones de acción ──────────────────────────────── -->
   <aside class="side-panel left-panel">
@@ -8,8 +8,7 @@
     <div class="btn-list">
       @for (b of btns; track b.label) {
       <button class="action-btn" [class.disabled]="!b.enabled" [class.brilla-btn]="btnsBrillan[$index]"
-        [style.--btn-color]="b.color" [disabled]="!b.enabled"
-        (click)="b.action && b.action()">
+        [style.--btn-color]="b.color" [disabled]="!b.enabled" (click)="b.action && b.action()">
         {{ b.label }}
       </button>
       }
@@ -103,8 +102,7 @@
       @for (c of misCarts; track $index) {
       <div class="fan-card" [class.hidden]="!c.visible" [class.played-out]="!c.carta"
         [class.carta-seleccionada]="c.seleccionada" [class.brilla]="cartasBrillan[$index]"
-        [class.carta-oculta]="c.oculta"
-        [style.--angle]="fanAngles[$index] + 'deg'"
+        [class.carta-oculta]="c.oculta" [style.--angle]="fanAngles[$index] + 'deg'"
         [style.--xoff]="fanXOff[$index] + 'px'" (click)="jugarCarta($index)">
         @if (c.carta) {
         @if (c.oculta) {
@@ -200,8 +198,7 @@
 
       <!-- Eventos de habilidad como botón -> mini popup -->
       @if (eventosHabilidad.length > 0) {
-      <button class="info-btn info-btn-eventos"
-        (click)="abrirInfoPopup('Eventos de la mano', eventosHabilidad)">
+      <button class="info-btn info-btn-eventos" (click)="abrirInfoPopup('Eventos de la mano', eventosHabilidad)">
         📜 Eventos ({{ eventosHabilidad.length }})
       </button>
       }
@@ -290,20 +287,20 @@
 }
 
 <!-- Toast -->
-  @if (toastMsg) {
-  <div class="toast" [class.toast-info]="toastTipo === 'info'">{{ toastMsg }}</div>
-  }
+@if (toastMsg) {
+<div class="toast" [class.toast-info]="toastTipo === 'info'">{{ toastMsg }}</div>
+}
 
-  <!-- ── CONFIRMAR SALIR ────────────────────────────────────────────────────── -->
-  @if (mostrarConfirmSalir) {
-  <div class="confirm-overlay" (click)="cancelarSalir()">
-    <div class="confirm-box" (click)="$event.stopPropagation()">
-      <div class="confirm-title">¿Salir de la partida?</div>
-      <div class="confirm-sub">Perdés el progreso de la mano actual.</div>
-      <div class="confirm-btn-row">
-        <button class="confirm-btn confirm-btn-si" (click)="confirmarSalir()">Sí, salir</button>
-        <button class="confirm-btn confirm-btn-no" (click)="cancelarSalir()">Cancelar</button>
-      </div>
+<!-- ── CONFIRMAR SALIR ────────────────────────────────────────────────────── -->
+@if (mostrarConfirmSalir) {
+<div class="confirm-overlay" (click)="cancelarSalir()">
+  <div class="confirm-box" (click)="$event.stopPropagation()">
+    <div class="confirm-title">¿Salir de la partida?</div>
+    <div class="confirm-sub">Perdés el progreso de la mano actual.</div>
+    <div class="confirm-btn-row">
+      <button class="confirm-btn confirm-btn-si" (click)="confirmarSalir()">Sí, salir</button>
+      <button class="confirm-btn confirm-btn-no" (click)="cancelarSalir()">Cancelar</button>
     </div>
   </div>
-  }
+</div>
+}
