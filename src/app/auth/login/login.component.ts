@@ -1,10 +1,17 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth.service';
 import { Card } from '../../components/card/card';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+
+function emailValido(control: AbstractControl): ValidationErrors | null {
+  const v: string = (control.value ?? '').trim();
+  if (!v) return null; // el required se encarga del vacío
+  const ok = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(v);
+  return ok ? null : { email: true };
+}
 
 @Component({
   selector: 'app-login',
@@ -24,8 +31,12 @@ export class LoginComponent {
     private router: Router
   ) {
     this.form = this.fb.group({
-      email:    ['', [Validators.required, Validators.email]],
+      email:    ['', [Validators.required, emailValido]],
       password: ['', Validators.required]
+    });
+
+    this.form.valueChanges.subscribe(() => {
+      if (this.errorServidor) this.errorServidor = '';
     });
   }
 
