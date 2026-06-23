@@ -51,30 +51,36 @@ export class Historia implements OnInit, OnDestroy {
 
   abrirMesaTruco = (): void => {
     this.mostrarTrucoSolo = true;
+    this.document.body.classList.add('combate-historia');
     this.historiaService.pausarEscenaMapaActiva();
   };
   cerrarMesaTruco = (): void => {
     this.mostrarTrucoSolo = false;
+    this.document.body.classList.remove('combate-historia');
     window.dispatchEvent(new CustomEvent('resume-game'));
     this.historiaService.reanudarEscenaMapaTrasCombate();
   };
 
   abrirMesa2v2 = (): void => {
     this.mostrarTruco2v2 = true;
+    this.document.body.classList.add('combate-historia');
     this.historiaService.pausarEscenaMapaActiva();
   };
   cerrarMesa2v2 = (): void => {
     this.mostrarTruco2v2 = false;
+    this.document.body.classList.remove('combate-historia');
     window.dispatchEvent(new CustomEvent('resume-game'));
     this.historiaService.reanudarEscenaMapaTrasCombate();
   };
 
   abrirMesa3v3 = (): void => {
     this.mostrarTruco3v3 = true;
+    this.document.body.classList.add('combate-historia');
     this.historiaService.pausarEscenaMapaActiva();
   };
   cerrarMesa3v3 = (): void => {
     this.mostrarTruco3v3 = false;
+    this.document.body.classList.remove('combate-historia');
     window.dispatchEvent(new CustomEvent('resume-game'));
     this.historiaService.reanudarEscenaMapaTrasCombate();
   };
@@ -91,6 +97,7 @@ export class Historia implements OnInit, OnDestroy {
     localStorage.removeItem('origenPulperia');
     this.historiaService.destruirJuego();
     this.document.body.classList.remove('modo-phaser-mobile');
+    this.document.body.classList.remove('combate-historia');
   }
 
   alTerminarPrologo(): void {

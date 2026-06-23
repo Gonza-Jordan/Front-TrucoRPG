@@ -6,7 +6,7 @@ export const OPONENTES: Oponente[] = [
       nombre: 'Nahuelito',
       apodo: 'El que nada entre brumas',
       icono: '🌊',
-      imagen: '/assets/oponentes/nahuelito.png',
+      imagen: '/assets/oponentes1v1/nahuelito_batalla.png',
       intro:
         'Emerge de las aguas frías del sur. Nadie le vio la cara completa, pero todos coinciden en algo: las cartas, cerca de él, dejan de ser lo que parecen.',
       habilidades: [
@@ -31,7 +31,7 @@ export const OPONENTES: Oponente[] = [
       nombre: 'El Pombero',
       apodo: 'El dueño del monte',
       icono: '🌲',
-      imagen: '/assets/oponentes/pomberito.png',
+      imagen: '/assets/oponentes1v1/pomberito_batalla.png',
       intro:
         'Silbidos en el monte, pasos que no se ven. El Pombero conoce tus cartas antes que vos mismo las olvides.',
       habilidades: [

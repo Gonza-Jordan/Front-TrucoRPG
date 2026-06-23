@@ -38,11 +38,9 @@
 
     <div class="rival-zone">
       <div class="rival-portrait">
-        <img src="assets/gaucho.png" alt="rival" class="rival-img" />
+        <img [src]="rivalImgSrc" alt="rival" class="rival-img" [ngClass]="rivalImgClase"
+          (error)="$any($event.target).src = 'assets/gaucho.png'" />
       </div>
-      @if (rival) {
-      <div class="rival-nombre">{{ rival.nombre }}</div>
-      }
       @if (bubbleText) {
       <div class="bubble">
         <span class="bubble-tail"></span>
@@ -186,8 +184,11 @@
       <!-- Nombre -->
       <div class="heroe-nombre" [style.color]="heroe.color">⚔ {{ heroe.nombre }}</div>
 
-      <!-- descripcion habilidad -->
-      <div class="heroe-desc">{{ heroe.descripcion }}</div>
+      <!-- descripcion habilidad como botón -> mini popup -->
+      <button class="info-btn" [style.border-color]="heroe.color + '66'"
+        (click)="abrirInfoPopup('⚔ ' + heroe.nombre, [heroe.descripcion])">
+        ℹ Mi habilidad
+      </button>
 
       <!-- usar habilidad -->
       <button class="habilidad-btn" [class.disponible]="habilidadDisponible && !manipuladorEsperandoCarta"
@@ -204,13 +205,12 @@
         }
       </button>
 
-      <!-- Log de eventos de habilidad -->
+      <!-- Eventos de habilidad como botón -> mini popup -->
       @if (eventosHabilidad.length > 0) {
-      <div class="heroe-log">
-        @for (linea of eventosHabilidad; track $index) {
-        <div class="heroe-log-linea">{{ linea }}</div>
-        }
-      </div>
+      <button class="info-btn info-btn-eventos"
+        (click)="abrirInfoPopup('Eventos de la mano', eventosHabilidad)">
+        📜 Eventos ({{ eventosHabilidad.length }})
+      </button>
       }
 
     </div>
@@ -243,6 +243,19 @@
 
   @if (countdown !== null) {
   <div class="nueva-mano-countdown">Nueva mano en {{ countdown }}</div>
+  }
+
+  <!-- ── MINI POPUP DE INFO (habilidad / eventos) ─────────────────────────── -->
+  @if (infoPopupTitulo) {
+  <div class="info-popup-overlay" (click)="cerrarInfoPopup()">
+    <div class="info-popup" (click)="$event.stopPropagation()">
+      <div class="info-popup-titulo">{{ infoPopupTitulo }}</div>
+      @for (l of infoPopupLineas; track $index) {
+      <div class="info-popup-linea">{{ l }}</div>
+      }
+      <button class="info-popup-close" (click)="cerrarInfoPopup()">Cerrar</button>
+    </div>
+  </div>
   }
 
 </div>
