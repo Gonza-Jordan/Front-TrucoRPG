@@ -281,6 +281,31 @@
   padding: 0;
 }
 
+.rival-card-face-wrap {
+  position: relative;
+  display: inline-block;
+  transition: opacity 0.2s, transform 0.25s ease;
+}
+
+.rival-card-face-wrap.hidden {
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.rival-card-face-img {
+  height: 80px;
+  width: auto;
+  border-radius: 4px;
+  box-shadow:
+    1px 2px 6px #0009,
+    0 0 0 2px #66dd88,
+    0 0 14px #66dd8866;
+  display: block;
+}
+
 
 
 /* ── Bazas ────────────────────────────────────────────────────────────────── */
@@ -873,6 +898,7 @@
 
 .rival-panel-left .heroe-desc {
   margin-bottom: 0;
+  white-space: pre-line;
 }
 
 .rival-panel-left .rival-log-msg {
@@ -1358,6 +1384,7 @@
   .fan-card { width: 38px; height: 55px; margin-left: -19px; }
   .fan-card-img { width: 100%; height: 100%; }
   .card-back-img { height: 40px; }
+  .rival-card-face-img { height: 40px; }
   .scoreboard { padding: 4px; gap: 3px; }
   .score-title { font-size: 5px; }
   .score-row { font-size: 12px; }
