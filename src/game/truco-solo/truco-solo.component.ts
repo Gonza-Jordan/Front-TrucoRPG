@@ -9,7 +9,7 @@ import {
   ChangeDetectionStrategy,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgStyle } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -163,7 +163,7 @@ const AULLIDO_REVEAL_SEG = 3;
 @Component({
   selector: 'app-truco-solo',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NgStyle],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './truco-solo.component.html',
   styleUrl: './truco-solo.component.css',
@@ -343,6 +343,12 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     const slug = this.rivalSlug;
     if (!slug) return 'assets/gaucho.png';
     return `assets/oponentes1v1/${slug}_batalla.png`;
+  }
+
+  get fondoStyle(): { [key: string]: string } {
+    const slug = this.rivalSlug;
+    const img = slug ? `assets/fondos1v1/${slug}_fondo.png` : 'assets/multijugador.png';
+    return { 'background-image': `url('${img}')` };
   }
 
   // ── Mini popups de info del panel derecho (habilidades) ───────────────────
