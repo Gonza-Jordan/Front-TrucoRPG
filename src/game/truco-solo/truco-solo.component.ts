@@ -113,6 +113,12 @@ export interface Slot {
   winner?: 'Humano' | 'Maquina' | 'Parda';
 }
 
+export interface OpCardDisplay {
+  visible: boolean;
+  revelada: boolean;
+  carta: Carta | null;
+}
+
 // ── Héroe ─────────────────────────────────────────────────────────────────────
 
 export interface Heroe {
@@ -253,8 +259,10 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── UI ───────────────────────────────────────────────────────────────────
   btns: Btn[] = [];
   slots: Slot[] = [{ pending: false }, { pending: false }, { pending: false }];
-  opCards: { visible: boolean }[] = [
-    { visible: true }, { visible: true }, { visible: true },
+  opCards: OpCardDisplay[] = [
+    { visible: true, revelada: false, carta: null },
+    { visible: true, revelada: false, carta: null },
+    { visible: true, revelada: false, carta: null },
   ];
   misCarts: { carta: Carta | null; visible: boolean; seleccionada: boolean; oculta: boolean }[] = [
     { carta: null, visible: false, seleccionada: false, oculta: false },
@@ -401,12 +409,34 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── Template helpers ──────────────────────────────────────────────────────
   sym(palo: Palo): string { return PALO_SYM[palo] ?? ''; }
 
+  /** Quita sufijos "(Truco N)" de mensajes de habilidades del backend. */
+  mensajeHabilidadLimpio(msg?: string | null): string {
+    if (!msg) return '';
+    return msg.replace(/\s*\(Truco\s+\d+\)/gi, '').trim();
+  }
+
   cardImg(carta: Carta): string {
     const mapaNumeros: Record<number, number> = {
       1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 10: 8, 11: 9, 12: 10
     };
     const offsetPalo: Record<Palo, number> = { Oro: 0, Copa: 10, Espada: 20, Basto: 30 };
     return `assets/cards/${offsetPalo[carta.palo] + mapaNumeros[carta.numero]}.PNG`;
+  }
+
+  private cartaCoincide(a: { numero: number; palo: string }, b: { numero: number; palo: string }): boolean {
+    return a.numero === b.numero
+      && a.palo.localeCompare(b.palo, undefined, { sensitivity: 'accent' }) === 0;
+  }
+
+  private cartaDesdeRevelada(
+    revelada: { numero: number; palo: string; valorTruco: number },
+  ): Carta {
+    return {
+      numero: revelada.numero,
+      palo: revelada.palo as Palo,
+      valorTruco: revelada.valorTruco,
+      valorEnvido: 0,
+    };
   }
 
   // ── Delay "la máquina piensa" (compartido con 2v2/3v3 vía cfg_delay) ────────
@@ -579,12 +609,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
         lineas.push(`👁 Rival revelado: ${v.cartaReveladaRival.numero} de ${v.cartaReveladaRival.palo}`);
 
       if (v.ultimoMensajeHabilidad)
-        lineas.push(`▶ ${v.ultimoMensajeHabilidad}`);
-    }
-
-    const vr = m.vistaHabilidadesRival;
-    if (vr?.ultimoMensajeHabilidad) {
-      lineas.push(`🐺 ${vr.ultimoMensajeHabilidad}`);
+        lineas.push(`▶ ${this.mensajeHabilidadLimpio(v.ultimoMensajeHabilidad)}`);
     }
 
     if (lineas.length > 0) {
@@ -812,7 +837,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     this.prevEnvidoResuelto = !!m.envidoResuelto;
 
     const cantOp = m.maquina?.mano?.length ?? 0;
-    this.opCards = [0, 1, 2].map(i => ({ visible: i < cantOp }));
+    this.actualizarCartasRival(m, cantOp);
 
     this.slots = [0, 1, 2].map(i => {
       const b = m.bazas?.[i];
@@ -1138,6 +1163,26 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       };
     });
     this.cdr.markForCheck();
+  }
+
+  private actualizarCartasRival(m: ManoState, cantOp: number): void {
+    const manoRival = m.maquina?.mano ?? [];
+    const revelada = m.vistaHabilidadesHumano?.cartaReveladaRival ?? null;
+    let indiceRevelada = -1;
+
+    if (revelada) {
+      indiceRevelada = manoRival.findIndex(c => this.cartaCoincide(c, revelada));
+    }
+
+    this.opCards = [0, 1, 2].map(i => {
+      const visible = i < cantOp;
+      const esRevelada = visible && i === indiceRevelada && revelada != null;
+      return {
+        visible,
+        revelada: esRevelada,
+        carta: esRevelada ? this.cartaDesdeRevelada(revelada!) : null,
+      };
+    });
   }
 
   private cartasParaAbanico(m: ManoState): Carta[] {

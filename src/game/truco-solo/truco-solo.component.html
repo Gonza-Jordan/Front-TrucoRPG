@@ -20,7 +20,7 @@
       <div class="rival-nombre-panel">⚔ {{ rival.nombre }}</div>
       <div class="heroe-desc">{{ rival.descripcionHabilidad }}</div>
       @if (vistaRival?.ultimoMensajeHabilidad) {
-      <div class="heroe-desc rival-log-msg">{{ vistaRival?.ultimoMensajeHabilidad }}</div>
+      <div class="heroe-desc rival-log-msg">{{ mensajeHabilidadLimpio(vistaRival?.ultimoMensajeHabilidad) }}</div>
       }
     </div>
     }
@@ -56,7 +56,14 @@
 
         <div class="rival-hand">
           @for (c of opCards; track $index) {
+          @if (c.revelada && c.carta) {
+          <div class="rival-card-face-wrap" [class.hidden]="!c.visible">
+            <img class="rival-card-face-img" [src]="cardImg(c.carta)"
+              [alt]="c.carta.numero + ' de ' + c.carta.palo" />
+          </div>
+          } @else {
           <img class="card-back-img" [class.hidden]="!c.visible" src="assets/cards/back.PNG" alt="reverso" />
+          }
           }
         </div>
 
