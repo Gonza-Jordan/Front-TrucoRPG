@@ -1,10 +1,10 @@
 export const INVENTARIO = [
   {
-    id: 1,
-    nombre: 'Boleadoras de Manipulador',
+    id: 2,
+    nombre: 'Habilidad timbero',
     categoria: 'HABILIDADES',
     cantidad: 2,
-    img: '/assets/objetos/objeto.png',
+    img: '/assets/objetos/habilidad-timbero.png',
   },
   {
     id: 5,

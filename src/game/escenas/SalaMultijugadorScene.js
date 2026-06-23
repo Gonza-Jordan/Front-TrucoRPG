@@ -89,7 +89,7 @@ export default class SalaMultijugadorScene extends BaseScene {
 
       // Label del modo
       this.add
-        .text(x, y - 82, label, {
+        .text(x, y - 102, label, {
           fontFamily: 'Jersey 20',
           fontSize: '22px',
           color: '#FFD700',
@@ -103,7 +103,7 @@ export default class SalaMultijugadorScene extends BaseScene {
     });
 
     this.puntosDeInteraccion = configMesas.map(({ x, y, gameMode }) =>
-      new PuntoInteraccion(this, x, y, 'multijugador', 'mesa_juego', 1, {
+      new PuntoInteraccion(this, x, y, 'multijugador', 'mesa_juego', 0.9, {
         gameMode,
         subVista: 'tradicional',
       }),
@@ -315,8 +315,8 @@ export default class SalaMultijugadorScene extends BaseScene {
 
   /** Genera dos texturas reutilizables: silla mirando al norte y al sur */
   _generarTexturasSilla() {
-    const W = 26;  // ancho silla
-    const H = 22;  // alto silla
+    const W = 36;  // ancho silla
+    const H = 32;  // alto silla
     const ASIENTO  = 0x8B5E3C;
     const RESPALDO = 0x4A2808;
     const BORDE    = 0x2D1804;
@@ -349,8 +349,8 @@ export default class SalaMultijugadorScene extends BaseScene {
    * @param {number} n - jugadores por equipo (1, 2 o 3)
    */
   _dibujarSillas(x, y, n) {
-    const sep    = 32;  // separación horizontal entre sillas
-    const offsetY = 48; // distancia vertical desde el centro de la mesa
+    const sep    = 45;  // separación horizontal entre sillas
+    const offsetY = 68; // distancia vertical desde el centro de la mesa
 
     for (let i = 0; i < n; i++) {
       const dx = (i - (n - 1) / 2) * sep;

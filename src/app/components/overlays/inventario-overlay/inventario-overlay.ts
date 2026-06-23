@@ -11,11 +11,11 @@ import { INVENTARIO } from '../../../../game/data/inventario';
   styleUrl: './inventario-overlay.css',
 })
 export class InventarioOverlay {
-
   inventarioCompleto = INVENTARIO;
-
   categoriaActiva: string = 'TODO';
   totalSlots: number = 12;
+
+  itemPorEquipar: any = null;
 
   constructor(private historiaService: HistoriaService) {}
 
@@ -25,11 +25,19 @@ export class InventarioOverlay {
 
   seleccionarItem(item: any) {
     if (item.categoria === 'ARMARIO' && item.spriteKey) {
-      const quiereEquipar = confirm(`¿Querés equipar ${item.nombre}?`);
-      if (quiereEquipar) {
-        this.historiaService.equiparSkinDesdeArmario(item.spriteKey);
-      }
+      this.itemPorEquipar = item;
     }
+  }
+
+  confirmarEquipacion() {
+    if (this.itemPorEquipar) {
+      this.historiaService.equiparSkinDesdeArmario(this.itemPorEquipar.spriteKey);
+    }
+    this.itemPorEquipar = null; 
+  }
+
+  cancelarEquipacion() {
+    this.itemPorEquipar = null; 
   }
 
   get itemsFiltrados() {

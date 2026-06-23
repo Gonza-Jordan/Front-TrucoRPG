@@ -28,7 +28,7 @@ export default class MultiBootScene extends Phaser.Scene {
     this.load.image('RackPulperia', './assets/mapa-pulperia/RackPulperia.png');
 
     // Objeto mesa y audio
-    this.load.image('mesa_juego', './assets/objetos/mesa-juego.png');
+    this.load.image('mesa_juego', './assets/objetos/mesa.png');
     this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
 
     // Plugin joystick mobile
