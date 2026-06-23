@@ -340,12 +340,16 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get rivalImgSrc(): string {
+    if (this.escenarioPractica !== null) return 'assets/gaucho.png';
     const slug = this.rivalSlug;
     if (!slug) return 'assets/gaucho.png';
     return `assets/oponentes1v1/${slug}_batalla.png`;
   }
 
   get fondoStyle(): { [key: string]: string } {
+    if (this.escenarioPractica !== null) {
+      return { 'background-image': `url('assets/multijugador.png')` };
+    }
     const slug = this.rivalSlug;
     const img = slug ? `assets/fondos1v1/${slug}_fondo.png` : 'assets/multijugador.png';
     return { 'background-image': `url('${img}')` };
