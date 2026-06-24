@@ -23,6 +23,12 @@ export default class InteriorPulperiaScene extends BaseScene {
   preload() {
     this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
     this.load.image('mesa_juego', './assets/objetos/mesa.png');
+    this.load.image('nenaSentada','./assets/mapa-pulperia/nenaSentada.png');
+    this.load.image('gaucho','./assets/mapa-pulperia/gauchosentado.png');
+    this.load.image('gaucho2','./assets/mapa-pulperia/gauchosentado2.png');
+    this.load.image('gaucho3','./assets/mapa-pulperia/gauchosentado3.png');
+    this.load.image('ObjetosMesa','./assets/mapa-pulperia/mesa_objetos.png');
+    this.load.image('ObjetosMesa2','./assets/mapa-pulperia/mesa_objetos_2.png');
   }
 
   async create() {
@@ -35,17 +41,35 @@ export default class InteriorPulperiaScene extends BaseScene {
     const paredesTileSet = map.addTilesetImage('Paredes', 'ParedesPulperia');
     const pisoTileSet = map.addTilesetImage('Piso', 'PisoPulperia');
     const rackTileSet = map.addTilesetImage('RackPulperia', 'RackPulperia');
-    const perchaTileSet = map.addTilesetImage('percha','percha');
-    const alfombraTileSet = map.addTilesetImage('alfombra','alfombra');
+    const perchaTileSet = map.addTilesetImage('percha', 'percha');
+    const alfombraTileSet = map.addTilesetImage('alfombra', 'alfombra');
+    const mesaTileset = map.addTilesetImage('mesa', 'mesa');
+    const chinitaTileset = map.addTilesetImage('chinita', 'nenaSentada');
+    const gaucho1Tileset = map.addTilesetImage('gaucho', 'gaucho');
+    const gaucho2Tileset = map.addTilesetImage('gaucho2', 'gaucho2');
+    const gaucho3Tileset = map.addTilesetImage('gaucho3', 'gaucho3');
+    const silla1Tileset = map.addTilesetImage('silla1', 'silla1');
+    const silla2Tileset = map.addTilesetImage('silla2', 'silla2');
+    const lenaTileset = map.addTilesetImage('lena', 'lena');
+    const objetosMesa1Tileset = map.addTilesetImage('ObjetosMesa','ObjetosMesa');
+    const objetosMesa2Tileset = map.addTilesetImage('ObjetosMesa2','ObjetosMesa2');
+
 
     map.createLayer('Base', pisoTileSet);
-    map.createLayer('Paredes', paredesTileSet);
+    map.createLayer('Paredes', [paredesTileSet,alfombraTileSet]);
     map.createLayer('Estantes', [rackTileSet, pisoTileSet]);
-    const barraLayer = map.createLayer('Barra', [barraTileSet,alfombraTileSet,perchaTileSet]);
+    const objetos2Layer = map.createLayer('Objetos2', [mesaTileset, lenaTileset]);
+    const personajesLayer = map.createLayer('Personajes', [gaucho1Tileset, gaucho2Tileset, gaucho3Tileset, chinitaTileset]);
+    map.createLayer('Objetos1', [mesaTileset, perchaTileSet, silla1Tileset,silla2Tileset,alfombraTileSet]);
+    const objetosMesaLayer = map.createLayer('Objetos3',[objetosMesa1Tileset,objetosMesa2Tileset]);
+    const barraLayer = map.createLayer('Barra', [barraTileSet]);
     const marcoLayer = map.createLayer('Marco', paredesTileSet);
     const colisionesLayer = map.createLayer('Colisiones', paredesTileSet);
     colisionesLayer.setCollisionByExclusion([-1]);
 
+    objetosMesaLayer.setDepth(2);
+    objetos2Layer.setDepth(2);
+    personajesLayer.setDepth(1);
     barraLayer.setDepth(2);
     marcoLayer.setDepth(3);
 
@@ -67,7 +91,7 @@ export default class InteriorPulperiaScene extends BaseScene {
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-    this.npc = new Npc(this, 536, 272, 'personaje').setDepth(1);
+    this.npc = new Npc(this, 536, 272, 'Facu').setDepth(1);
 
     const pasosCargados = TUTORIALES.pulperia.map((paso) => {
       if (paso.enfoque === 'npc') {
@@ -84,21 +108,11 @@ export default class InteriorPulperiaScene extends BaseScene {
 
     this.puntosDeInteraccion = [
       new PuntoInteraccion(this, 536, 378, 'tienda', false, {}),
-      new PuntoInteraccion(this, 1600, 180, 'partida-solo', 'mesa_juego',0.9, {}),
-      new PuntoInteraccion(this, 1400, 180, 'multijugador', 'mesa_juego',0.9, { subVista: 'tipo' }),
+      new PuntoInteraccion(this, 1610, 180, 'partida-solo', {}),
+      new PuntoInteraccion(this, 1283, 180, 'multijugador',{
+        subVista: 'tipo',
+      }),
     ];
-
-    const estiloVineta = {
-      fontFamily: 'Jersey 20',
-      fontSize: '14px',
-      color: '#ffe8a0',
-      backgroundColor: '#3a1e00cc',
-      stroke: '#000000',
-      strokeThickness: 2,
-      padding: { x: 10, y: 5 },
-    };
-    this.add.text(1400, 118, 'Multijugador', estiloVineta).setOrigin(0.5).setDepth(5);
-    this.add.text(1600, 118, 'Solitario',    estiloVineta).setOrigin(0.5).setDepth(5);
 
     const salaService = this.game.registry.get('salaService');
     const uiService = this.game.registry.get('uiService');

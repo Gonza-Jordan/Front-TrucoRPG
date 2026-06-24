@@ -21,6 +21,18 @@ export default class HistoriaBootScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64,
     });
+    this.load.spritesheet('Nuri','./assets/sprites/Nuri.png',{
+      frameWidth:64,
+      frameHeight:64
+    });
+    this.load.spritesheet('Facu','./assets/sprites/Facu.png',{
+      frameWidth:64,
+      frameHeight:64
+    });
+    this.load.spritesheet('Ale','./assets/sprites/Ale.png',{
+      frameWidth:64,
+      frameHeight:64
+    });
 
     this.load.tilemapTiledJSON('mapa', './assets/mapa-principal/mapa-principal.json');
 
@@ -51,6 +63,11 @@ export default class HistoriaBootScene extends Phaser.Scene {
     this.load.image('RackPulperia', './assets/mapa-pulperia/RackPulperia.png');
     this.load.image('alfombra', './assets/mapa-pulperia/alfombra2.png');
     this.load.image('percha', './assets/mapa-pulperia/perchero.png');
+    this.load.image('mesa','./assets/mapa-pulperia/mesa.png');
+    this.load.image('lena','./assets/mapa-pulperia/lena.png');
+    this.load.image('silla1','./assets/mapa-pulperia/silla_costado.png')
+    this.load.image('silla2','./assets/mapa-pulperia/silla_frente.png')
+
 
     //mapa casa
     this.load.image('InteriorCasa', './assets/mapa-casa/InteriorCasa.png');

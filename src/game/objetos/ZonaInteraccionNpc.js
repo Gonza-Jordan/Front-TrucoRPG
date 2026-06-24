@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-const ANCHO_ZONA = 56;
+const ANCHO_ZONA = 120;
 const ALTO_ZONA = 56;
 
 export default class ZonaInteraccionNpc {
