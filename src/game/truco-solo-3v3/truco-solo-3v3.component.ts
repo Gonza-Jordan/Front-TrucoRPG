@@ -89,6 +89,7 @@ const API = '/api/truco3v3';
     '../truco-solo/truco-solo.component.css',
     '../truco-2v2/truco-2v2.component.css',
     '../truco-3v3/truco-3v3.component.css',
+    './truco-solo-3v3.component.css',
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
