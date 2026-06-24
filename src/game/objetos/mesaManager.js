@@ -60,9 +60,9 @@ export default class MesaManager {
       } else {
         // Comportamiento original (pulpería)
         const todasLasSalas = [...s1, ...s2, ...s3];
-        let origenX  = 1000;
-        let origenY  = 400;
-        let espacioX = 140;
+        let origenX  = 966;
+        let origenY  = 344;
+        let espacioX = 240;
 
         todasLasSalas.forEach((sala, index) => {
           const posX = origenX + index * espacioX;

@@ -7,14 +7,14 @@ export const TUTORIALES = {
     {
       texto: 'Mirá, en aquella mesa del rincón podés jugar partidas en solitario.',
       enfoque: 'npc',
-      camaraDestino: { x: 1602, y: 180 },
+      camaraDestino: { x: 1800, y: 180 },
       camaraTiempo: 1200,
-      camaraZoom: 1.8,
+      camaraZoom: 2.2,
     },
     {
       texto: '¡En la mesa de al lado podés crear tus propias partidas multijugador!',
       enfoque: 'npc',
-      camaraDestino: { x: 1400, y: 180 },
+      camaraDestino: { x: 1270, y: 180 },
       camaraTiempo: 1200,
       camaraZoom: 1.8,
     },

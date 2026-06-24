@@ -105,7 +105,7 @@ export default class MapaPrincipalScene extends BaseScene {
       y: 552,
     });
 
-    this.npc = new Npc(this, 333, 438, 'personaje').setDepth(1);
+    this.npc = new Npc(this, 333, 438, 'Nuri').setDepth(1);
     this.npc.setScale(1.3);
 
     const pasosCargados = TUTORIALES.mapaPrincipal.map((paso) => {

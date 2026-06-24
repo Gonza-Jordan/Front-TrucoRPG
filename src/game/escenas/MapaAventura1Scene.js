@@ -106,7 +106,7 @@ export default class MapaAventura1Scene extends BaseScene {
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.startFollow(this.JugadorPrincipal, true, 0.1, 0.1);
 
-    this.JugadorPrincipal.setScale(1.1);
+    this.JugadorPrincipal.setScale(1.4);
 
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
@@ -127,7 +127,7 @@ export default class MapaAventura1Scene extends BaseScene {
     this._crearJefePomberito();
 
     //npc para charlar
-    this.npcAldeano = new NpcDialogo(this, NPC_ALDEANO_X, NPC_ALDEANO_Y, 'personaje', [
+    this.npcAldeano = new NpcDialogo(this, NPC_ALDEANO_X, NPC_ALDEANO_Y, 'Ale', [
       '¡Hola, aventurero!\nBienvenido a estas tierras.',
       'El Nahuelito merodea\npor el lago... tené cuidado.',
       'Dicen que si lo derrotás,\nel Pomberito te dejará desafiarlo.',
