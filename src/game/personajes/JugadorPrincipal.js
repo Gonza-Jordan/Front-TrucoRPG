@@ -14,6 +14,29 @@ export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
       volume: 0.5,
     });
 
+    // El sonido se reproduce en loop mientras el jugador camina y solo se
+    // detiene dentro de update(). Si la escena se pausa, duerme o se cierra
+    // (al interactuar con un portal, abrir un diálogo, cambiar de escena, etc.)
+    // update() deja de ejecutarse y los pasos quedarían sonando para siempre.
+    // Atamos el corte del sonido al ciclo de vida de la escena para evitarlo.
+    const detenerPasos = () => {
+      if (this.sonidoPasos && (this.sonidoPasos.isPlaying || this.sonidoPasos.isPaused)) {
+        this.sonidoPasos.stop();
+      }
+    };
+    escena.events.on('pause', detenerPasos);
+    escena.events.on('sleep', detenerPasos);
+    escena.events.on('shutdown', detenerPasos);
+    escena.events.once('destroy', () => {
+      escena.events.off('pause', detenerPasos);
+      escena.events.off('sleep', detenerPasos);
+      escena.events.off('shutdown', detenerPasos);
+      if (this.sonidoPasos) {
+        this.sonidoPasos.stop();
+        this.sonidoPasos.destroy();
+      }
+    });
+
     this.verificarYCrearAnimaciones(escena, this.nombre);
   }
 
