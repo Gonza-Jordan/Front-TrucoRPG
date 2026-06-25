@@ -10,7 +10,7 @@
 @if (vistaActual === 'en-juego') {
   <div class="contenedor-juego-wrapper">
     <div id="historia-container"
-         [style.display]="(mostrarTrucoSolo || mostrarTruco2v2 || mostrarTruco3v3) ? 'none' : 'block'">
+         [style.display]="(mostrarTrucoSolo || mostrarTruco2v2 || mostrarTruco3v3 || mostrarTrucoMulti || mostrarTruco2v2Multi || mostrarTruco3v3Multi) ? 'none' : 'block'">
     </div>
     @if (mostrarTrucoSolo) {
       <app-truco-solo></app-truco-solo>
@@ -20,6 +20,15 @@
     }
     @if (mostrarTruco3v3) {
       <app-truco-solo-3v3></app-truco-solo-3v3>
+    }
+    @if (mostrarTrucoMulti) {
+      <app-truco-multi></app-truco-multi>
+    }
+    @if (mostrarTruco2v2Multi) {
+      <app-truco-2v2></app-truco-2v2>
+    }
+    @if (mostrarTruco3v3Multi) {
+      <app-truco-3v3></app-truco-3v3>
     }
     <app-casa-manager></app-casa-manager>
     <app-pulperia-manager></app-pulperia-manager>

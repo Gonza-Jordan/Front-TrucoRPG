@@ -79,6 +79,18 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
 
       this.sala.juegoIniciado$.subscribe((v) => {
         if (v) {
+          // Si venimos del modo historia, el juego se muestra como overlay
+          // (sin cambiar de ruta) para poder volver a la pulpería de historia.
+          if (this.uiService.esMultijugadorPhaser && this.router.url.startsWith('/historia')) {
+            localStorage.setItem('multiEnHistoria', '1');
+            localStorage.removeItem('origenSalaMulti');
+            this.uiService.cerrarOverlay();
+            const evento =
+              this.gameMode === '3v3' ? 'truco-3v3-multi:start' : 'truco-2v2-multi:start';
+            window.dispatchEvent(new CustomEvent(evento));
+            return;
+          }
+
           let rutaDestino = '/juego/multi';
 
           if (this.gameMode === '2v2') {
@@ -86,6 +98,15 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
           } else if (this.gameMode === '3v3') {
             rutaDestino = '/juego/3v3';
           }
+
+          // Si el juego se inicia desde la sala Phaser (pulpería), recordamos
+          // el origen para volver allí al salir, en lugar de ir al menú.
+          if (this.uiService.esMultijugadorPhaser) {
+            localStorage.setItem('origenSalaMulti', '1');
+          } else {
+            localStorage.removeItem('origenSalaMulti');
+          }
+          localStorage.removeItem('multiEnHistoria');
 
           this.uiService.cerrarOverlay();
 

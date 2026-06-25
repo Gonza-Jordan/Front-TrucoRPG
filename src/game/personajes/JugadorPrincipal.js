@@ -57,7 +57,7 @@ export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
   }
 
   update(keys) {
-    const velocidad = 700;
+    const velocidad = 250;
 
     this.setVelocity(0);
 
