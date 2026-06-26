@@ -1,13 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PartidaSoloComponent } from './partida-solo';
-
+import { provideRouter } from "@angular/router";
 describe('PartidaSolo', () => {
   let component: PartidaSoloComponent;
   let fixture: ComponentFixture<PartidaSoloComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PartidaSoloComponent]
+      imports: [PartidaSoloComponent],
+      providers: [
+        provideRouter([])
+      ]
     })
     .compileComponents();
 
