@@ -41,7 +41,6 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-<<<<<<< HEAD
               "budgets": [
                 {
                   "type": "initial",
@@ -53,10 +52,9 @@
                   "maximumWarning": "30kb",
                   "maximumError": "50kb"
                 }
-=======
+              ],
               "allowedCommonJsDependencies": [
                 "phaser"
->>>>>>> develop
               ],
               "outputHashing": "all"
             },
