@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { TiendaOverlayComponent } from './tienda-overlay';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('TiendaOverlay', () => {
   let component: TiendaOverlayComponent;
@@ -8,7 +9,8 @@ describe('TiendaOverlay', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TiendaOverlayComponent]
+      imports: [TiendaOverlayComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     })
     .compileComponents();
 
