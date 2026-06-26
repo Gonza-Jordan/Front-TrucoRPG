@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TiendaOverlay } from './tienda-overlay';
+import { TiendaOverlayComponent } from './tienda-overlay';
 
 describe('TiendaOverlay', () => {
-  let component: TiendaOverlay;
-  let fixture: ComponentFixture<TiendaOverlay>;
+  let component: TiendaOverlayComponent;
+  let fixture: ComponentFixture<TiendaOverlayComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TiendaOverlay]
+      imports: [TiendaOverlayComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TiendaOverlay);
+    fixture = TestBed.createComponent(TiendaOverlayComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
