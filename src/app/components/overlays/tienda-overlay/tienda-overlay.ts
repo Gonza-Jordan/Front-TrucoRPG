@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { CategoriaTienda } from '../../../interfaces/categoriaTienda';
 import { ObjetoTienda } from '../../../interfaces/ObjetoTienda';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-tienda-overlay',
@@ -22,7 +23,7 @@ export class TiendaOverlayComponent implements OnInit {
   }
 
   cargarTienda() {
-    this.http.get<CategoriaTienda[]>('/api/tienda').subscribe({
+    this.http.get<CategoriaTienda[]>(`${environment.apiUrl}/api/Tienda`).subscribe({
       next: (res) => {
         this.datos = res;
       },
