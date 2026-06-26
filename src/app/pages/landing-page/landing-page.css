@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+========================================================= */
 
 :host {
     display: flex;
@@ -16,156 +18,517 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 3rem;
+    font-family: 'Jersey 20';
 
-background: linear-gradient(
-    to bottom,
-    #441310,
-    #000000
-);
+    /* background: linear-gradient(to bottom,
+            #441310,
+            #000000); */
+
+    background: #441310;
 }
 
+p {
+    color: #c89030;
+}
+
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+========================================================= */
+
 .contenedor-landing {
-    width: min(1000px, 90%);
-    height: auto;
+    width: 100%;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    gap: 4rem;
+    gap: 2rem;
 
-    background: rgba(14, 12, 8, 0.94);
+    /* background: rgba(119, 66, 31, 0.45);
     border: 2px solid #5a4020;
     outline: 1px solid rgba(200, 144, 48, 0.18);
     outline-offset: 4px;
     box-shadow:
         0 0 40px rgba(0, 0, 0, 0.8),
-        inset 0 0 24px rgba(0, 0, 0, 0.4);
+        inset 0 0 24px rgba(0, 0, 0, 0.4);*/
 }
+
+/* =========================================================
+   SECCIONES
+========================================================= */
 
 .seccion-1 {
     width: 100%;
+    min-height: 100vh;
     height: auto;
+    padding: 2rem;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
+    background-image:
+        url('/assets/imagen-hero-landing.png');
 
-    padding: 4rem 2rem;
-    box-sizing: border-box;
-
-    text-align: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .seccion-2 {
     width: 100%;
-    height: auto;
-
-    display: flex;
-    align-items: center;
-
-    justify-content: space-evenly;
-    align-items: center;
-
-    padding: 4rem 2rem;
-    box-sizing: border-box;
-
-    text-align: center;
-}
-
-.seccion-3 {
-    width: 100%;
+    min-height: 100vh;
     height: auto;
 
     display: flex;
     flex-direction: column;
+    justify-content: space-evenly;
     align-items: center;
+    gap: 2rem;
 
+    padding: 2rem;
+    box-sizing: border-box;
+
+    text-align: center;
+
+    background-image:
+        url('/assets/multijugador2.png');
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.seccion-3 {
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 2rem;
 
     padding: 4rem 2rem;
     box-sizing: border-box;
 
     text-align: center;
+
+    background-image:
+        url('/assets/home.png');
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-.seccion-1 a {
-    width: 40%;
-    height: 4rem;
+.seccion-fade {
+    opacity: 0;
+    transform: translateY(50px);
+    transition:
+        opacity 0.8s ease,
+        transform 0.8s ease;
+}
+
+.seccion-fade.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* =========================================================
+   BOTÓN PRINCIPAL
+========================================================= */
+
+.contenido-seccion-1{
+    width: 500px;
     display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0.5rem;
+
+    padding: 2rem;
+    box-sizing: border-box;
+
+    text-align: center;
+}
+
+
+.seccion-1 a {
+    /*width: 40%;*/
+    width: 100%;
+    height: 4rem;
+    box-sizing: border-box;
+    padding: 1rem 4rem;
+    white-space: nowrap; /* evita salto de línea */
+
+    display: inline-flex;
     justify-content: center;
     align-items: center;
+
     text-decoration: none;
     font-family: 'Jersey 10';
     font-size: 2rem;
     letter-spacing: 2px;
-    color: #c89030;
-    background: #1e1508;
+    color: #ffe5b7;
+
+    background: #77421f;
     border: 2px solid #5a4020;
+
     cursor: pointer;
-    transition: background 0.1s, color 0.1s, border-color 0.1s, box-shadow 0.1s;
+
+    transition: background 0.1s,
+        color 0.1s,
+        border-color 0.1s,
+        box-shadow 0.1s;
+
+    box-shadow: 8px 8px 0 #000;
 }
 
 .seccion-1 a:hover:not(.inactivo) {
-    background: #2e1f0e;
-    color: #f0b050;
-    border-color: #8a6030;
+    background: #8a4d24;
+    color: #ffe5b7;
+    border-color: #5c3217;
     box-shadow: 0 0 10px rgba(200, 144, 48, 0.25);
 }
 
 .seccion-1 a:active:not(.inactivo) {
     background: #140e04;
-    color: #a07020;
+    color: #ffe5b7;
 }
 
-
-.seccion-2 .texto-landing {
-    max-width: 35rem;
-    text-align: left;
-}
-
-.seccion-3 .texto-landing {
-    width: 100%;
-}
-
-.imagen-hero-landing {
-    width: min(30rem, 90vw);
-    height: auto;
-    animation: flotar 2.5s infinite ease-in-out;
-}
-
-.imagen-seccion-2 {
-    width: 10rem;
-    height: auto;
-    animation: balanceo 6s infinite ease-in-out;
-}
-
-.personajes {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    gap: 1rem;
-}
-
-.personajes img {
-    width: 10rem;
-    height: auto;
-}
+/* =========================================================
+   TEXTOS GENERALES
+========================================================= */
 
 .titulo-landing {
     font-family: 'Jersey 20';
     font-size: 3rem;
     color: #c89030;
 
+    text-shadow:
+        1px 1px 0 #000,
+        2px 2px 0 #000,
+        3px 3px 0 #000,
+        4px 4px 0 #000,
+        5px 5px 0 #000,
+        6px 6px 0 #000;
 }
 
 .texto-landing {
     font-family: 'Jersey 20';
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: #c89030;
+    padding: 0.5rem;
 }
+
+.seccion-2 .texto-landing {
+    max-width: 35rem;
+    text-align: left;
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.imagen-hero-landing {
+    width: min(30rem, 90vw);
+    max-width: 100%;
+    height: auto;
+    animation: flotar 2.5s infinite ease-in-out;
+}
+
+/* =========================================================
+   MODOS DE JUEGO
+========================================================= */
+
+.modos-juego {
+    width: 100%;
+
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.modo-juego {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+    max-width: 12rem;
+}
+
+.circulo-icono {
+    width: 8rem;
+    aspect-ratio: 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #000;
+
+    box-shadow: 4px 4px 0 #000;
+}
+
+
+.imagen-modo {
+    width: 8rem;
+    height: 8rem;
+    object-fit: contain;
+    margin: 0;
+}
+
+/* =========================================================
+   DESARROLLADORES
+========================================================= */
+
+.desarrolladores {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+
+    justify-items: center;
+    row-gap: 2rem;
+}
+
+/* Primera fila */
+
+.desarrollador:nth-child(1) {
+    grid-column: 1 / span 2;
+}
+
+.desarrollador:nth-child(2) {
+    grid-column: 3 / span 2;
+}
+
+.desarrollador:nth-child(3) {
+    grid-column: 5 / span 2;
+}
+
+.desarrollador:nth-child(4) {
+    grid-column: 7 / span 2;
+}
+
+.desarrollador:nth-child(5) {
+    grid-column: 9 / span 2;
+}
+
+/* Segunda fila centrada */
+
+.desarrollador:nth-child(6) {
+    grid-column: 2 / span 2;
+}
+
+.desarrollador:nth-child(7) {
+    grid-column: 4 / span 2;
+}
+
+.desarrollador:nth-child(8) {
+    grid-column: 6 / span 2;
+}
+
+.desarrollador:nth-child(9) {
+    grid-column: 8 / span 2;
+}
+
+.desarrollador {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.foto-desarrollador {
+    width: 8rem;
+    height: 8rem;
+
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #000;
+
+    box-shadow: 4px 4px 0 #000;
+}
+
+.desarrollador .texto-landing {
+    text-shadow:
+        1px 1px 0 #000,
+        2px 2px 0 #000,
+        3px 3px 0 #000,
+        4px 4px 0 #000,
+        5px 5px 0 #000,
+        6px 6px 0 #000;
+}
+
+.titulo-desarrolladores {
+    padding: 4rem;
+}
+
+/* =========================================================
+   HABILIDADES Y CARTAS
+========================================================= */
+
+.habilidades {
+    width: 100%;
+
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.tarjeta {
+    width: 12rem;
+    height: 16rem;
+    perspective: 1000px;
+}
+
+.interior-tarjeta {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.tarjeta:hover .interior-tarjeta {
+    transform: rotateY(180deg);
+}
+
+/* =========================================================
+   CARAS DE LA CARTA
+========================================================= */
+
+.cara {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    backface-visibility: hidden;
+    box-sizing: border-box;
+
+    border: 4px solid #000;
+    outline: 4px solid #f4eedb;
+    outline-offset: -8px;
+    border-radius: 15px;
+
+    background: #f4eedb;
+    overflow: hidden;
+
+    box-shadow:
+        inset 0 0 0 2px #000,
+        8px 8px 0 rgba(0, 0, 0, 0.45);
+}
+
+.frente {
+    z-index: 2;
+    position: relative;
+    height: 100%;
+
+    padding: 0.8em;
+    box-sizing: border-box;
+}
+
+.atras {
+    transform: rotateY(180deg);
+
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.marco-carta {
+    position: absolute;
+    inset: 12px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: 2px solid #7a7a7a;
+    border-radius: 4px;
+}
+
+/* =========================================================
+   ÍNDICES DE LA CARTA
+========================================================= */
+
+.indice {
+    position: absolute;
+
+    font-family: 'Jersey 20';
+    font-size: 1.4rem;
+    color: #111;
+}
+
+.superior {
+    top: 1.5rem;
+    left: 1.5rem;
+}
+
+.inferior {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    transform: rotate(180deg);
+}
+
+/* =========================================================
+   DETALLES DECORATIVOS DE LA CARTA
+========================================================= */
+
+.frente::before,
+.frente::after {
+    content: "";
+
+    position: absolute;
+
+    width: 16px;
+    height: 16px;
+
+    border-top: 2px solid #666;
+    border-left: 2px solid #666;
+}
+
+.frente::before {
+    top: 18px;
+    left: 18px;
+}
+
+.frente::after {
+    bottom: 18px;
+    right: 18px;
+    transform: rotate(180deg);
+}
+
+/* =========================================================
+   CONTENIDO DE LAS CARTAS
+========================================================= */
+
+.texto-carta {
+    font-size: 2rem;
+    color: #111;
+    text-align: center;
+}
+
+.texto-carta-atras {
+    font-size: 1.2rem;
+    color: #111;
+    text-align: center;
+}
+
+.imagen-personaje {
+    width: 8rem;
+    height: auto;
+}
+
+/* =========================================================
+   ANIMACIONES
+========================================================= */
 
 @keyframes flotar {
     0% {
@@ -181,16 +544,320 @@ background: linear-gradient(
     }
 }
 
-@keyframes balanceo {
-    0% {
-        transform: rotate(-25deg);
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .seccion-1,
+    .seccion-2,
+    .seccion-3 {
+        padding: 2rem 1rem;
     }
 
-    50% {
-        transform: rotate(25deg);
+    .seccion-2 {
+        height: auto;
+        min-height: 100vh;
     }
 
-    100% {
-        transform: rotate(-25deg);
+    .titulo-landing {
+        font-size: 2.5rem;
+    }
+
+    .imagen-hero-landing {
+        width: min(24rem, 80vw);
+    }
+
+    .seccion-1 a {
+        width: 50%;
+        height: 2.5rem;
+
+        font-size: 1rem;
+        letter-spacing: 1px;
+
+        box-shadow: 4px 4px 0 #000;
+    }
+
+    .modos-juego,
+    .habilidades {
+        gap: 1.5rem;
+    }
+
+    .circulo-icono,
+    .imagen-modo {
+        width: 6.5rem;
+        height: 6.5rem;
+    }
+
+    .tarjeta {
+        width: 10rem;
+        height: 14rem;
+    }
+
+    .texto-carta {
+        font-size: 1.6rem;
+    }
+
+    .texto-carta-atras {
+        font-size: 1rem;
+    }
+
+    /* Desarrolladores */
+
+    .desarrolladores {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+
+    .desarrollador:nth-child(n) {
+        grid-column: auto;
+    }
+
+    .foto-desarrollador {
+        width: 7rem;
+        height: 7rem;
+    }
+
+    .titulo-desarrolladores {
+        padding: 2rem;
+    }
+}
+
+/* =========================================================
+   CELULAR
+========================================================= */
+
+@media (max-width: 850px) {
+
+    .seccion-1,
+    .seccion-2,
+    .seccion-3 {
+        padding: 1rem;
+    }
+
+    .titulo-landing {
+        font-size: 2rem;
+        text-shadow:
+            1px 1px 0 #000,
+            2px 2px 0 #000,
+            3px 3px 0 #000;
+    }
+
+    .texto-landing {
+        font-size: 1.2rem;
+    }
+
+    .imagen-hero-landing {
+        width: min(14rem, 45vw);
+    }
+
+    .seccion-1 {
+        justify-content: center;
+        align-items: center;
+    }
+
+    .contenido-seccion-1 {
+        width: 300px;
+        padding: 1rem;
+        gap: 0px;
+    }
+
+    .seccion-1 a {
+        width: 15rem;
+        padding: 0 1rem;
+        height: 2rem;
+        font-size: 0.8rem;
+        margin-left: 2rem;
+
+        letter-spacing: 0.5px;
+
+        box-shadow: 3px 3px 0 #000;
+    }
+
+    /* Modos */
+
+    .modos-juego {
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .modo-juego {
+        max-width: 100%;
+    }
+
+    .circulo-icono,
+    .imagen-modo {
+        width: 5rem;
+        height: 5rem;
+    }
+
+    /* Cartas */
+
+    .habilidades {
+        gap: 1.5rem;
+    }
+
+    .tarjeta {
+        width: 9rem;
+        height: 12rem;
+    }
+
+    .texto-carta {
+        font-size: 1.3rem;
+    }
+
+    .texto-carta-atras {
+        font-size: 0.9rem;
+    }
+
+    .indice {
+        font-size: 1rem;
+    }
+
+    .superior {
+        top: 1rem;
+        left: 1rem;
+    }
+
+    .inferior {
+        bottom: 1rem;
+        right: 1rem;
+    }
+
+    /* Desarrolladores */
+
+    .desarrolladores {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .desarrollador:nth-child(n) {
+        grid-column: auto;
+    }
+
+    .foto-desarrollador {
+        width: 5.5rem;
+        height: 5.5rem;
+    }
+
+    .titulo-desarrolladores {
+        padding: 1rem;
+    }
+}
+
+/* =========================================================
+   PANTALLAS BAJAS (hasta 620px de alto)
+========================================================= */
+
+@media (max-height: 620px) {
+
+    .seccion-1,
+    .seccion-2,
+    .seccion-3 {
+        min-height: auto;
+        padding: 1.5rem;
+    }
+
+    .titulo-landing {
+        font-size: 2.2rem;
+    }
+
+    .imagen-hero-landing {
+        width: min(22rem, 60vw);
+    }
+
+    .seccion-1 a {
+        width: 15rem;
+        height: 3rem;
+        font-size: 1.5rem;
+    }
+
+    .foto-desarrollador {
+        width: 6rem;
+        height: 6rem;
+    }
+
+    .circulo-icono,
+    .imagen-modo {
+        width: 6rem;
+        height: 6rem;
+    }
+
+    .tarjeta {
+        width: 10rem;
+        height: 14rem;
+    }
+
+    .texto-carta {
+        font-size: 1.5rem;
+    }
+
+    .texto-carta-atras {
+        font-size: 1rem;
+    }
+}
+
+/* =========================================================
+   PANTALLAS MUY BAJAS (hasta 500px de alto)
+========================================================= */
+
+@media (max-height: 500px) {
+
+    .seccion-1,
+    .seccion-2,
+    .seccion-3 {
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .titulo-landing {
+        font-size: 1.8rem;
+    }
+
+    .imagen-hero-landing {
+        width: min(18rem, 50vw);
+    }
+
+    .seccion-1 a {
+        width: 15rem;
+        height: 1.8rem;
+
+        font-size: 0.75rem;
+        margin-left: 2rem;
+    }
+
+    .modos-juego,
+    .habilidades {
+        gap: 1rem;
+    }
+
+    .circulo-icono,
+    .imagen-modo {
+        width: 5rem;
+        height: 5rem;
+    }
+
+    .foto-desarrollador {
+        width: 5rem;
+        height: 5rem;
+    }
+
+    .tarjeta {
+        width: 8rem;
+        height: 11rem;
+    }
+
+    .texto-carta {
+        font-size: 1.2rem;
+    }
+
+    .texto-carta-atras {
+        font-size: 0.85rem;
+    }
+
+    .indice {
+        font-size: 1rem;
     }
 }

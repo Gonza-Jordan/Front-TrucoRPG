@@ -1,6 +1,9 @@
 import BaseScene from './BaseScene.js';
 import JugadorPrincipal from '../personajes/JugadorPrincipal.js';
 import Portal from '../objetos/Portal.js';
+import Npc from '../personajes/Npc.js';
+import Tutorial from '../objetos/Tutorial.js';
+import { TUTORIALES } from '../data/tutoriales.js';
 
 export default class MapaPrincipalScene extends BaseScene {
   constructor() {
@@ -13,10 +16,10 @@ export default class MapaPrincipalScene extends BaseScene {
     this.startY = data.y || 470;
   }
 
-  preload(){
-     this.load.image('CartelOponentes','./assets/mapa-principal/CartelOponentes.png');
-     
-     this.load.audio('pasos', './assets/musica/sonidos/paso.ogg'); 
+  preload() {
+    this.load.image('CartelOponentes', './assets/mapa-principal/CartelOponentes.png');
+
+    this.load.audio('pasos', './assets/musica/sonidos/paso.ogg');
   }
 
   create() {
@@ -80,43 +83,53 @@ export default class MapaPrincipalScene extends BaseScene {
     this.physics.add.collider(this.JugadorPrincipal, colisionesLayer);
 
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-
     this.cameras.main.startFollow(this.JugadorPrincipal, true, 0.1, 0.1);
 
-    this.JugadorPrincipal.setScale(1.1);
+    this.JugadorPrincipal.setScale(1.3);
 
     this.keys = this.input.keyboard.createCursorKeys();
     this.teclaE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-    this.portalACasa = new Portal(this, 464, 195, 'InteriorCasaScene', false, { x: 621, y: 64 });
-
+    this.portalACasa = new Portal(this, 464, 195, 'InteriorCasaScene', false, { x: 627, y: 640 });
     this.physics.add.overlap(this.JugadorPrincipal, this.portalACasa.zone);
 
     this.portalAPulperia = new Portal(this, 1603, 163, 'InteriorPulperiaScene', false, {
-      x: 621,
-      y: 64,
+      x: 627,
+      y: 640,
     });
-
     this.physics.add.overlap(this.JugadorPrincipal, this.portalAPulperia.zone);
 
-    this.portalAOponentes = new Portal(
-      this,
-      1917,
-      300,
-      'MapaAventura1',
-      'CartelOponentes',
-      { x: 35, y: 552 },
-    );
+    this.portalAOponentes = new Portal(this, 1917, 300, 'MapaAventura1', 'CartelOponentes', {
+      x: 35,
+      y: 552,
+    });
+
+    this.npc = new Npc(this, 333, 438, 'Nuri').setDepth(1);
+    this.npc.setScale(1.3);
+
+    const pasosCargados = TUTORIALES.mapaPrincipal.map((paso) => {
+      if (paso.enfoque === 'npc') {
+        return { ...paso, enfoqueNpc: this.npc };
+      }
+      return paso;
+    });
+
+    this.tutorial = new Tutorial(this, 'tutorialLobby', pasosCargados,true);
+
+    this.tutorial.iniciar();
   }
 
   update() {
+    if (this.tutorial && this.tutorial.activo) {
+      this.tutorial.update();
+      return;
+    }
+
     this.JugadorPrincipal.update(this.keys, this.teclaE);
-    
+
     const seMueve =
       this.JugadorPrincipal.body.velocity.x !== 0 || this.JugadorPrincipal.body.velocity.y !== 0;
-
     if (seMueve) {
       this.estabaMoviendose = true;
     } else if (this.estabaMoviendose) {
@@ -126,8 +139,14 @@ export default class MapaPrincipalScene extends BaseScene {
       this.estabaMoviendose = false;
     }
 
-    this.portalACasa.update(this.JugadorPrincipal, this.teclaE);
-    this.portalAPulperia.update(this.JugadorPrincipal, this.teclaE);
-    this.portalAOponentes.update(this.JugadorPrincipal, this.teclaE);
+    const interactuoMobile = this.botonInteractuarPresionado;
+
+    this.portalACasa.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+    this.portalAPulperia.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+    this.portalAOponentes.update(this.JugadorPrincipal, this.teclaE, interactuoMobile);
+
+    if (this.botonInteractuarPresionado) {
+      this.botonInteractuarPresionado = false;
+    }
   }
 }

@@ -6,17 +6,34 @@ import InteriorCasaScene from './escenas/InteriorCasaScene.js';
 import InteriorPulperiaScene from './escenas/InteriorPulperiaScene.js';
 import MapaAventura1Scene from './escenas/MapaAventura1Scene.js';
 import MapaAventura2Scene from './escenas/MapaAventura2Scene.js';
+import MapaAventura3Scene from './escenas/MapaAventura3Scene.js';
 
+export function initHistoria(parent = 'historia-container', salaService, uiService) {
+  const esTactil = navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
 
-export function initHistoria(parent = 'contenedor-juego') {
   const config = {
     type: Phaser.AUTO,
+    pixelArt: esTactil,
+    roundPixels: esTactil,
     callbacks: {
       postBoot: (game) => {
-        const esTactil =
-          navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches;
         if (esTactil && screen.orientation?.lock) {
-          screen.orientation.lock('landscape').catch(() => { });
+          screen.orientation.lock('landscape').catch(() => {});
+        }
+        if (esTactil) {
+          try {
+            if (game && game.canvas) {
+              const ctx = game.canvas.getContext && game.canvas.getContext('2d');
+              if (ctx) ctx.imageSmoothingEnabled = false;
+              game.canvas.style.imageRendering = 'pixelated';
+            }
+          } catch (err) {}
+        } else {
+          try {
+            if (game && game.canvas) {
+              game.canvas.style.imageRendering = 'auto';
+            }
+          } catch (err) {}
         }
       },
     },
@@ -24,22 +41,30 @@ export function initHistoria(parent = 'contenedor-juego') {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
       width: 1280,
-      height: 720,
-      fullscreenTarget: parent,
+      height: 708,
+      fullscreenTarget: '.contenedor-juego-wrapper',
     },
     physics: {
       default: 'arcade',
       arcade: { debug: false },
     },
-    scene: [HistoriaBootScene, MapaPrincipalScene, BaseScene, InteriorCasaScene, InteriorPulperiaScene, MapaAventura1Scene, MapaAventura2Scene],
+    scene: [
+      HistoriaBootScene,
+      MapaPrincipalScene,
+      BaseScene,
+      InteriorCasaScene,
+      InteriorPulperiaScene,
+      MapaAventura1Scene,
+      MapaAventura2Scene,
+      MapaAventura3Scene,
+    ],
     parent,
-
-
-    //para que no se rompan los assets con zoom
-    //antialias: false,
-    //pixelArt: true,
-
   };
 
-  return new Phaser.Game(config);
+  const gameInstance = new Phaser.Game(config);
+
+  gameInstance.registry.set('salaService', salaService);
+  gameInstance.registry.set('uiService', uiService);
+
+  return gameInstance;
 }

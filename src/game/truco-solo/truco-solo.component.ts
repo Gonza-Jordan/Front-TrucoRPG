@@ -9,7 +9,7 @@ import {
   ChangeDetectionStrategy,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgStyle } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -43,18 +43,31 @@ export interface VistaHabilidades {
   cartaReveladaRival?: { numero: number; palo: string; valorTruco: number };
 }
 
+export interface VistaHabilidadesRival {
+  habilidadesActivasEnPartida: boolean;
+  salpicaduraActiva: boolean;
+  salpicaduraBloqueando: boolean;
+  travesuraActiva: boolean;
+  travesuraBloqueando: boolean;
+  rasgunoActivo?: boolean;
+  rasgunoBloqueando?: boolean;
+  aullidoBloqueando?: boolean;
+  cartasOcultasTravesura?: { numero: number; palo: string }[];
+  ultimoMensajeHabilidad?: string;
+}
+
 export interface ManoState {
   id: string;
-  humano:   { mano: Carta[] };
-  maquina:  { mano: Carta[] };
-  bazas:    Baza[];
+  humano: { mano: Carta[] };
+  maquina: { mano: Carta[] };
+  bazas: Baza[];
   turnoActual: 'Humano' | 'Maquina';
   puntosHumano: number;
   puntosMaquina: number;
   estadoEnvido?: string;
-  estadoTruco?:  string;
+  estadoTruco?: string;
   envidoCantado?: boolean;
-  trucoCantado?:  boolean;
+  trucoCantado?: boolean;
   trucoResuelto?: boolean;
   nivelTruco?: number;
   cantorTruco?: 'Humano' | 'Maquina';
@@ -62,15 +75,29 @@ export interface ManoState {
   tantoCantadoMaquina?: number;
   tantoHumano?: number;
   envidoResuelto?: boolean;
-  ganadorMano?:    'Humano' | 'Maquina' | 'Parda';
+  cantorEnvido?: 'Humano' | 'Maquina';
+  ganadorEnvido?: 'Humano' | 'Maquina';
+  manoIniciadaPor?: 'Humano' | 'Maquina';
+  sonBuenasDeclarado?: boolean;
+  ganadorMano?: 'Humano' | 'Maquina' | 'Parda';
   ganadorPartida?: 'Humano' | 'Maquina';
   partidaTerminada?: boolean;
   envidoPendienteRespuestaHumano?: boolean;
-  trucoPendienteRespuestaHumano?:  boolean;
+  trucoPendienteRespuestaHumano?: boolean;
   cartaMaquinaEnMesa?: Carta;
+  cartaHumanoEnMesa?: Carta;
   numeroDeMano?: number;
-  configuracion?: { modo: number; heroeDelHumano?: number };
+  configuracion?: { modo: number; heroeDelHumano?: number; rivalDeLaMaquina?: number; rivalNivel?: number };
   vistaHabilidadesHumano?: VistaHabilidades;
+  vistaHabilidadesRival?: VistaHabilidadesRival;
+  salpicaduraActiva?: boolean;
+  salpicaduraBloqueando?: boolean;
+  travesuraActiva?: boolean;
+  travesuraBloqueando?: boolean;
+  rasgunoActivo?: boolean;
+  rasgunoBloqueando?: boolean;
+  aullidoBloqueando?: boolean;
+  cartasOcultasTravesura?: { numero: number; palo: string }[];
 }
 
 export interface Btn {
@@ -87,6 +114,12 @@ export interface Slot {
   winner?: 'Humano' | 'Maquina' | 'Parda';
 }
 
+export interface OpCardDisplay {
+  visible: boolean;
+  revelada: boolean;
+  carta: Carta | null;
+}
+
 // ── Héroe ─────────────────────────────────────────────────────────────────────
 
 export interface Heroe {
@@ -96,26 +129,42 @@ export interface Heroe {
   descripcion: string;
 }
 
+export interface Rival {
+  id: string;
+  nivel: number;
+  nombre: string;
+  descripcion: string;
+  nombreHabilidad: string;
+  descripcionHabilidad: string;
+  tipoRival: number;
+  tipoHabilidad: number;
+}
+
 const HEROES: Heroe[] = [
   { id: 0, nombre: 'Manipulador', color: '#aa66ff', descripcion: 'Cada 3 manos: reemplazá 1 carta por otra del mazo (nunca de menor valor).' },
-  { id: 1, nombre: 'Timbero',     color: '#ffaa44', descripcion: 'Antes de jugar: apostá. Si ganás la mano, duplicás puntos; si perdés, rival +2.' },
-  { id: 2, nombre: 'Fanfarrón',   color: '#44aaff', descripcion: 'Tu próximo envido o truco aceptado vale +1 punto extra.' },
-  { id: 3, nombre: 'Mentiroso',   color: '#66dd88', descripcion: 'Cada 2 manos: al inicio, revelás 1 carta aleatoria del rival.' },
+  { id: 1, nombre: 'Timbero', color: '#ffaa44', descripcion: 'Antes de jugar: apostá. Si ganás la mano, duplicás puntos; si perdés, rival +2.' },
+  { id: 2, nombre: 'Fanfarrón', color: '#44aaff', descripcion: 'Tu próximo envido o truco aceptado vale +1 punto extra.' },
+  { id: 3, nombre: 'Mentiroso', color: '#66dd88', descripcion: 'Cada 2 manos: al inicio, revelás 1 carta aleatoria del rival.' },
 ];
 
 // ── Constantes ───────────────────────────────────────────────────────────────
 
 const PALO_SYM: Record<Palo, string> = { Oro: '★', Espada: '†', Copa: '♦', Basto: '♣' };
 const API = `${environment.apiUrl}/api/Truco`;
+const API_HISTORIA = '/api/historia';
 const FAN_ANGLES = [-16, 0, 16];
-const FAN_X      = [-84, 0, 84];
+const FAN_X = [-84, 0, 84];
+const SALPICADURA_REVEAL_SEG = 5;
+const TRAVESURA_REVEAL_SEG = 5;
+const RASGUNO_REVEAL_SEG = 3;
+const AULLIDO_REVEAL_SEG = 3;
 
 // ── Componente ───────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-truco-solo',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NgStyle],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './truco-solo.component.html',
   styleUrl: './truco-solo.component.css',
@@ -124,15 +173,17 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('gauchoVideo') gauchoVideo!: ElementRef<HTMLVideoElement>;
 
-  private http   = inject(HttpClient);
+  private http = inject(HttpClient);
   private router = inject(Router);
-  private cdr    = inject(ChangeDetectorRef);
+  private cdr = inject(ChangeDetectorRef);
 
   // ── Estado del juego ─────────────────────────────────────────────────────
   mano: ManoState | null = null;
 
   // ── Héroe ─────────────────────────────────────────────────────────────────
   heroe: Heroe | null = null;
+
+  rival: Rival | null = null;
 
   // Índice de la carta seleccionada para el Manipulador (claseHeroe === 0)
   habilidadCartaIdx: number | null = null;
@@ -146,6 +197,47 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   get vista(): VistaHabilidades | undefined {
     return this.mano?.vistaHabilidadesHumano;
   }
+
+  get vistaRival(): VistaHabilidadesRival | undefined {
+    return this.mano?.vistaHabilidadesRival;
+  }
+
+  /** SOLO PRUEBAS — Botón debug de victoria automática. Eliminar antes de producción. */
+  get mostrarBotonGanarAutomatico(): boolean {
+    return this.esPartidaHistoria(this.mano) && !this.gameOver && !!this.mano;
+  }
+
+  get accionesBloqueadasPorHabilidadRival(): boolean {
+    const m = this.mano;
+    return this.salpicaduraRevelando
+      || this.travesuraRevelando
+      || this.rasgunoRevelando
+      || this.rasgunoConfirmando
+      || !!this.vistaRival?.salpicaduraBloqueando
+      || !!this.vistaRival?.travesuraBloqueando
+      || !!this.vistaRival?.rasgunoBloqueando
+      || !!this.vistaRival?.aullidoBloqueando
+      || !!m?.salpicaduraBloqueando
+      || !!m?.travesuraBloqueando
+      || !!m?.rasgunoBloqueando
+      || !!m?.aullidoBloqueando;
+  }
+
+  /** @deprecated usar accionesBloqueadasPorHabilidadRival */
+  get accionesBloqueadasPorSalpicadura(): boolean {
+    return this.accionesBloqueadasPorHabilidadRival;
+  }
+
+  salpicaduraRevelando = false;
+  salpicaduraSegundos = 0;
+  travesuraRevelando = false;
+  travesuraSegundos = 0;
+  rasgunoRevelando = false;
+  rasgunoSegundos = 0;
+  aullidoRevelando = false;
+  aullidoSegundos = 0;
+  private salpicaduraCartasOriginales: Carta[] = [];
+  private rasgunoCartasOriginales: Carta[] = [];
 
   // Habilidad disponible = el backend dice que está lista y no fue usada esta mano
   get habilidadDisponible(): boolean {
@@ -162,52 +254,134 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── Modo práctica ─────────────────────────────────────────────────────────
   escenarioPractica: number | null = null;
   cartasBrillan: boolean[] = [false, false, false];
-  btnsBrillan:   boolean[] = [];
-  tutorialMsg    = '';
+  btnsBrillan: boolean[] = [];
+  tutorialMsg = '';
 
   // ── UI ───────────────────────────────────────────────────────────────────
   btns: Btn[] = [];
   slots: Slot[] = [{ pending: false }, { pending: false }, { pending: false }];
-  opCards: { visible: boolean }[] = [
-    { visible: true }, { visible: true }, { visible: true },
+  opCards: OpCardDisplay[] = [
+    { visible: true, revelada: false, carta: null },
+    { visible: true, revelada: false, carta: null },
+    { visible: true, revelada: false, carta: null },
   ];
-  misCarts: { carta: Carta | null; visible: boolean; seleccionada: boolean }[] = [
-    { carta: null, visible: false, seleccionada: false },
-    { carta: null, visible: false, seleccionada: false },
-    { carta: null, visible: false, seleccionada: false },
+  misCarts: { carta: Carta | null; visible: boolean; seleccionada: boolean; oculta: boolean }[] = [
+    { carta: null, visible: false, seleccionada: false, oculta: false },
+    { carta: null, visible: false, seleccionada: false, oculta: false },
+    { carta: null, visible: false, seleccionada: false, oculta: false },
   ];
 
-  rivalLabel  = 'Esperando mano...';
-  turnoBadge  = '';
-  bubbleText  = '';
-  gameOver    = false;
+  rivalLabel = 'Esperando mano...';
+  turnoBadge = '';
+  bubbleText = '';
+  bubbleHumanoText = '';
+  gameOver = false;
   gameOverWon = false;
-  toastMsg    = '';
+  toastMsg = '';
+  toastTipo: 'error' | 'info' = 'error';
 
   readonly fanAngles = FAN_ANGLES;
-  readonly fanXOff   = FAN_X;
+  readonly fanXOff = FAN_X;
 
   tallySticks: { x1: number; y1: number; x2: number; y2: number; color: string }[] = [];
 
   // ── Estado interno ────────────────────────────────────────────────────────
-  private loading          = false;
-  private prevEstadoTruco    = '';
-  private prevEstadoEnvido   = '';
-  private prevPendTru        = false;
-  private prevPendEnv        = false;
+  private loading = false;
+  private prevEstadoTruco = '';
+  private prevEstadoEnvido = '';
+  private prevPendTru = false;
+  private prevPendEnv = false;
   private prevEnvidoResuelto = false;
   private prevGanadorMano: string | null = null;
   private nuevaManoTimer: ReturnType<typeof setTimeout> | null = null;
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
   countdown: number | null = null;
   private bubbleTimer: ReturnType<typeof setTimeout> | null = null;
-  private toastTimer:  ReturnType<typeof setTimeout> | null = null;
+  private bubbleHumanoTimer: ReturnType<typeof setTimeout> | null = null;
+  private envidoSeqTimers: ReturnType<typeof setTimeout>[] = [];
+  private gameOverTimer: ReturnType<typeof setTimeout> | null = null;
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
+  private rivalNivel: number | null = null;
+  private salpicaduraManoId: string | null = null;
+  private salpicaduraTimer: ReturnType<typeof setTimeout> | null = null;
+  private salpicaduraInterval: ReturnType<typeof setInterval> | null = null;
+  private travesuraManoId: string | null = null;
+  private travesuraTimer: ReturnType<typeof setTimeout> | null = null;
+  private travesuraInterval: ReturnType<typeof setInterval> | null = null;
+  private rasgunoManoId: string | null = null;
+  private rasgunoTimer: ReturnType<typeof setTimeout> | null = null;
+  private rasgunoInterval: ReturnType<typeof setInterval> | null = null;
+  private aullidoManoId: string | null = null;
+  private aullidoTimer: ReturnType<typeof setTimeout> | null = null;
+  private aullidoInterval: ReturnType<typeof setInterval> | null = null;
+  private rasgunoWatchdog: ReturnType<typeof setInterval> | null = null;
+  private rasgunoConfirmando = false;
+  private nuevaManoEnCurso = false;
+  private prevMensajeRival: string | null = null;
+  private victoriaHistoriaRegistrada = false;
+  private maquinaCorriendo = false;
+
+  // ── Imagen del rival ──────────────────────────────────────────────────────
+
+  // Slug normalizado del rival (ej. "El Pomberito" -> "pomberito"). Vac\u00edo si no hay rival.
+  get rivalSlug(): string {
+    if (!this.rival?.nombre) return '';
+    return this.rival.nombre
+      .toLowerCase()
+      .replace(/^(el|la|los|las)\s+/i, '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '')
+      .trim();
+  }
+
+  // Clase CSS por personaje para poder estilar cada uno por separado.
+  get rivalImgClase(): string {
+    return `rival-${this.rivalSlug || 'gaucho'}`;
+  }
+
+  get rivalImgSrc(): string {
+    if (this.escenarioPractica !== null) return 'assets/gaucho.png';
+    const slug = this.rivalSlug;
+    if (!slug) return 'assets/gaucho.png';
+    return `assets/oponentes1v1/${slug}_batalla.png`;
+  }
+
+  get fondoStyle(): { [key: string]: string } {
+    if (this.escenarioPractica !== null) {
+      return { 'background-image': `url('assets/multijugador.png')` };
+    }
+    const slug = this.rivalSlug;
+    const img = slug ? `assets/fondos1v1/${slug}_fondo.png` : 'assets/multijugador.png';
+    return { 'background-image': `url('${img}')` };
+  }
+
+  // ── Mini popups de info del panel derecho (habilidades) ───────────────────
+  infoPopupTitulo: string | null = null;
+  infoPopupLineas: string[] = [];
+
+  abrirInfoPopup(titulo: string, lineas: string[]): void {
+    this.infoPopupTitulo = titulo;
+    this.infoPopupLineas = (lineas || []).filter(l => !!l);
+    this.cdr.markForCheck();
+  }
+
+  cerrarInfoPopup(): void {
+    this.infoPopupTitulo = null;
+    this.infoPopupLineas = [];
+    this.cdr.markForCheck();
+  }
+
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngAfterViewInit(): void {
     const video = this.gauchoVideo?.nativeElement;
     if (video) {
       video.muted = true;
-      video.play().catch(() => {});
+      video.play().catch(() => { });
+    }
+    this.rasgunoWatchdog = setInterval(() => this.revisarRasgunoPendiente(), 500);
+    if (this.mano && this.rasgunoBloqueandoEn(this.mano)) {
+      this.manejarRasguno(this.mano);
     }
   }
 
@@ -218,25 +392,87 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       this.heroe = HEROES.find(h => h.id === id) ?? null;
     }
 
+    const rivalNivelStr = localStorage.getItem('rivalNivel');
+    if (rivalNivelStr !== null) {
+      this.rivalNivel = parseInt(rivalNivelStr, 10);
+      this.cargarRival(this.rivalNivel);
+    }
+
     const escStr = localStorage.getItem('practicaEscenario');
     if (escStr !== null) {
       this.escenarioPractica = parseInt(escStr, 10);
       localStorage.removeItem('practicaEscenario');
     }
 
-    const body: Record<string, unknown> = { modo: this.heroe ? 1 : 0 };
+    this.cancelarSalpicaduraTimer();
+    this.cancelarTravesuraTimer();
+    this.cancelarRasgunoTimer();
+    this.cancelarAullidoTimer();
+    this.rasgunoManoId = null;
+
+    this.call('nueva-partida', this.construirBodyPartida());
+  }
+
+  private cargarRival(nivel: number): void {
+    this.http.get<Rival>(`${API_HISTORIA}/rivales/${nivel}`).subscribe({
+      next: (rival) => {
+        this.rival = {
+          ...rival,
+          descripcionHabilidad: this.formatearDescripcionRival(rival.descripcionHabilidad),
+        };
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.showToast('No se pudo cargar los datos del rival.');
+      },
+    });
+  }
+
+  private construirBodyPartida(): Record<string, unknown> {
+    const esHistoria = this.heroe !== null || this.rivalNivel !== null;
+    const body: Record<string, unknown> = { modo: esHistoria ? 1 : 0 };
     if (this.heroe) body['claseHeroe'] = this.heroe.id;
-    this.call('nueva-partida', body);
+    if (this.rivalNivel !== null) body['rivalNivel'] = this.rivalNivel;
+    return body;
   }
 
   ngOnDestroy(): void {
     if (this.bubbleTimer) clearTimeout(this.bubbleTimer);
-    if (this.toastTimer)  clearTimeout(this.toastTimer);
+    if (this.bubbleHumanoTimer) clearTimeout(this.bubbleHumanoTimer);
+    if (this.gameOverTimer) clearTimeout(this.gameOverTimer);
+    this.limpiarEnvidoSeq();
+    if (this.toastTimer) clearTimeout(this.toastTimer);
     this.cancelarCountdown();
+    this.cancelarSalpicaduraTimer();
+    this.cancelarTravesuraTimer();
+    this.cancelarRasgunoTimer();
+    this.cancelarAullidoTimer();
+    if (this.rasgunoWatchdog) {
+      clearInterval(this.rasgunoWatchdog);
+      this.rasgunoWatchdog = null;
+    }
+  }
+
+  private revisarRasgunoPendiente(): void {
+    const m = this.mano;
+    if (!m || this.gameOver || this.rasgunoConfirmando) return;
+    if (!this.rasgunoBloqueandoEn(m)) return;
+    if (this.rasgunoManoId === m.id) return;
+    this.manejarRasguno(m);
   }
 
   // ── Template helpers ──────────────────────────────────────────────────────
   sym(palo: Palo): string { return PALO_SYM[palo] ?? ''; }
+
+  /** Quita sufijos "(Truco N)" de mensajes de habilidades del backend. */
+  mensajeHabilidadLimpio(msg?: string | null): string {
+    if (!msg) return '';
+    return msg.replace(/\s*\(Truco\s+\d+\)/gi, '').trim();
+  }
+
+  private formatearDescripcionRival(desc: string): string {
+    return desc.replace(/\s+Aullido:/, '\nAullido:');
+  }
 
   cardImg(carta: Carta): string {
     const mapaNumeros: Record<number, number> = {
@@ -246,43 +482,195 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     return `assets/cards/${offsetPalo[carta.palo] + mapaNumeros[carta.numero]}.PNG`;
   }
 
-  // ── API ───────────────────────────────────────────────────────────────────
+  private cartaCoincide(a: { numero: number; palo: string }, b: { numero: number; palo: string }): boolean {
+    return a.numero === b.numero
+      && a.palo.localeCompare(b.palo, undefined, { sensitivity: 'accent' }) === 0;
+  }
+
+  private cartaDesdeRevelada(
+    revelada: { numero: number; palo: string; valorTruco: number },
+  ): Carta {
+    return {
+      numero: revelada.numero,
+      palo: revelada.palo as Palo,
+      valorTruco: revelada.valorTruco,
+      valorEnvido: 0,
+    };
+  }
+
+  // ── Delay "la máquina piensa" (compartido con 2v2/3v3 vía cfg_delay) ────────
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /** Delay (ms) configurable desde Configuración ("Delay de juego"). */
+  private get delayMaquinaMs(): number {
+    const raw = localStorage.getItem('cfg_delay');
+    if (raw == null) return 1200; // default si nunca se configuró
+    const v = Number(raw);
+    return Number.isFinite(v) && v >= 0 ? v : 1200;
+  }
+
+  /** Acciones tras las cuales la máquina juega/responde → conviene simular que "piensa". */
+  private readonly ENDPOINTS_PENSAR = new Set([
+    'jugar-carta', 'cantar-envido', 'cantar-envido-tipo', 'responder-envido',
+    'son-buenas', 'cantar-truco', 'responder-truco', 'escalar-truco',
+  ]);
+
+  private esPartidaHistoria(m?: ManoState | null): boolean {
+    return (m?.configuracion?.modo ?? (this.rivalNivel !== null || this.heroe !== null ? 1 : 0)) === 1;
+  }
+
+  private esperaAccionHumano(m: ManoState): boolean {
+    if (m.salpicaduraBloqueando || m.travesuraBloqueando || this.rasgunoBloqueandoEn(m)) return true;
+    if (m.envidoPendienteRespuestaHumano || m.trucoPendienteRespuestaHumano) return true;
+    if (m.cartaMaquinaEnMesa) return true;
+    if (m.cartaHumanoEnMesa) return false;
+    return m.turnoActual === 'Humano';
+  }
+
+  private firmaEstadoMaquina(m: ManoState): string {
+    return [
+      m.turnoActual,
+      m.bazas?.length,
+      m.cartaMaquinaEnMesa?.numero,
+      m.cartaHumanoEnMesa?.numero,
+      m.envidoPendienteRespuestaHumano,
+      m.trucoPendienteRespuestaHumano,
+      m.ganadorMano,
+    ].join('|');
+  }
+
+  private async correrMaquinas(): Promise<void> {
+    if (!this.esPartidaHistoria(this.mano) || this.maquinaCorriendo) return;
+    this.maquinaCorriendo = true;
+    try {
+      let sinProgreso = 0;
+      while (this.mano) {
+        const m = this.mano;
+        if (m.ganadorPartida || m.ganadorMano) break;
+        if (this.accionesBloqueadasPorHabilidadRival) {
+          if (this.mano?.id === m.id && this.rasgunoBloqueandoEn(m) && this.rasgunoManoId !== m.id) {
+            this.manejarRasguno(m);
+          }
+          if (this.mano?.id === m.id && this.aullidoBloqueandoEn(m) && this.aullidoManoId !== m.id) {
+            this.manejarAullido(m);
+          }
+          break;
+        }
+        if (this.esperaAccionHumano(m)) break;
+
+        const firmaAntes = this.firmaEstadoMaquina(m);
+        this.rivalLabel = 'Pensando...';
+        this.cdr.markForCheck();
+
+        await this.delay(this.delayMaquinaMs);
+
+        try {
+          const res = await firstValueFrom(
+            this.http.post<{ mano: ManoState; evento?: { tipo: string; texto: string } }>(
+              `${API}/avanzar-maquina`,
+              { manoId: m.id },
+            ),
+          );
+          this.mano = res.mano;
+          if (res.evento?.texto) {
+            this.bubbleText = res.evento.texto;
+          }
+          this.updateEventosHabilidad(res.mano);
+          this.updateUI(res.mano);
+          if (!res.evento) break;
+
+          if (this.firmaEstadoMaquina(res.mano) === firmaAntes) {
+            if (++sinProgreso >= 2) break;
+          } else {
+            sinProgreso = 0;
+          }
+        } catch {
+          this.showToast('Error de conexión al avanzar la máquina.');
+          break;
+        }
+      }
+    } finally {
+      this.maquinaCorriendo = false;
+      this.cdr.markForCheck();
+    }
+  }
+
   async call(endpoint: string, body: object): Promise<void> {
-    if (this.loading) return;
+    if (this.loading || this.maquinaCorriendo) return;
+    if (endpoint !== 'confirmar-salpicadura'
+      && endpoint !== 'confirmar-travesura'
+      && endpoint !== 'confirmar-rasguno'
+      && endpoint !== 'confirmar-aullido'
+      && endpoint !== 'ganar-automatico-debug'
+      && this.accionesBloqueadasPorHabilidadRival) return;
     this.loading = true;
+
+    const pensar = this.ENDPOINTS_PENSAR.has(endpoint);
+    // Tu carta aparece al instante en la mesa; la máquina "piensa" antes de mostrar su jugada.
+    if (endpoint === 'jugar-carta') this.colocarCartaHumanoOptimista(body);
+    // Tu canto aparece al instante en tu burbuja (la respuesta/tantos los muestra la secuencia).
+    this.feedbackCantoHumano(endpoint, body);
+
     try {
       const data = await firstValueFrom(
         this.http.post<ManoState>(`${API}/${endpoint}`, body)
       );
-      this.mano = data;
-      this.updateEventosHabilidad(data);
-      this.updateUI(data);
-    } catch (err: any) {
-      const msg = (typeof err?.error === 'string' ? err.error : null) ?? err?.error?.message ?? err?.message ?? String(err);
+      // Pausa que simula a la máquina pensando antes de revelar su jugada/respuesta.
+      if (pensar) await this.delay(this.delayMaquinaMs);
+      this.recibirMano(data);
+      await this.correrMaquinas();
+    } catch (err: unknown) {
+      const msg = this.extraerErrorApi(err);
       this.showToast(`Error en ${endpoint}: ${msg}`);
+      if (this.mano) this.updateUI(this.mano);
     } finally {
       this.loading = false;
       this.cdr.markForCheck();
     }
   }
 
+  /**
+   * Coloca la carta que el humano acaba de jugar en la mesa de inmediato (sin esperar
+   * al backend), para que su propia jugada no se sienta lenta durante el delay.
+   * El estado autoritativo del backend se aplica después y reemplaza esta vista.
+   */
+  private colocarCartaHumanoOptimista(body: any): void {
+    const m = this.mano;
+    if (!m) return;
+
+    const idxHand = this.misCarts.findIndex(
+      mc => mc.carta?.numero === body?.numero && mc.carta?.palo === body?.palo
+    );
+    if (idxHand < 0) return;
+    const carta = this.misCarts[idxHand].carta;
+
+    this.misCarts = this.misCarts.map((mc, i) => i === idxHand ? { ...mc, visible: false } : mc);
+
+    const slotIdx = m.bazas?.length ?? 0;
+    if (carta && slotIdx >= 0 && slotIdx < this.slots.length) {
+      this.slots = this.slots.map((s, i) => i === slotIdx ? { ...s, jugador: carta, pending: true } : s);
+    }
+    this.cdr.markForCheck();
+  }
+
   // Acumula los eventos de habilidad en el log
   private updateEventosHabilidad(m: ManoState): void {
-    const v = m.vistaHabilidadesHumano;
-    if (!v?.habilidadesActivasEnPartida) return;
-
     const lineas: string[] = [];
+    const v = m.vistaHabilidadesHumano;
 
-    if (v.activaDisponible && !v.activaUsadaEnEstaMano)
-      lineas.push('⚡ Activa disponible');
+    if (v?.habilidadesActivasEnPartida) {
+      if (v.activaDisponible && !v.activaUsadaEnEstaMano)
+        lineas.push('⚡ Activa disponible');
 
-    if (v.cartaReveladaRival)
-      lineas.push(`👁 Rival revelado: ${v.cartaReveladaRival.numero} de ${v.cartaReveladaRival.palo}`);
+      if (v.cartaReveladaRival)
+        lineas.push(`👁 Rival revelado: ${v.cartaReveladaRival.numero} de ${v.cartaReveladaRival.palo}`);
 
-    if (v.ultimoMensajeHabilidad)
-      lineas.push(`▶ ${v.ultimoMensajeHabilidad}`);
+      if (v.ultimoMensajeHabilidad)
+        lineas.push(`▶ ${this.mensajeHabilidadLimpio(v.ultimoMensajeHabilidad)}`);
+    }
 
-    // Solo actualizar si hay algo nuevo que mostrar
     if (lineas.length > 0) {
       this.eventosHabilidad = lineas;
     }
@@ -290,6 +678,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Jugar carta ───────────────────────────────────────────────────────────
   jugarCarta(i: number): void {
+    if (this.loading || this.maquinaCorriendo || this.accionesBloqueadasPorHabilidadRival) return;
     const c = this.misCarts[i]?.carta;
     if (!c || !this.mano) return;
 
@@ -302,21 +691,34 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       const body: Record<string, unknown> = {
         manoId: this.mano.id,
         numeroCarta: c.numero,
-        paloCarta:   c.palo,
+        paloCarta: c.palo,
       };
       this.misCarts = this.misCarts.map(mc => ({ ...mc, seleccionada: false }));
       this.call('activar-habilidad', body);
       return;
     }
 
+    // No podés jugar una carta si hay un canto de la máquina sin responder.
+    if (this.mano.trucoPendienteRespuestaHumano || this.mano.envidoPendienteRespuestaHumano) {
+      this.showToast('No podés jugar: primero respondé el canto.', 'info');
+      return;
+    }
+
+    // Tampoco si todavía no es tu turno.
+    if (this.mano.turnoActual === 'Maquina' && !this.mano.cartaMaquinaEnMesa) {
+      this.showToast('Esperá tu turno para jugar.', 'info');
+      return;
+    }
+
     // Flujo normal: jugar la carta
-    new Audio('/assets/musica/card.mp3').play().catch(() => {});
+    new Audio('/assets/musica/card.mp3').play().catch(() => { });
     this.call('jugar-carta', { manoId: this.mano.id, numero: c.numero, palo: c.palo });
   }
 
   // ── Usar habilidad ────────────────────────────────────────────────────────
   usarHabilidad(): void {
-    if (!this.mano || !this.habilidadDisponible) return;
+    if (this.loading || this.maquinaCorriendo || !this.mano || !this.habilidadDisponible
+      || this.accionesBloqueadasPorHabilidadRival) return;
 
     // Manipulador: activar modo selección (si ya está activo, ignorar)
     if (this.heroe?.id === 0) {
@@ -346,18 +748,26 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private cancelarCountdown(): void {
     if (this.countdownInterval) { clearInterval(this.countdownInterval); this.countdownInterval = null; }
-    if (this.nuevaManoTimer)    { clearTimeout(this.nuevaManoTimer);     this.nuevaManoTimer = null; }
+    if (this.nuevaManoTimer) { clearTimeout(this.nuevaManoTimer); this.nuevaManoTimer = null; }
     this.countdown = null;
   }
 
   nuevaPartida(): void {
     this.gameOver = false;
+    this.victoriaHistoriaRegistrada = false;
     this.eventosHabilidad = [];
     this.habilidadCartaIdx = null;
     this.modoSeleccionCarta = false;
-    const body: Record<string, unknown> = { modo: this.heroe ? 1 : 0 };
-    if (this.heroe) body['claseHeroe'] = this.heroe.id;
-    this.call('nueva-partida', body);
+    this.salpicaduraManoId = null;
+    this.travesuraManoId = null;
+    this.rasgunoManoId = null;
+    this.prevMensajeRival = null;
+    this.salpicaduraCartasOriginales = [];
+    this.rasgunoCartasOriginales = [];
+    this.cancelarSalpicaduraTimer();
+    this.cancelarTravesuraTimer();
+    this.cancelarRasgunoTimer();
+    this.call('nueva-partida', this.construirBodyPartida());
   }
 
   mostrarConfirmSalir = false;
@@ -369,21 +779,78 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
   confirmarSalir(): void {
     this.mostrarConfirmSalir = false;
     localStorage.removeItem('practicaEscenario');
+    const esHistoria = localStorage.getItem('historiaPartida') === '1';
+    const esPulperia = localStorage.getItem('origenPulperia') === '1';
+    if (esHistoria) {
+      localStorage.removeItem('historiaPartida');
+      localStorage.removeItem('rivalNivel');
+    }
+    localStorage.removeItem('origenPulperia');
     window.dispatchEvent(new CustomEvent('truco-solo:end'));
-    this.router.navigate(['/home']);
+    // No navegar si es historia (Phaser lo maneja) ni si vino de la pulpería (overlay)
+    if (!esHistoria && !esPulperia) {
+      this.router.navigate(['/home']);
+    }
   }
 
   cancelarSalir(): void {
     this.mostrarConfirmSalir = false;
   }
 
+  // SOLO PRUEBAS — Forzar victoria a 30 puntos en historia. Eliminar antes de producción.
+  ganarAutomaticoDebug(): void {
+    if (!this.mano || !this.esPartidaHistoria(this.mano)) return;
+    this.cancelarSalpicaduraTimer();
+    this.cancelarTravesuraTimer();
+    this.cancelarRasgunoTimer();
+    this.call('ganar-automatico-debug', { manoId: this.mano.id });
+  }
+
+  private registrarVictoriaHistoria(m: ManoState): void {
+    if (this.victoriaHistoriaRegistrada || this.rivalNivel === null) return;
+    this.victoriaHistoriaRegistrada = true;
+
+    const diferencia = Math.max(0, m.puntosHumano - m.puntosMaquina);
+    this.http.post(`${API_HISTORIA}/registrar-victoria`, {
+      rivalNivel: this.rivalNivel,
+      diferenciaPuntos: diferencia,
+    }).subscribe({
+      next: () => window.dispatchEvent(new Event('historia:progreso-actualizado')),
+      error: () => {
+        this.victoriaHistoriaRegistrada = false;
+        this.showToast('No se pudo guardar el progreso de historia.');
+      },
+    });
+  }
+
   // ── UI update ─────────────────────────────────────────────────────────────
   private updateUI(m: ManoState): void {
     this.redrawTally(m.puntosHumano, m.puntosMaquina);
 
+    const justResolvedEnvido = !!m.envidoResuelto && !this.prevEnvidoResuelto;
+
     if (m.ganadorPartida) {
-      this.gameOver    = true;
+      // Si la partida se definió por el envido, primero se ven los tantos (¡Quiero!,
+      // los cantos de cada uno) y recién después aparece el overlay de fin de partida.
+      if (justResolvedEnvido) {
+        this.btns = []; // sin acciones mientras corre la animación de cierre
+        this.turnoBadge = '';
+        this.reproducirSecuenciaEnvido(m);
+        this.prevEnvidoResuelto = true;
+        if (this.gameOverTimer) clearTimeout(this.gameOverTimer);
+        this.gameOverTimer = setTimeout(() => {
+          this.gameOver = true;
+          this.gameOverWon = m.ganadorPartida === 'Humano';
+          this.cdr.markForCheck();
+        }, this.duracionSecuenciaEnvido(m) + 800);
+        this.cdr.markForCheck();
+        return;
+      }
+      this.gameOver = true;
       this.gameOverWon = m.ganadorPartida === 'Humano';
+      if (this.gameOverWon && this.rivalNivel !== null) {
+        this.registrarVictoriaHistoria(m);
+      }
       this.cdr.markForCheck();
       return;
     }
@@ -393,11 +860,8 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       this.rivalLabel = m.ganadorMano === 'Humano' ? '¡Perdí la mano!' : '¡Gané la mano!';
       this.habilidadCartaIdx = null;
       this.modoSeleccionCarta = false;
-      if (m.ganadorMano !== this.prevGanadorMano && !m.partidaTerminada) {
-        this.iniciarCountdown(() => {
-          if (this.mano?.ganadorMano && !this.mano?.partidaTerminada)
-            this.call('nueva-mano', { manoAnteriorId: this.mano.id });
-        });
+      if (!m.partidaTerminada && m.ganadorMano !== this.prevGanadorMano) {
+        this.iniciarCountdown(() => this.solicitarNuevaMano());
       }
     } else {
       this.rivalLabel = m.turnoActual === 'Maquina' ? 'Pensando...' : '...';
@@ -405,62 +869,446 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.prevGanadorMano = m.ganadorMano ?? null;
 
-    const pendEnv   = !!m.envidoPendienteRespuestaHumano;
-    const pendTru   = !!m.trucoPendienteRespuestaHumano;
+    const pendEnv = !!m.envidoPendienteRespuestaHumano;
+    const pendTru = !!m.trucoPendienteRespuestaHumano;
     const esMiTurno = (m.turnoActual === 'Humano' || !!m.cartaMaquinaEnMesa)
-                      && !m.ganadorMano && !m.ganadorPartida && !pendEnv && !pendTru;
+      && !m.ganadorMano && !m.ganadorPartida && !pendEnv && !pendTru;
 
-    this.turnoBadge = esMiTurno
-      ? 'Tu turno — jugá una carta o cantá'
-      : (pendEnv || pendTru) ? 'Respondé el canto de la máquina' : '';
+    if (this.rasgunoRevelando) {
+      this.turnoBadge = 'Rasguño: el Lobizón va a debilitar una carta...';
+    } else if (this.aullidoRevelando) {
+      this.turnoBadge = 'Aullido: el Lobizón te asusta...';
+    } else if (this.travesuraRevelando) {
+      this.turnoBadge = 'Travesura: memorizá tus cartas...';
+    } else if (this.salpicaduraRevelando) {
+      this.turnoBadge = 'Salpicadura: mirá tus cartas originales...';
+    } else {
+      this.turnoBadge = esMiTurno
+        ? 'Tu turno — jugá una carta o cantá'
+        : (pendEnv || pendTru) ? 'Respondé el canto de la máquina' : '';
+    }
 
     this.updateBubble(m, pendTru, pendEnv);
-    this.prevEstadoTruco    = m.estadoTruco  ?? '';
-    this.prevEstadoEnvido   = m.estadoEnvido ?? '';
-    this.prevPendTru        = pendTru;
-    this.prevPendEnv        = pendEnv;
+    this.prevEstadoTruco = m.estadoTruco ?? '';
+    this.prevEstadoEnvido = m.estadoEnvido ?? '';
+    this.prevPendTru = pendTru;
+    this.prevPendEnv = pendEnv;
     this.prevEnvidoResuelto = !!m.envidoResuelto;
 
     const cantOp = m.maquina?.mano?.length ?? 0;
-    this.opCards = [0, 1, 2].map(i => ({ visible: i < cantOp }));
+    this.actualizarCartasRival(m, cantOp);
 
     this.slots = [0, 1, 2].map(i => {
       const b = m.bazas?.[i];
-      const pendingMaq = !b && i === (m.bazas?.length ?? 0) && !!m.cartaMaquinaEnMesa;
+      const idxActual = m.bazas?.length ?? 0;
+      const pendingMaq = !b && i === idxActual && !!m.cartaMaquinaEnMesa;
+      const pendingHum = !b && i === idxActual && !!m.cartaHumanoEnMesa && !m.cartaMaquinaEnMesa;
       return {
-        jugador: b?.cartaJugador,
+        jugador: b?.cartaJugador ?? (pendingHum ? m.cartaHumanoEnMesa : undefined),
         maquina: b?.cartaMaquina ?? (pendingMaq ? m.cartaMaquinaEnMesa : undefined),
         pending: pendingMaq,
-        winner:  b?.ganador,
+        winner: b?.ganador,
       };
     });
 
-    // Preservar estado de selección del Manipulador al actualizar cartas
-    this.misCarts = [0, 1, 2].map(i => {
-      const carta = m.humano?.mano?.[i] ?? null;
-      return {
-        carta,
-        visible: !!carta && !m.ganadorMano,
-        seleccionada: this.habilidadCartaIdx === i,
-      };
-    });
+    this.manejarSalpicadura(m);
+    this.manejarRasguno(m);
+    this.manejarTravesura(m);
+    this.manejarAullido(m);
+    this.actualizarCartasMano(m);
 
     this.buildBtns(m, esMiTurno, pendEnv, pendTru);
 
     if (this.escenarioPractica !== null) {
       this.actualizarTutorial(m);
     }
+
+    this.cdr.markForCheck();
+  }
+
+  private cancelarSalpicaduraTimer(): void {
+    if (this.salpicaduraTimer) {
+      clearTimeout(this.salpicaduraTimer);
+      this.salpicaduraTimer = null;
+    }
+    if (this.salpicaduraInterval) {
+      clearInterval(this.salpicaduraInterval);
+      this.salpicaduraInterval = null;
+    }
+    this.salpicaduraRevelando = false;
+    this.salpicaduraSegundos = 0;
+  }
+
+  private manejarSalpicadura(m: ManoState): void {
+    const bloqueando = !!m.vistaHabilidadesRival?.salpicaduraBloqueando;
+    if (!bloqueando) {
+      if (!this.salpicaduraTimer) {
+        this.salpicaduraRevelando = false;
+        this.salpicaduraSegundos = 0;
+        this.salpicaduraCartasOriginales = [];
+      }
+      return;
+    }
+
+    if (this.salpicaduraManoId === m.id) return;
+
+    if (this.salpicaduraTimer) clearTimeout(this.salpicaduraTimer);
+    if (this.salpicaduraInterval) clearInterval(this.salpicaduraInterval);
+
+    this.salpicaduraManoId = m.id;
+    this.salpicaduraCartasOriginales = [...(m.humano?.mano ?? [])];
+    this.salpicaduraRevelando = true;
+    this.salpicaduraSegundos = SALPICADURA_REVEAL_SEG;
+
+    this.salpicaduraInterval = setInterval(() => {
+      this.salpicaduraSegundos = Math.max(0, this.salpicaduraSegundos - 1);
+      this.cdr.markForCheck();
+    }, 1000);
+
+    this.salpicaduraTimer = setTimeout(() => {
+      this.salpicaduraTimer = null;
+      if (this.salpicaduraInterval) clearInterval(this.salpicaduraInterval);
+      this.salpicaduraInterval = null;
+      this.salpicaduraRevelando = false;
+      this.salpicaduraSegundos = 0;
+      this.cdr.markForCheck();
+      if (this.mano?.id === m.id) {
+        this.confirmarHabilidadRival('confirmar-salpicadura', m.id);
+      }
+    }, SALPICADURA_REVEAL_SEG * 1000);
+
+    this.cdr.markForCheck();
+  }
+
+  private cartaEsOculta(carta: Carta, m: ManoState): boolean {
+    if (this.travesuraRevelando || m.travesuraBloqueando || !!m.vistaHabilidadesRival?.travesuraBloqueando) {
+      return false;
+    }
+    const ocultas = m.cartasOcultasTravesura
+      ?? m.vistaHabilidadesRival?.cartasOcultasTravesura
+      ?? [];
+    return ocultas.some(o => o.numero === carta.numero && o.palo === carta.palo);
+  }
+
+  private cancelarTravesuraTimer(): void {
+    if (this.travesuraTimer) {
+      clearTimeout(this.travesuraTimer);
+      this.travesuraTimer = null;
+    }
+    if (this.travesuraInterval) {
+      clearInterval(this.travesuraInterval);
+      this.travesuraInterval = null;
+    }
+    this.travesuraRevelando = false;
+    this.travesuraSegundos = 0;
+  }
+
+  private manejarTravesura(m: ManoState): void {
+    const bloqueando = !!m.vistaHabilidadesRival?.travesuraBloqueando || !!m.travesuraBloqueando;
+    if (!bloqueando) {
+      if (!this.travesuraTimer) {
+        this.travesuraRevelando = false;
+        this.travesuraSegundos = 0;
+      }
+      return;
+    }
+
+    if (this.travesuraManoId === m.id) return;
+
+    if (this.travesuraTimer) clearTimeout(this.travesuraTimer);
+    if (this.travesuraInterval) clearInterval(this.travesuraInterval);
+
+    this.travesuraManoId = m.id;
+    this.travesuraRevelando = true;
+    this.travesuraSegundos = TRAVESURA_REVEAL_SEG;
+
+    this.travesuraInterval = setInterval(() => {
+      this.travesuraSegundos = Math.max(0, this.travesuraSegundos - 1);
+      this.cdr.markForCheck();
+    }, 1000);
+
+    this.travesuraTimer = setTimeout(() => {
+      this.travesuraTimer = null;
+      if (this.travesuraInterval) clearInterval(this.travesuraInterval);
+      this.travesuraInterval = null;
+      this.travesuraRevelando = false;
+      this.travesuraSegundos = 0;
+      this.cdr.markForCheck();
+      if (this.mano?.id === m.id) {
+        this.confirmarHabilidadRival('confirmar-travesura', m.id);
+      }
+    }, TRAVESURA_REVEAL_SEG * 1000);
+
+    this.cdr.markForCheck();
+  }
+
+  private cancelarRasgunoTimer(): void {
+    if (this.rasgunoTimer) {
+      clearTimeout(this.rasgunoTimer);
+      this.rasgunoTimer = null;
+    }
+    if (this.rasgunoInterval) {
+      clearInterval(this.rasgunoInterval);
+      this.rasgunoInterval = null;
+    }
+    this.rasgunoRevelando = false;
+    this.rasgunoSegundos = 0;
+    this.rasgunoCartasOriginales = [];
+    this.rasgunoManoId = null;
+  }
+
+  private rasgunoBloqueandoEn(m: ManoState): boolean {
+    return !!(
+      m.rasgunoBloqueando
+      || m.vistaHabilidadesRival?.rasgunoBloqueando
+    );
+  }
+
+  private manejarRasguno(m: ManoState): void {
+    const bloqueando = this.rasgunoBloqueandoEn(m);
+    if (!bloqueando) {
+      if (!this.rasgunoTimer) {
+        this.rasgunoRevelando = false;
+        this.rasgunoSegundos = 0;
+        this.rasgunoCartasOriginales = [];
+        this.rasgunoManoId = null;
+      }
+      return;
+    }
+
+    if (this.rasgunoManoId === m.id) return;
+
+    if (this.rasgunoTimer) clearTimeout(this.rasgunoTimer);
+    if (this.rasgunoInterval) clearInterval(this.rasgunoInterval);
+
+    this.rasgunoManoId = m.id;
+    this.rasgunoCartasOriginales = [...(m.humano?.mano ?? [])];
+    this.rasgunoRevelando = true;
+    this.rasgunoSegundos = RASGUNO_REVEAL_SEG;
+
+    this.rasgunoInterval = setInterval(() => {
+      this.rasgunoSegundos = Math.max(0, this.rasgunoSegundos - 1);
+      this.cdr.markForCheck();
+    }, 1000);
+
+    this.rasgunoTimer = setTimeout(() => {
+      this.rasgunoTimer = null;
+      if (this.rasgunoInterval) clearInterval(this.rasgunoInterval);
+      this.rasgunoInterval = null;
+      this.rasgunoRevelando = false;
+      this.rasgunoSegundos = 0;
+      this.rasgunoCartasOriginales = [];
+      this.cdr.markForCheck();
+      if (this.mano?.id === m.id) {
+        this.confirmarHabilidadRival('confirmar-rasguno', m.id);
+      }
+    }, RASGUNO_REVEAL_SEG * 1000);
+
+    this.cdr.detectChanges();
+  }
+
+  private aullidoBloqueandoEn(m: ManoState): boolean {
+    return !!(
+      m.aullidoBloqueando
+      || m.vistaHabilidadesRival?.aullidoBloqueando
+    );
+  }
+
+  private cancelarAullidoTimer(): void {
+    if (this.aullidoTimer) {
+      clearTimeout(this.aullidoTimer);
+      this.aullidoTimer = null;
+    }
+    if (this.aullidoInterval) {
+      clearInterval(this.aullidoInterval);
+      this.aullidoInterval = null;
+    }
+    this.aullidoRevelando = false;
+    this.aullidoSegundos = 0;
+    this.aullidoManoId = null;
+  }
+
+  private manejarAullido(m: ManoState): void {
+    const bloqueando = this.aullidoBloqueandoEn(m);
+    if (!bloqueando) {
+      if (!this.aullidoTimer) {
+        this.aullidoRevelando = false;
+        this.aullidoSegundos = 0;
+        this.aullidoManoId = null;
+      }
+      return;
+    }
+
+    if (this.aullidoManoId === m.id) return;
+
+    if (this.aullidoTimer) clearTimeout(this.aullidoTimer);
+    if (this.aullidoInterval) clearInterval(this.aullidoInterval);
+
+    this.aullidoManoId = m.id;
+    this.aullidoRevelando = true;
+    this.aullidoSegundos = AULLIDO_REVEAL_SEG;
+
+    this.aullidoInterval = setInterval(() => {
+      this.aullidoSegundos = Math.max(0, this.aullidoSegundos - 1);
+      this.cdr.markForCheck();
+    }, 1000);
+
+    this.aullidoTimer = setTimeout(() => {
+      this.aullidoTimer = null;
+      if (this.aullidoInterval) clearInterval(this.aullidoInterval);
+      this.aullidoInterval = null;
+      this.aullidoRevelando = false;
+      this.aullidoSegundos = 0;
+      this.cdr.markForCheck();
+      if (this.mano?.id === m.id) {
+        this.confirmarHabilidadRival('confirmar-aullido', m.id);
+      }
+    }, AULLIDO_REVEAL_SEG * 1000);
+
+    this.cdr.detectChanges();
+  }
+
+  private confirmarHabilidadRival(
+    endpoint: 'confirmar-salpicadura' | 'confirmar-travesura' | 'confirmar-rasguno' | 'confirmar-aullido',
+    manoId: string,
+  ): void {
+    if (endpoint === 'confirmar-rasguno') this.rasgunoConfirmando = true;
+    firstValueFrom(
+      this.http.post<ManoState>(`${API}/${endpoint}`, { manoId }),
+    ).then(data => {
+      this.rasgunoManoId = null;
+      this.rasgunoConfirmando = false;
+      this.aullidoManoId = null;
+      this.recibirMano(data);
+      return this.correrMaquinas();
+    }).catch(err => {
+      this.rasgunoManoId = null;
+      this.rasgunoConfirmando = false;
+      this.showToast(`Error en ${endpoint}: ${this.extraerErrorApi(err)}`);
+    }).finally(() => this.cdr.detectChanges());
+  }
+
+  private recibirMano(data: ManoState): void {
+    const manoCambio = !this.mano || data.id !== this.mano.id;
+    if (manoCambio) {
+      this.cancelarCountdown();
+      if (!this.rasgunoBloqueandoEn(data)) {
+        this.cancelarRasgunoTimer();
+      }
+      if (!this.aullidoBloqueandoEn(data)) {
+        this.cancelarAullidoTimer();
+      }
+    }
+    this.mano = data;
+    this.updateEventosHabilidad(data);
+    this.updateUI(data);
+    if (this.rasgunoBloqueandoEn(data) && this.rasgunoManoId !== data.id) {
+      this.manejarRasguno(data);
+    }
+    if (this.aullidoBloqueandoEn(data) && this.aullidoManoId !== data.id) {
+      this.manejarAullido(data);
+    }
+  }
+
+  private actualizarCartasMano(m: ManoState): void {
+    const manoVisible = this.cartasParaAbanico(m);
+    this.misCarts = [0, 1, 2].map(i => {
+      const carta = manoVisible[i] ?? null;
+      return {
+        carta,
+        visible: !!carta,
+        seleccionada: this.habilidadCartaIdx === i,
+        oculta: !!carta && this.cartaEsOculta(carta, m),
+      };
+    });
+    this.cdr.markForCheck();
+  }
+
+  private actualizarCartasRival(m: ManoState, cantOp: number): void {
+    const manoRival = m.maquina?.mano ?? [];
+    const revelada = m.vistaHabilidadesHumano?.cartaReveladaRival ?? null;
+    let indiceRevelada = -1;
+
+    if (revelada) {
+      indiceRevelada = manoRival.findIndex(c => this.cartaCoincide(c, revelada));
+    }
+
+    this.opCards = [0, 1, 2].map(i => {
+      const visible = i < cantOp;
+      const esRevelada = visible && i === indiceRevelada && revelada != null;
+      return {
+        visible,
+        revelada: esRevelada,
+        carta: esRevelada ? this.cartaDesdeRevelada(revelada!) : null,
+      };
+    });
+  }
+
+  private cartasParaAbanico(m: ManoState): Carta[] {
+    if (this.salpicaduraRevelando && this.salpicaduraCartasOriginales.length > 0) {
+      return this.salpicaduraCartasOriginales;
+    }
+    if (this.rasgunoRevelando && this.rasgunoCartasOriginales.length > 0) {
+      return this.rasgunoCartasOriginales;
+    }
+    return this.cartasHumano(m);
+  }
+
+  private cartasHumano(m: ManoState): Carta[] {
+    const directo = m.humano?.mano;
+    if (directo?.length) return directo.map(c => this.normalizarCarta(c));
+
+    const raw = m as unknown as Record<string, unknown>;
+    const humano = (raw['humano'] ?? raw['Humano']) as Record<string, unknown> | undefined;
+    const mano = (humano?.['mano'] ?? humano?.['Mano']) as Record<string, unknown>[] | undefined;
+    return (mano ?? []).map(c => this.normalizarCarta(c));
+  }
+
+  private normalizarCarta(c: Carta | Record<string, unknown>): Carta {
+    const raw = c as unknown as Record<string, unknown>;
+    const numero = Number((c as Carta).numero ?? raw['numero'] ?? raw['Numero'] ?? 0);
+    const paloRaw = String((c as Carta).palo ?? raw['palo'] ?? raw['Palo'] ?? '');
+    const palos: Palo[] = ['Oro', 'Copa', 'Espada', 'Basto'];
+    const palo = palos.find(p => p.toLowerCase() === paloRaw.toLowerCase()) ?? (paloRaw as Palo);
+    const valorTruco = Number((c as Carta).valorTruco ?? raw['valorTruco'] ?? raw['ValorTruco'] ?? 0);
+    return { numero, palo, valorTruco, valorEnvido: Number(raw['valorEnvido'] ?? raw['ValorEnvido'] ?? 0) };
+  }
+
+  private solicitarNuevaMano(): void {
+    if (this.nuevaManoEnCurso || !this.mano?.ganadorMano || this.mano.partidaTerminada) return;
+    this.nuevaManoEnCurso = true;
+    const manoAnteriorId = this.mano.id;
+    firstValueFrom(
+      this.http.post<ManoState>(`${API}/nueva-mano`, { manoAnteriorId }),
+    ).then(data => {
+      this.recibirMano(data);
+      return this.correrMaquinas();
+    }).catch(err => {
+      this.showToast(`Error en nueva-mano: ${this.extraerErrorApi(err)}`);
+    }).finally(() => {
+      this.nuevaManoEnCurso = false;
+      this.cdr.markForCheck();
+    });
+  }
+
+  private extraerErrorApi(err: unknown): string {
+    const e = err as { error?: string | { error?: string; message?: string }; message?: string };
+    if (typeof e?.error === 'string') return e.error;
+    if (e?.error && typeof e.error === 'object') {
+      return e.error.error ?? e.error.message ?? '';
+    }
+    return e?.message ?? String(err);
   }
 
   // ── Tutorial práctica ──────────────────────────────────────────────────────
   private actualizarTutorial(m: ManoState): void {
     this.cartasBrillan = [false, false, false];
-    this.btnsBrillan   = new Array(this.btns.length).fill(false);
-    this.tutorialMsg   = '';
+    this.btnsBrillan = new Array(this.btns.length).fill(false);
+    this.tutorialMsg = '';
 
     if (m.ganadorPartida || m.partidaTerminada) return;
 
-    const cartas        = m.humano?.mano ?? [];
+    const cartas = m.humano?.mano ?? [];
     const manoTerminada = !!m.ganadorMano;
     const envidoPosible = !m.envidoCantado && !m.trucoResuelto
       && (m.bazas?.length ?? 0) === 0 && !manoTerminada
@@ -475,8 +1323,8 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // 2. Cuando el envido es posible: marcar botones y armar mensaje
     if (envidoPosible && cartas.length > 0) {
-      const pts       = this.calcularPuntosEnvido(cartas);
-      const vasAbajo  = (m.puntosHumano ?? 0) < (m.puntosMaquina ?? 0);
+      const pts = this.calcularPuntosEnvido(cartas);
+      const vasAbajo = (m.puntosHumano ?? 0) < (m.puntosMaquina ?? 0);
       const casiGanas = (m.puntosHumano ?? 0) >= 24;
 
       if (pts >= 25) {
@@ -524,30 +1372,27 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Burbuja ───────────────────────────────────────────────────────────────
   private updateBubble(m: ManoState, pendTru: boolean, pendEnv: boolean): void {
-    const trucoChanged  = (m.estadoTruco  ?? '') !== this.prevEstadoTruco;
-    const envidoChanged = (m.estadoEnvido ?? '') !== this.prevEstadoEnvido;
+    const trucoChanged = (m.estadoTruco ?? '') !== this.prevEstadoTruco;
+    const justResolvedEnvido = !!m.envidoResuelto && !this.prevEnvidoResuelto;
+
+    // El envido recién se resolvió → reproducir la secuencia de tantos (máquina/humano),
+    // como en 2v2/3v3. Si además quedó un truco pendiente, se muestra al final.
+    if (justResolvedEnvido) {
+      this.reproducirSecuenciaEnvido(m);
+      if (pendTru) {
+        const txt = this.cantoBubbleText(m, true, false);
+        const t = setTimeout(() => { if (txt) this.showBubble(txt); }, this.duracionSecuenciaEnvido(m));
+        this.envidoSeqTimers.push(t);
+      }
+      return;
+    }
 
     if (pendTru || pendEnv) {
-      if (pendTru && envidoChanged && m.envidoCantado && !this.prevPendEnv) {
-        const e = (m.estadoEnvido ?? '').toLowerCase();
-        let rsp = '';
-        const justResolved = !!m.envidoResuelto && !this.prevEnvidoResuelto;
-        if      (e.includes('no quiso') || e.includes('no quiere')) rsp = '¡No quiero!';
-        else if (justResolved && m.tantoCantadoMaquina != null)      rsp = this.prevPendEnv ? `Tengo ${m.tantoCantadoMaquina}.` : `¡Quiero! Tengo ${m.tantoCantadoMaquina}.`;
-        else if (e.includes('quiso')    || e.includes('quiere'))     rsp = m.tantoCantadoMaquina != null ? (this.prevPendEnv ? `Tengo ${m.tantoCantadoMaquina}.` : `¡Quiero! Tengo ${m.tantoCantadoMaquina}.`) : '¡Quiero!';
-        if (rsp) {
-          this.showTempBubble(rsp, 2000);
-          setTimeout(() => {
-            const trucotxt = this.cantoBubbleText(m, pendTru, false);
-            if (trucotxt) this.showBubble(trucotxt);
-          }, 2100);
-          return;
-        }
-      }
       if (this.bubbleTimer) { clearTimeout(this.bubbleTimer); this.bubbleTimer = null; }
       const txt = this.cantoBubbleText(m, pendTru, pendEnv);
       if (txt) this.showBubble(txt);
     } else {
+      // Acá solo manejamos la respuesta al TRUCO; el envido lo cubre la secuencia.
       let resp = '';
       if (trucoChanged && m.trucoCantado && !this.prevPendTru) {
         const t = (m.estadoTruco ?? '').toLowerCase();
@@ -555,29 +1400,93 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
           ? '¡No quiero!'
           : (t.includes('quiso') || t.includes('quiere') || t.includes('acepto'))
             ? '¡Quiero!' : '';
-      } else if (envidoChanged && m.envidoCantado) {
-        const e = (m.estadoEnvido ?? '').toLowerCase();
-        const justResolved = !!m.envidoResuelto && !this.prevEnvidoResuelto;
-        if (e.includes('no quiso') || e.includes('no quiere')) {
-          resp = '¡No quiero!';
-        } else if (justResolved && m.tantoCantadoMaquina != null) {
-          // Si el humano aceptó el envido de la máquina (prevPendEnv=true) → solo "Tengo X"
-          // Si la máquina aceptó la escalación del humano (prevPendEnv=false) → "¡Quiero! Tengo X"
-          resp = this.prevPendEnv
-            ? `Tengo ${m.tantoCantadoMaquina}.`
-            : `¡Quiero! Tengo ${m.tantoCantadoMaquina}.`;
-        } else if (e.includes('quiso') || e.includes('quiere') || e.includes('acepto')) {
-          resp = m.tantoCantadoMaquina != null
-            ? (this.prevPendEnv ? `Tengo ${m.tantoCantadoMaquina}.` : `¡Quiero! Tengo ${m.tantoCantadoMaquina}.`)
-            : '¡Quiero!';
-        }
       }
       if (resp) {
         this.showTempBubble(resp, 2500);
-      } else if (!this.bubbleTimer) {
+      } else if (!this.bubbleTimer && this.envidoSeqTimers.length === 0) {
         this.bubbleText = '';
       }
     }
+  }
+
+  /**
+   * Reproduce el intercambio del envido como una secuencia de diálogos (¡Quiero!,
+   * los tantos en orden de mano, o "Son buenas"), espejo de 2v2/3v3. En 1v1 el
+   * backend resuelve todo de una, así que reconstruimos la secuencia desde el estado.
+   */
+  private reproducirSecuenciaEnvido(m: ManoState): void {
+    this.limpiarEnvidoSeq();
+
+    const estado = (m.estadoEnvido ?? '').toLowerCase();
+    const humanoCanto = m.cantorEnvido === 'Humano';
+    const maquinaCanto = m.cantorEnvido === 'Maquina';
+    const noQuiso = estado.includes('no quis') || estado.includes('no quier');
+
+    const steps: { lado: 'maquina' | 'humano'; texto: string }[] = [];
+
+    if (m.sonBuenasDeclarado) {
+      // El humano reconoció el envido de la máquina sin mostrar cartas.
+      steps.push({ lado: 'humano', texto: '¡Son buenas!' });
+    } else if (noQuiso) {
+      // Quien rechazó: si cantó el humano, rechazó la máquina; si cantó la máquina, el humano.
+      steps.push({ lado: humanoCanto ? 'maquina' : 'humano', texto: '¡No quiero!' });
+    } else if (m.tantoHumano != null && m.tantoCantadoMaquina != null) {
+      // Hubo "quiero": primero la aceptación, después los tantos en orden de mano.
+      if (humanoCanto) steps.push({ lado: 'maquina', texto: '¡Quiero!' });
+      else if (maquinaCanto) steps.push({ lado: 'humano', texto: '¡Quiero!' });
+
+      const decls: { lado: 'maquina' | 'humano'; texto: string }[] = [
+        { lado: 'humano', texto: `Tengo ${m.tantoHumano}` },
+        { lado: 'maquina', texto: `Tengo ${m.tantoCantadoMaquina}` },
+      ];
+      // El "mano" declara primero.
+      if (m.manoIniciadaPor === 'Maquina') decls.reverse();
+      steps.push(...decls);
+    }
+
+    const paso = this.pasoEnvidoMs;
+    let acc = 300; // pequeño respiro antes del primer diálogo
+    for (const s of steps) {
+      const at = acc;
+      const t = setTimeout(() => {
+        if (s.lado === 'maquina') this.showTempBubble(s.texto, paso + 600);
+        else this.showTempBubbleHumano(s.texto, paso + 600);
+      }, at);
+      this.envidoSeqTimers.push(t);
+      acc += paso;
+    }
+    // Marcar el fin de la secuencia para liberar el guard de limpieza de burbuja.
+    this.envidoSeqTimers.push(setTimeout(() => { this.envidoSeqTimers = []; }, acc + 700));
+  }
+
+  /** Ritmo entre diálogos del envido: sigue al delay de juego pero acotado (0.9–1.4s). */
+  private get pasoEnvidoMs(): number {
+    return Math.min(1400, Math.max(900, this.delayMaquinaMs));
+  }
+
+  /** Duración estimada de la secuencia de envido (para encadenar el truco después). */
+  private duracionSecuenciaEnvido(m: ManoState): number {
+    let n = 0;
+    const estado = (m.estadoEnvido ?? '').toLowerCase();
+    if (m.sonBuenasDeclarado) n = 1;
+    else if (estado.includes('no quis') || estado.includes('no quier')) n = 1;
+    else if (m.tantoHumano != null && m.tantoCantadoMaquina != null) n = 3;
+    return 300 + n * this.pasoEnvidoMs + 200;
+  }
+
+  private limpiarEnvidoSeq(): void {
+    this.envidoSeqTimers.forEach(t => clearTimeout(t));
+    this.envidoSeqTimers = [];
+  }
+
+  /** Muestra el canto del humano en su burbuja apenas lo hace (envido/truco). */
+  private feedbackCantoHumano(endpoint: string, body: any): void {
+    let txt = '';
+    if (endpoint === 'cantar-envido' || endpoint === 'cantar-envido-tipo')
+      txt = '¡' + (body?.tipo ?? 'Envido') + '!';
+    else if (endpoint === 'cantar-truco') txt = '¡Truco!';
+    else if (endpoint === 'escalar-truco') txt = '¡Quiero más!';
+    if (txt) this.showTempBubbleHumano(txt, 1800);
   }
 
   private cantoBubbleText(m: ManoState, pendTru: boolean, pendEnv: boolean): string {
@@ -589,7 +1498,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     if (pendEnv) {
       const s = (m.estadoEnvido ?? '').toLowerCase();
       if (s.includes('falta')) return '¡Falta Envido!';
-      if (s.includes('real'))  return '¡Real Envido!';
+      if (s.includes('real')) return '¡Real Envido!';
       return '¡Envido!';
     }
     return '';
@@ -611,24 +1520,37 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     }, ms);
   }
 
+  /** Burbuja del lado del jugador (para sus declaraciones de tanto / "son buenas"). */
+  private showTempBubbleHumano(txt: string, ms: number): void {
+    if (this.bubbleHumanoTimer) { clearTimeout(this.bubbleHumanoTimer); this.bubbleHumanoTimer = null; }
+    this.bubbleHumanoText = txt;
+    this.cdr.markForCheck();
+    this.bubbleHumanoTimer = setTimeout(() => {
+      this.bubbleHumanoText = '';
+      this.bubbleHumanoTimer = null;
+      this.cdr.markForCheck();
+    }, ms);
+  }
+
   // ── Toast ─────────────────────────────────────────────────────────────────
-  private showToast(msg: string): void {
+  private showToast(msg: string, tipo: 'error' | 'info' = 'error'): void {
     if (this.toastTimer) { clearTimeout(this.toastTimer); this.toastTimer = null; }
     this.toastMsg = msg;
+    this.toastTipo = tipo;
     this.cdr.markForCheck();
     this.toastTimer = setTimeout(() => {
       this.toastMsg = '';
       this.toastTimer = null;
       this.cdr.markForCheck();
-    }, 4000);
+    }, tipo === 'info' ? 2600 : 4000);
   }
 
   // ── Botones ───────────────────────────────────────────────────────────────
   private buildBtns(
     m: ManoState, esMiTurno: boolean, pendEnv: boolean, pendTru: boolean
   ): void {
-    const manoEnd       = !!m.ganadorMano || !!m.ganadorPartida;
-    const trucoCantado  = !!m.trucoCantado;
+    const manoEnd = !!m.ganadorMano || !!m.ganadorPartida;
+    const trucoCantado = !!m.trucoCantado;
     const trucoResuelto = !!m.trucoResuelto;
     const raw: [string, string, (() => void) | null][] = [];
 
@@ -638,7 +1560,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (m.ganadorMano) {
       raw.push(['Nueva mano', '#cc8800', () => {
         this.cancelarCountdown();
-        this.call('nueva-mano', { manoAnteriorId: m.id });
+        this.solicitarNuevaMano();
       }]);
 
     } else if (pendEnv) {
@@ -669,8 +1591,8 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       raw.push(['NO QUIERO', '#ff4444',
         () => this.call('responder-truco', { manoId: m.id, aceptar: false })]);
       if (!m.envidoCantado && (m.bazas?.length ?? 0) === 0) {
-        raw.push(['Envido',       '#4488ff', () => this.call('cantar-envido-tipo', { manoId: m.id, tipo: 'Envido' })]);
-        raw.push(['Real Envido',  '#4488ff', () => this.call('cantar-envido-tipo', { manoId: m.id, tipo: 'Real Envido' })]);
+        raw.push(['Envido', '#4488ff', () => this.call('cantar-envido-tipo', { manoId: m.id, tipo: 'Envido' })]);
+        raw.push(['Real Envido', '#4488ff', () => this.call('cantar-envido-tipo', { manoId: m.id, tipo: 'Real Envido' })]);
         raw.push(['Falta Envido', '#4488ff', () => this.call('cantar-envido-tipo', { manoId: m.id, tipo: 'Falta Envido' })]);
       }
 
@@ -678,8 +1600,8 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       const envidoPosible = !m.envidoCantado && !m.trucoResuelto
         && (m.bazas?.length ?? 0) === 0 && !manoEnd;
       if (envidoPosible) {
-        raw.push(['Envido',       '#4488ff', esMiTurno ? () => this.call('cantar-envido-tipo', { manoId: m.id, tipo: 'Envido' })       : null]);
-        raw.push(['Real Envido',  '#4488ff', esMiTurno ? () => this.call('cantar-envido-tipo', { manoId: m.id, tipo: 'Real Envido' })  : null]);
+        raw.push(['Envido', '#4488ff', esMiTurno ? () => this.call('cantar-envido-tipo', { manoId: m.id, tipo: 'Envido' }) : null]);
+        raw.push(['Real Envido', '#4488ff', esMiTurno ? () => this.call('cantar-envido-tipo', { manoId: m.id, tipo: 'Real Envido' }) : null]);
         raw.push(['Falta Envido', '#4488ff', esMiTurno ? () => this.call('cantar-envido-tipo', { manoId: m.id, tipo: 'Falta Envido' }) : null]);
       }
 
@@ -696,17 +1618,21 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
         raw.push(['Ir al mazo', '#556677', () => this.call('irse-al-mazo', { manoId: m.id })]);
     }
 
-    this.btns = raw.map(([label, color, action]) => ({ label, color, action, enabled: !!action }));
+    const bloqueado = this.accionesBloqueadasPorHabilidadRival;
+    this.btns = raw.map(([label, color, action]) => ({
+      label, color, action,
+      enabled: !!action && !bloqueado,
+    }));
   }
 
   // ── Tanteador SVG ─────────────────────────────────────────────────────────
   private redrawTally(ptsVos: number, ptsMaq: number): void {
     const sticks: typeof this.tallySticks = [];
-    this.drawPalitos(sticks, 36,  Math.min(ptsVos, 15), false, 4);
-    this.drawPalitos(sticks, 124, Math.min(ptsMaq, 15), true,  4);
+    this.drawPalitos(sticks, 36, Math.min(ptsVos, 15), false, 4);
+    this.drawPalitos(sticks, 124, Math.min(ptsMaq, 15), true, 4);
     // Buenas (puntos > 15)
-    if (ptsVos > 15) this.drawPalitos(sticks, 36,  ptsVos - 15, false, 58);
-    if (ptsMaq > 15) this.drawPalitos(sticks, 124, ptsMaq - 15, true,  58);
+    if (ptsVos > 15) this.drawPalitos(sticks, 36, ptsVos - 15, false, 58);
+    if (ptsMaq > 15) this.drawPalitos(sticks, 124, ptsMaq - 15, true, 58);
     this.tallySticks = sticks;
   }
 
@@ -720,11 +1646,11 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       let bx = cx - totalW / 2;
       for (let i = 0; i < full; i++) {
         const by = yTop;
-        this.stick(out, bx, by+BS, bx, by, color);
-        this.stick(out, bx, by, bx+BS, by, color);
-        this.stick(out, bx+BS, by, bx+BS, by+BS, color);
-        this.stick(out, bx+BS, by+BS, bx, by+BS, color);
-        this.stick(out, bx, by+BS, bx+BS, by, color);
+        this.stick(out, bx, by + BS, bx, by, color);
+        this.stick(out, bx, by, bx + BS, by, color);
+        this.stick(out, bx + BS, by, bx + BS, by + BS, color);
+        this.stick(out, bx + BS, by + BS, bx, by + BS, color);
+        this.stick(out, bx, by + BS, bx + BS, by, color);
         bx += BS + BGAP;
       }
     }
@@ -733,7 +1659,7 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       let sx = cx - totalW / 2;
       const sy = full > 0 ? yTop + BS + 4 : yTop + 4;
       for (let i = 0; i < rem; i++) {
-        this.stick(out, sx, sy+SL, sx+SL, sy, color);
+        this.stick(out, sx, sy + SL, sx + SL, sy, color);
         sx += SL + SGAP;
       }
     }

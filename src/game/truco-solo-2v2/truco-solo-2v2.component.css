@@ -1,4 +1,8 @@
 /* Estilos específicos del componente solo 2v2 que no están en los archivos compartidos */
+.root {
+  background-image: url('/assets/multijugador.png') !important;
+  background-color: transparent !important;
+}
 
 /* Indicador de "mano" de la ronda (quién abre y juega primero tras una parda) */
 .mano-badge {
@@ -26,8 +30,15 @@
 }
 
 @keyframes parpadeo {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .sin-cartas {
@@ -43,7 +54,7 @@
 .game-over-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.75);
+  background: rgba(0, 0, 0, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,8 +79,14 @@
   letter-spacing: 3px;
   text-align: center;
 }
-.go-win  { color: #c8a030; }
-.go-lose { color: #cc4444; }
+
+.go-win {
+  color: #c8a030;
+}
+
+.go-lose {
+  color: #cc4444;
+}
 
 .go-subtitle {
   font-family: var(--font-data);
@@ -96,12 +113,216 @@
   border-radius: 3px;
   transition: filter 0.1s;
 }
-.go-btn:hover { filter: brightness(1.2); }
 
-.go-btn-play { background: #1a3d22; border-color: #2a7a3a; color: #4adc6a; }
-.go-btn-exit { background: #3a1010; border-color: #7a3020; color: #dd7070; }
+.go-btn:hover {
+  filter: brightness(1.2);
+}
+
+.go-btn-play {
+  background: #1a3d22;
+  border-color: #2a7a3a;
+  color: #4adc6a;
+}
+
+.go-btn-exit {
+  background: #3a1010;
+  border-color: #7a3020;
+  color: #dd7070;
+}
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Botón Acciones (órdenes al compañero) ──────────────────────────────── */
+.left-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.acciones-btn {
+  margin-top: auto;
+  font-family: var(--font-data, 'VT323', monospace);
+  font-size: 17px;
+  letter-spacing: 1px;
+  color: #e8c860;
+  background: #1a1408;
+  border: 1px solid #6b4a18;
+  padding: 7px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: center;
+  transition: background 0.12s, border-color 0.12s, transform 0.08s;
+  width: 100%;
+}
+
+.acciones-btn:hover {
+  background: #2a1e0c;
+  border-color: #c8a030;
+}
+
+.acciones-btn:active {
+  transform: scale(0.97);
+}
+
+/* ── Modal overlay ───────────────────────────────────────────────────────── */
+.acciones-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.68);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  z-index: 400;
+  padding: 0 0 12px 12px;
+}
+
+.acciones-dialog {
+  background: #12100a;
+  border: 2px solid #6b4423;
+  border-radius: 10px;
+  padding: 14px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 260px;
+  max-width: 380px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+  animation: accionesIn 0.16s ease-out;
+}
+
+@keyframes accionesIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.acciones-title {
+  font-family: var(--font-data, 'VT323', monospace);
+  font-size: 20px;
+  letter-spacing: 1.5px;
+  color: #e8c860;
+  border-bottom: 1px solid #3a2810;
+  padding-bottom: 6px;
+  text-align: center;
+}
+
+.acciones-grid {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+
+.acciones-jugador {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  align-items: stretch;
+  flex: 1;
+}
+
+.acciones-nombre {
+  font-family: var(--font-data, 'VT323', monospace);
+  font-size: 16px;
+  color: #c8a030;
+  letter-spacing: 1px;
+  text-align: center;
+  border-bottom: 1px solid #2a1a08;
+  padding-bottom: 4px;
+}
+
+.accion-item {
+  font-family: var(--font-data, 'VT323', monospace);
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  padding: 7px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.1s, transform 0.08s;
+  border: 1px solid;
+}
+
+.accion-item:active {
+  transform: scale(0.96);
+}
+
+.accion-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.accion-jugar {
+  background: #1a2a12;
+  border-color: #4a8a28;
+  color: #88dd44;
+}
+
+.accion-jugar:not(:disabled):hover {
+  background: #223614;
+}
+
+.accion-consulta {
+  background: #12202a;
+  border-color: #2a6a9a;
+  color: #55aadd;
+}
+
+.accion-consulta:hover {
+  background: #162838;
+}
+
+.acciones-cerrar {
+  font-family: var(--font-data, 'VT323', monospace);
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #7a6040;
+  background: #0e0a06;
+  border: 1px solid #2e1e0c;
+  padding: 5px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: center;
+  transition: color 0.1s, border-color 0.1s;
+}
+
+.acciones-cerrar:hover {
+  color: #c89030;
+  border-color: #5a4020;
+}
+
+/* ── Responsive landscape mobile ─────────────────────────────── */
+/* Elimina el gap del panel izquierdo cuando hay pocos botones   */
+@media (max-height: 560px) {
+  .btn-list {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .acciones-btn {
+    margin-top: 8px !important;
+    font-size: 15px;
+    padding: 5px 4px;
+  }
+}
+
+@media (max-height: 440px) {
+  .acciones-btn {
+    font-size: 13px !important;
+    padding: 4px 3px !important;
+  }
 }

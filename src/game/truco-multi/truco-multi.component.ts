@@ -78,6 +78,7 @@ export class TrucoMultiComponent implements OnInit, OnDestroy {
   turnoBadge  = '';
   bubbleText  = '';
   toastMsg    = '';
+  toastTipo: 'error' | 'info' = 'error';
   gameOver    = false;
   gameOverWon = false;
   mostrarConfirmSalir = false;
@@ -288,9 +289,18 @@ export class TrucoMultiComponent implements OnInit, OnDestroy {
     const e         = this.msg?.estado;
     if (!e) return;
     const esMiTurno = esJ1 ? e.turnoActual === 'Humano' : e.turnoActual === 'Maquina';
-    if (!esMiTurno) return;
-    if (e.envidoPendienteJ1 || e.envidoPendienteJ2) return;
-    if (e.trucoPendienteJ1  || e.trucoPendienteJ2)  return;
+
+    const miEnvidoPend = esJ1 ? e.envidoPendienteJ1 : e.envidoPendienteJ2;
+    const miTrucoPend  = esJ1 ? e.trucoPendienteJ1  : e.trucoPendienteJ2;
+    if (miEnvidoPend || miTrucoPend) {
+      this.showToast('No podés jugar: primero respondé el canto.', 'info');
+      return;
+    }
+    if (e.envidoPendienteJ1 || e.envidoPendienteJ2 || e.trucoPendienteJ1 || e.trucoPendienteJ2) {
+      this.showToast('Esperá la respuesta del rival.', 'info');
+      return;
+    }
+    if (!esMiTurno) { this.showToast('Esperá tu turno para jugar.', 'info'); return; }
     this.hub('JugarCarta', fc.carta.numero, fc.carta.palo);
   }
 
@@ -462,7 +472,15 @@ export class TrucoMultiComponent implements OnInit, OnDestroy {
   async confirmarSalir(): Promise<void> {
     this.mostrarConfirmSalir = false;
     await this.sala.abandonar();
-    this.router.navigate(['/home']);
+    // Desde historia: cerrar el overlay y volver a la pulpería (sin navegar).
+    if (localStorage.getItem('multiEnHistoria') === '1') {
+      localStorage.removeItem('multiEnHistoria');
+      window.dispatchEvent(new CustomEvent('truco-multi:end'));
+      return;
+    }
+    const volverASala = localStorage.getItem('origenSalaMulti') === '1';
+    localStorage.removeItem('origenSalaMulti');
+    this.router.navigate([volverASala ? '/multijugador-mapa' : '/home']);
   }
 
   cancelarSalir(): void { this.mostrarConfirmSalir = false; }
@@ -476,11 +494,12 @@ export class TrucoMultiComponent implements OnInit, OnDestroy {
     return `assets/cards/${offsetPalo[c.palo] + mapaNumeros[c.numero]}.PNG`;
   }
 
-  private showToast(msg: string): void {
-    this.toastMsg = msg;
+  private showToast(msg: string, tipo: 'error' | 'info' = 'error'): void {
+    this.toastMsg  = msg;
+    this.toastTipo = tipo;
     this.cdr.markForCheck();
     if (this.toastTimer) clearTimeout(this.toastTimer);
-    this.toastTimer = setTimeout(() => { this.toastMsg = ''; this.cdr.markForCheck(); }, 4000);
+    this.toastTimer = setTimeout(() => { this.toastMsg = ''; this.cdr.markForCheck(); }, tipo === 'info' ? 2600 : 4000);
   }
 
   get puntosVos(): number {

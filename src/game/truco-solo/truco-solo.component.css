@@ -14,11 +14,13 @@
   --divider: #5a4020;
   --font-pixel: 'Press Start 2P', monospace;
   --font-data: 'VT323', monospace;
+  --log-text-size: 15px;
   display: block;
   width: 100%;
   height: 100%;
   flex: 1;
   min-height: 0;
+  position: relative;
 }
 
 /* ── Root layout ──────────────────────────────────────────────────────────── */
@@ -30,7 +32,7 @@
   background-color: black;
   position: relative;
   overflow: hidden;
-  background-image: url('/assets/multijugador.png');
+
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -46,6 +48,8 @@
   padding: 12px 10px;
   gap: 8px;
   z-index: 10;
+  min-height: 0;
+  overflow-y: auto; /* en pantallas bajas permite scrollear hasta el botón Volver */
 }
 
 .left-panel {
@@ -116,7 +120,7 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  z-index: 20;
+  z-index: 1; /* el rival va detrás de la mesa (la mesa tiene z-index 2) */
 }
 
 .rival-portrait {
@@ -172,6 +176,23 @@
   border-right-color: #333;
 }
 
+/* Burbuja del jugador: centrada arriba de su mano, con la colita apuntando hacia abajo. */
+.bubble-humano {
+  top: auto;
+  bottom: 168px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+}
+.bubble-humano .bubble-tail {
+  right: auto;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: #333;
+}
+
 @keyframes bubblePop {
   from {
     transform: scale(0.7);
@@ -189,11 +210,13 @@
   width: 100%;
   flex: 1;
   display: flex;
-  align-items: flex-start;
+  align-items: center; /* mobile: mesa centrada verticalmente. Desktop la sube (media query). */
   justify-content: center;
   perspective: 860px;
   perspective-origin: 50% 5%;
   margin-top: 10px;
+  position: relative;
+  z-index: 2; /* la mesa tapa la parte baja del rival -> efecto "sentado del otro lado" (desktop) */
 }
 
 .table-surface {
@@ -256,6 +279,31 @@
   width: 0;
   margin: 0;
   padding: 0;
+}
+
+.rival-card-face-wrap {
+  position: relative;
+  display: inline-block;
+  transition: opacity 0.2s, transform 0.25s ease;
+}
+
+.rival-card-face-wrap.hidden {
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.rival-card-face-img {
+  height: 80px;
+  width: auto;
+  border-radius: 4px;
+  box-shadow:
+    1px 2px 6px #0009,
+    0 0 0 2px #66dd88,
+    0 0 14px #66dd8866;
+  display: block;
 }
 
 
@@ -409,6 +457,7 @@
   width: 300px;
   margin-top: 8px;
   flex-shrink: 0;
+  z-index: 3; /* por encima de la mesa (z-index 2) para que las cartas sean clickeables */
 }
 
 .fan-card {
@@ -447,6 +496,19 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+/* Cada ranura reserva el alto de una carta aunque esté vacía. Sin esto, al abrir
+   la baza tu carta queda "flotando" arriba (lado máquina) hasta que la máquina
+   juega y recién ahí se acomoda — se notaba con el delay de "máquina pensando". */
+.baza-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.baza-slot.far-slot,
+.baza-slot.near-slot {
+  min-height: 113px;
 }
 
 .fan-card:hover:not(.hidden):not(.played-out) {
@@ -567,7 +629,7 @@
 
 .state-text {
   font-family: var(--font-data);
-  font-size: 15px;
+  font-size: var(--log-text-size);
   color: #bbb;
   line-height: 1.3;
 }
@@ -716,8 +778,25 @@
   animation: toastIn 0.2s ease;
 }
 
+/* Aviso amigable (reglas del juego) — lado izquierdo, tono cálido en vez de error rojo. */
+.toast.toast-info {
+  left: 18px;
+  transform: none;
+  background: #14331a;
+  border-color: #4a8a3a;
+  color: #c8efc0;
+  max-width: 230px;
+  text-align: center;
+  animation: toastInLeft 0.2s ease;
+}
+
+@keyframes toastInLeft {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .nueva-mano-countdown {
-  position: absolute;
+  position: fixed;
   bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
@@ -729,8 +808,101 @@
   letter-spacing: 2px;
   padding: 7px 24px;
   border-radius: 4px;
-  z-index: 199;
+  z-index: 9998;
   pointer-events: none;
+}
+
+.salpicadura-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 20, 40, 0.55);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 80px;
+  z-index: 100000;
+  pointer-events: all;
+}
+
+.salpicadura-box {
+  background: rgba(8, 30, 55, 0.92);
+  border: 2px solid #44aaff;
+  color: #dff4ff;
+  padding: 16px 28px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  max-width: min(92vw, 640px);
+}
+
+.salpicadura-titulo {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  line-height: 1.6;
+  color: #7fd4ff;
+}
+
+.salpicadura-sub {
+  margin-top: 8px;
+  font-family: var(--font-data);
+  font-size: 18px;
+  letter-spacing: 0.5px;
+  line-height: 1.35;
+}
+
+.fan-card-back {
+  object-fit: cover;
+}
+
+/* SOLO PRUEBAS — Eliminar antes de producción */
+.debug-win-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 8px 10px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: #ffe8a8;
+  background: #553300;
+  border: 2px solid #aa7700;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.debug-win-btn:hover {
+  background: #774400;
+}
+
+.rival-nombre {
+  margin-top: 6px;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: #7fd4ff;
+  text-align: center;
+}
+
+.rival-panel-left {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--divider);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rival-nombre-panel {
+  font-family: var(--font-data);
+  font-size: var(--log-text-size);
+  color: #7fd4ff;
+  line-height: 1.3;
+}
+
+.rival-panel-left .heroe-desc {
+  margin-bottom: 0;
+  white-space: pre-line;
+}
+
+.rival-panel-left .rival-log-msg {
+  color: #7fd4ff;
 }
 
 @keyframes toastIn {
@@ -747,15 +919,76 @@
 
 
 
-/* gaucho rival */
+/* ── Imagen del rival: base común (también la del gaucho por defecto) ───────── */
 .rival-img {
-  width: 420px;
+  width: auto;
   height: auto;
+  max-width: 300px;
+  max-height: 240px;
+  object-fit: contain;
+  object-position: bottom center;
   border-radius: 0;
   mask-image: none;
   -webkit-mask-image: none;
   filter: drop-shadow(0 8px 24px rgba(0,0,0,0.9));
 }
+
+/* ── Estilos por personaje (SOLO desktop) ──────────────────────────────────
+   Cada lienzo tiene proporciones distintas, así que cada uno se calibra aparte.
+   - max-width / max-height: tamaño del personaje.
+   - translateY positivo = baja el personaje (la mesa le tapa más la parte baja).
+   Se limitan a desktop (ancho > 1050 y alto > 540) para no pisar el avatar
+   circular que usa el layout responsive en pantallas chicas.
+   --------------------------------------------------------------------------- */
+@media (min-width: 1051px) and (min-height: 541px) {
+
+/* En desktop la mesa va arriba (en mobile se centra). El z-index "detrás" está en la base. */
+.table-wrap { align-items: flex-start; }
+
+/* Nahuelito — lienzo cuadrado (1:1), llena el marco. Achicado y hundido para que
+   la mesa le tape la base y no quede "superpuesto". */
+.rival-img.rival-nahuelito {
+  max-width: 258px;
+  max-height: 258px;
+  transform: translateY(48px);
+}
+
+/* Mandinga — también cuadrado (1:1). */
+.rival-img.rival-mandinga {
+  max-width: 240px;
+  max-height: 250px;
+  transform: translateY(40px);
+}
+
+/* Pombero — lienzo ancho (1.83:1); necesita más ancho para no quedar bajito. */
+.rival-img.rival-pomberito {
+  max-width: 470px;
+  max-height: 320px;
+  transform: translateY(38px);
+}
+
+/* Lobizón — lienzo ancho (1.83:1) con márgenes laterales; necesita más ancho. */
+.rival-img.rival-lobizon {
+  max-width: 480px;
+  max-height: 320px;
+  transform: translateY(38px);
+}
+
+/* Luz Mala — figura vertical dentro de un lienzo muy ancho. */
+.rival-img.rival-luzmala {
+  max-width: 540px;
+  max-height: 300px;
+  transform: translateY(0);
+}
+
+/* Gaucho — rival por defecto; lienzo apaisado (1.83:1) con la figura centrada. */
+.rival-img.rival-gaucho {
+  max-width: 420px;
+  max-height: 300px;
+  transform: translateY(20px);
+}
+
+} /* fin estilos por personaje (solo desktop) */
 
 
 /* eeee cambios descripcion habilidad, falta */
@@ -806,26 +1039,27 @@
 }
 
 .heroe-nombre {
-  font-family: "Jersey 10", monospace;
-  font-size: 14px;
-  letter-spacing: 1px;
+  font-family: var(--font-data);
+  font-size: var(--log-text-size);
+  letter-spacing: 0.5px;
+  line-height: 1.3;
   margin-bottom: 4px;
 }
 
 .heroe-desc {
-  font-family: "Jersey 10", monospace;
-  font-size: 11px;
+  font-family: var(--font-data);
+  font-size: var(--log-text-size);
   color: #999;
-  line-height: 1.4;
+  line-height: 1.3;
   margin-bottom: 8px;
 }
 
 /* Botón usar habilidad */
 .habilidad-btn {
-  font-family: "Jersey 10", monospace;
-  font-size: 12px;
+  font-family: var(--font-data);
+  font-size: var(--log-text-size);
   width: 100%;
-  padding: 6px 4px;
+  padding: 8px 6px;
   border-radius: 3px;
   border: 1px solid #333;
   background: #161616;
@@ -867,8 +1101,8 @@
 }
 
 .heroe-log-linea {
-  font-family: "Jersey 10", monospace;
-  font-size: 11px;
+  font-family: var(--font-data);
+  font-size: var(--log-text-size);
   color: #ffdd88;
   background: #1a1400;
   border: 1px solid #5a4400;
@@ -876,6 +1110,93 @@
   padding: 4px 6px;
   line-height: 1.4;
   word-break: break-word;
+}
+
+/* ── Botones de info (abren mini popup) ──────────────────────────────────── */
+.info-btn {
+  font-family: var(--font-data);
+  font-size: var(--log-text-size);
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 6px;
+  border-radius: 3px;
+  border: 1px solid #5a4400;
+  background: #1a1400;
+  color: #ffdd88;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.info-btn:hover {
+  background: #251c00;
+}
+
+.info-btn-eventos {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+/* ── Mini popup de info ───────────────────────────────────────────────────── */
+.info-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000000aa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.info-popup {
+  background: #0d0b08;
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px #000c;
+  padding: 16px 18px;
+  max-width: 360px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-popup-titulo {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.info-popup-linea {
+  font-family: var(--font-data);
+  font-size: 16px;
+  color: #ffdd88;
+  background: #1a1400;
+  border: 1px solid #5a4400;
+  border-radius: 3px;
+  padding: 6px 8px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.info-popup-close {
+  font-family: var(--font-data);
+  font-size: 15px;
+  margin-top: 6px;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--gold);
+  background: #1a1206;
+  color: var(--gold);
+  cursor: pointer;
+}
+
+.info-popup-close:hover {
+  background: #2a1d0a;
 }
 
 /* Carta seleccionada (Manipulador) */
@@ -917,10 +1238,7 @@
   .score-row { font-size: 16px; }
   .state-section { padding: 6px 8px; }
   .state-title { font-size: 10px; }
-  .state-text { font-size: 15px; }
-  .heroe-nombre { font-size: 14px; }
-  .heroe-desc { font-size: 13px; }
-  .habilidad-btn { font-size: 13px; padding: 6px 8px; }
+  .habilidad-btn { padding: 8px 6px; }
   .back-btn { font-size: 15px; }
 }
 
@@ -932,6 +1250,8 @@
   .fan-card { width: 58px; height: 84px; margin-left: -29px; }
   .far-card-img { height: 46px; }
   .near-card-img { height: 66px; }
+  .baza-slot.far-slot  { min-height: 46px; }
+  .baza-slot.near-slot { min-height: 66px; }
   .rival-portrait {
     width: 56px;
     height: 56px;
@@ -949,13 +1269,13 @@
     mask-image: none;
     -webkit-mask-image: none;
   }
-  .rival-zone { top: -10px; }
+  .rival-zone { top: 50%; left: 50%; transform: translate(-50%, -240px); z-index: 5; }
   .arena { padding-top: 75px; }
   .rival-hand { margin-top: 8px; }
   .scoreboard { padding: 6px 4px; }
   .score-title { font-size: 7px; }
   .score-row { font-size: 14px; }
-  .state-text { font-size: 13px; }
+  :host { --log-text-size: 13px; }
   .back-btn { font-size: 14px; padding: 6px 4px; }
 }
 
@@ -1022,18 +1342,20 @@
   .table-surface { width: 420px; height: 300px; }
   .far-card-img { height: 44px; }
   .near-card-img { height: 64px; }
+  .baza-slot.far-slot  { min-height: 44px; }
+  .baza-slot.near-slot { min-height: 64px; }
   .back-btn { min-height: 44px; font-size: 15px; }
-  .habilidad-btn { min-height: 44px; font-size: 13px; }
+  .habilidad-btn { min-height: 44px; }
   .score-title { font-size: 6px; }
   .score-row { font-size: 14px; }
-  .state-text { font-size: 13px; }
+  :host { --log-text-size: 13px; }
 }
 
 /* ── Pantalla baja (cualquier dispositivo < 540px alto) ─────────────────── */
 @media (max-height: 540px) {
   .side-panel { width: 110px; padding: 6px 5px; gap: 4px; }
   .action-btn { font-size: 13px; padding: 5px 3px; min-height: 36px; }
-  .arena { padding-top: 38px; }
+  .arena { padding-top: 40px; }
   .rival-portrait {
     width: 48px; height: 48px;
     border: 2px solid #aa4444;
@@ -1049,36 +1371,38 @@
     mask-image: none;
     -webkit-mask-image: none;
   }
-  .rival-zone { top: 10px; left: 22%; }
+  .rival-zone { top: 50%; left: 50%; transform: translate(-50%, -195px); z-index: 5; }
   .rival-hand { margin-top: 4px; }
   .bubble { top: 50px; left: calc(100% + 8px); font-size: 13px; }
   .table-wrap { perspective: 500px; margin-top: 2px; }
   .table-surface { width: 280px; height: 190px; }
   .far-card-img { height: 24px; }
   .near-card-img { height: 36px; }
+  .baza-slot.far-slot  { min-height: 24px; }
+  .baza-slot.near-slot { min-height: 36px; }
   .fan-wrap { height: 70px; width: 155px; margin-top: 2px; }
   .fan-card { width: 38px; height: 55px; margin-left: -19px; }
   .fan-card-img { width: 100%; height: 100%; }
   .card-back-img { height: 40px; }
+  .rival-card-face-img { height: 40px; }
   .scoreboard { padding: 4px; gap: 3px; }
   .score-title { font-size: 5px; }
   .score-row { font-size: 12px; }
   .tally-svg { height: 72px; }
   .state-section { padding-top: 4px; gap: 1px; }
   .state-title { font-size: 7px; }
-  .state-text { font-size: 11px; }
+  :host { --log-text-size: 11px; }
   .back-btn { font-size: 13px; padding: 5px 4px; }
-  .habilidad-btn { font-size: 11px; padding: 4px; }
-  .heroe-nombre { font-size: 11px; }
-  .heroe-desc { font-size: 10px; }
+  .habilidad-btn { padding: 6px 4px; }
 }
 
 /* ── Pantalla muy baja (< 400px alto, ej. teléfono landscape pequeño) ─────── */
 @media (max-height: 400px) {
   .side-panel { width: 95px; padding: 4px; gap: 3px; }
   .action-btn { font-size: 12px; padding: 4px 2px; min-height: 30px; }
-  .arena { padding-top: 28px; }
+  .arena { padding-top: 30px; }
   .rival-portrait { width: 28px; height: 28px; font-size: 16px; }
+  .rival-zone { top: 50%; left: 50%; transform: translate(-50%, -150px); z-index: 5; }
   .rival-label { display: none; }
   .table-wrap { margin-top: 1px; }
   .table-surface { width: 260px; height: 180px; }
@@ -1097,10 +1421,10 @@
   .table-surface { width: min(360px, 55vw); height: 260px; }
   .fan-wrap { width: min(200px, 40vw); }
   .score-title { font-size: 6px; }
-  .state-text { font-size: 13px; }
+  :host { --log-text-size: 13px; }
 
   /* Gaucho: avatar pequeño en mobile */
-  .rival-zone { top: -10px; }
+  .rival-zone { top: 50%; left: 50%; transform: translate(-50%, -215px); z-index: 5; }
   .rival-portrait {
     width: 56px;
     height: 56px;

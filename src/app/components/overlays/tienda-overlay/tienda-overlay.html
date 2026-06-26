@@ -1,0 +1,25 @@
+<div class="contenedor-tienda">
+  @for (estante of datos; track estante.categoria) {
+    <div class="estante">
+      <div class="cartel-estante">{{ estante.categoria }}</div>
+
+      @for (objeto of estante.objetos; track objeto.id) {
+        <div class="objeto" (mouseenter)="mostrarInfo(objeto)" (mouseleave)="ocultarInfo()">
+          <img [src]="objeto.img" [alt]="objeto.nombre" />
+
+          <div class="cartelito">
+            <span class="precio">${{ objeto.precio }}</span>
+            <button class="botonComprar" (click)="comprar(objeto)">COMPRAR</button>
+          </div>
+
+          @if (objetoActivo === objeto) {
+            <div class="tooltip-info">
+              <h4>{{ objeto.nombre }}</h4>
+              <p>{{ objeto.descripcion }}</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
