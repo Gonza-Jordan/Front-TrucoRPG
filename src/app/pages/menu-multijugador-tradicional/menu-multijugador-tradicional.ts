@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { ConnectionStatusComponent } from '../../components/connection-status/connection-status';
 import { QrScannerComponent } from '../../components/qr-scanner/qr-scanner';
 import { SalaService, SalaPublicaInfo } from '../../services/sala.service';
+import { ToastService } from '../../services/toast/toast.service';
 import { PulperiaUiService } from '../../services/pulperiaOverlay/pulperia-overlay-config';
 
 @Component({
@@ -38,6 +39,7 @@ export class MenuMultijugadorTradicional implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     protected uiService: PulperiaUiService,
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -103,6 +105,7 @@ export class MenuMultijugadorTradicional implements OnInit, OnDestroy {
       this.salasPublicas = await this.sala.listarSalasPublicas(this.gameMode);
     } catch {
       this.errorBuscar = 'No se pudieron cargar las salas. Verificá la conexión.';
+      this.toast.error(this.errorBuscar);
       this.salasPublicas = [];
     } finally {
       this.cargandoBuscar = false;
@@ -178,6 +181,7 @@ export class MenuMultijugadorTradicional implements OnInit, OnDestroy {
       }
     } catch {
       this.errorUnirse = 'Error de conexión. Verificá que el servidor esté activo.';
+      this.toast.error(this.errorUnirse);
       this.cargando = false;
       if (onError) onError();
     }

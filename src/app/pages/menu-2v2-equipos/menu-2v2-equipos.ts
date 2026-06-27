@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ConnectionStatusComponent } from '../../components/connection-status/connection-status';
 import { SalaService, EstadoEquipos, LobbyListos } from '../../services/sala.service';
+import { ToastService } from '../../services/toast/toast.service';
 import { PulperiaUiService } from '../../services/pulperiaOverlay/pulperia-overlay-config';
 import { Slot } from '../../interfaces/slot';
 
@@ -36,6 +37,7 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     public uiService: PulperiaUiService,
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -198,6 +200,7 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
       this.errorMsg = '';
     } catch {
       this.errorMsg = 'Error al comunicarse con el servidor.';
+      this.toast.error(this.errorMsg);
     }
   }
 
@@ -216,6 +219,7 @@ export class Menu2v2EquiposComponent implements OnInit, OnDestroy {
       this.errorMsg = '';
     } catch {
       this.errorMsg = 'Error al comunicarse con el servidor.';
+      this.toast.error(this.errorMsg);
     }
   }
 
