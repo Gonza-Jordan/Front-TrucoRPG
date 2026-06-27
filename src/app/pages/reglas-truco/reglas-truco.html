@@ -1,0 +1,114 @@
+<app-page-wrapper>
+  <div class="grimorio-escena">
+
+    <!-- Título sobre el libro -->
+    <div class="grimorio-header">
+      <span class="grimorio-deco">✦</span>
+      <h1 class="grimorio-titulo">Grimorio del Truco</h1>
+      <span class="grimorio-deco">✦</span>
+    </div>
+
+    <!-- El libro físico -->
+    <div class="libro">
+
+      <!-- Tapa izquierda (visible como borde) -->
+      <!-- Canto superior del libro (hojas apiladas) -->
+      <div class="libro-canto-top"></div>
+
+      <!-- Páginas internas -->
+      <div class="libro-paginas">
+
+        <!-- Página izquierda: índice -->
+        <div class="pagina pagina-izq">
+          <!-- Línea de margen vertical -->
+          <div class="margen-vert"></div>
+
+          <!-- Clasp de esquina superior izquierda -->
+          <div class="clasp clasp-tl"></div>
+
+          <h2 class="pagina-sec-titulo">✦ Índice ✦</h2>
+          <div class="sep-libro"></div>
+
+          <nav class="capitulos-nav">
+            @for (cap of capitulos; track cap.pagina; let i = $index) {
+              <button
+                class="cap-btn"
+                [class.activo]="capituloActivo() === i"
+                (click)="seleccionar(i)">
+                <span class="cap-icono">{{ cap.icono }}</span>
+                <div class="cap-info">
+                  <span class="cap-titulo">{{ cap.titulo }}</span>
+                  <span class="cap-desc">{{ cap.descripcion }}</span>
+                </div>
+                <span class="cap-pag">p.{{ cap.pagina }}</span>
+              </button>
+            }
+          </nav>
+
+          <div class="clasp clasp-bl"></div>
+          <div class="num-pagina">{{ capitulo.pagina }}</div>
+        </div>
+
+        <!-- Lomo con costura -->
+        <div class="lomo">
+          <div class="lomo-stitch"></div>
+          <div class="lomo-gema">⚜</div>
+          <div class="lomo-stitch"></div>
+        </div>
+
+        <!-- Página derecha: contenido -->
+        <div class="pagina pagina-der" [class.volteando]="animando()">
+          <div class="margen-vert margen-der"></div>
+
+          <div class="clasp clasp-tr"></div>
+
+          <!-- Header capítulo -->
+          <div class="cap-header">
+            <span class="cap-icono-grande">{{ capitulo.icono }}</span>
+            <div>
+              <h2 class="cap-nombre">{{ capitulo.titulo }}</h2>
+              <p class="cap-sub">{{ capitulo.descripcion }}</p>
+            </div>
+          </div>
+          <div class="sep-libro"></div>
+
+          <!-- Entradas de contenido -->
+          <div class="entradas-scroll">
+            @for (e of capitulo.entradas; track e.titulo) {
+              <div class="entrada">
+                @if (e.tag) {
+                  <span [class]="'entrada-tag ' + tagCss(e.tag)">{{ e.tag }}</span>
+                }
+                <h3 class="entrada-titulo">{{ e.titulo }}</h3>
+                <p class="entrada-texto">{{ e.texto }}</p>
+                @if (e.nota) {
+                  <div class="entrada-nota">📌 {{ e.nota }}</div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Navegación entre capítulos -->
+          <div class="pagina-nav">
+            <button class="nav-btn" (click)="anterior()" [disabled]="capituloActivo() === 0">❮ Ant.</button>
+            <span class="nav-indicador">{{ capituloActivo() + 1 }} / {{ capitulos.length }}</span>
+            <button class="nav-btn" (click)="siguiente()" [disabled]="capituloActivo() === capitulos.length - 1">Sig. ❯</button>
+          </div>
+
+          <div class="clasp clasp-br"></div>
+          <div class="num-pagina num-pagina-der">{{ capitulo.pagina + 1 }}</div>
+
+          <!-- Doblez de esquina (page curl) -->
+          <div class="page-curl"></div>
+        </div>
+
+      </div><!-- /libro-paginas -->
+
+      <!-- Sombra inferior del libro (grosor del lomo) -->
+      <div class="libro-canto-bottom"></div>
+    </div>
+
+    <a routerLink="/tutorial" class="volver-btn">← Volver al Tutorial</a>
+
+  </div>
+</app-page-wrapper>

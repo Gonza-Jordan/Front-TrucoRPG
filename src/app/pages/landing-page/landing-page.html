@@ -1,41 +1,188 @@
 <main>
-    <div class="contenedor-landing">
-        <div class="seccion-1">
+    <!-- <div class="contenedor-landing"> -->
+        <div class="seccion-1 seccion-fade">
+          <div class="contenido-seccion-1">
             <img src="/Logo.png" alt="Logo Truco y Maña" class="imagen-hero-landing">
             <a routerLink="/registro">¡ANIMATE A LA AVENTURA!</a>
+          </div>
         </div>
 
-        <div class="seccion-2">
-            <img src="assets/cards/21.PNG" alt="Imagen de Truco y Maña" class="imagen-seccion-2">
-            <p class="texto-landing">En Truco y Maña, cada partida de truco es un paso más en tu aventura. Usá tus
-                habilidades, enfrentá desafiantes rivales y abrí camino hasta el mismísimo Diablo.</p>
+        <div class="seccion-2 seccion-fade">
+
+            <h2 class="titulo-landing">MODOS DE JUEGO</h2>
+            <div class="modos-juego">
+                <div class="modo-juego">
+                    <div class="circulo-icono">
+                        <img src="UI/tutorial.png" alt="ícono modo tutorial" class="imagen-modo">
+                    </div>
+                    <p class="texto-landing">Tutorial</p>
+                </div>
+
+                <div class="modo-juego">
+                    <div class="circulo-icono">
+                        <img src="UI/historia.png" alt="ícono modo historia" class="imagen-modo">
+                    </div>
+                    <p class="texto-landing">Historia</p>
+                </div>
+
+                <div class="modo-juego">
+                    <div class="circulo-icono">
+                        <img src="UI/multijugador.png" alt="ícono modo multijugador" class="imagen-modo">
+                    </div>
+                    <p class="texto-landing">Multijugador</p>
+                </div>
+
+                <div class="modo-juego">
+                    <div class="circulo-icono">
+                        <img src="UI/solitario.png" alt="ícono modo solitario" class="imagen-modo">
+                    </div>
+                    <p class="texto-landing">Solitario</p>
+                    <p>con/sin habilidades</p>
+                </div>
+            </div>
+
+            <h2 class="titulo-landing">¿CUÁLES SON LAS HABILIDADES?</h2>
+            <div class="habilidades">
+                <div class="tarjeta">
+                    <div class="interior-tarjeta">
+
+                        <div class="cara frente">
+
+                            <div class="indice superior">1</div>
+
+                            <div class="marco-carta">
+                                <p class="texto-carta">Manipulador</p>
+                            </div>
+
+                            <div class="indice inferior">1</div>
+                        </div>
+
+                        <div class="cara atras">
+                            <p class="texto-carta-atras">
+                                Cada 3 manos: reemplazá 1 carta por otra del mazo (nunca de menor valor).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta">
+                    <div class="interior-tarjeta">
+
+                        <div class="cara frente">
+                            <div class="indice superior">2</div>
+                            <div class="marco-carta">
+                                <p class="texto-carta">Timbero</p>
+                            </div>
+                            <div class="indice inferior">2</div>
+                        </div>
+
+                        <div class="cara atras">
+                            <p class="texto-carta-atras">
+                                Antes de jugar: apostá. Si ganás la mano, duplicás puntos; si perdés, rival +2.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta">
+                    <div class="interior-tarjeta">
+
+                        <div class="cara frente">
+                            <div class="indice superior">3</div>
+                            <div class="marco-carta">
+                                <p class="texto-carta">Fanfarrón</p>
+                            </div>
+                            <div class="indice inferior">3</div>
+                        </div>
+
+                        <div class="cara atras">
+                            <p class="texto-carta-atras">
+                                Tu próximo envido o truco aceptado vale +1 punto extra.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tarjeta">
+                    <div class="interior-tarjeta">
+
+                        <div class="cara frente">
+                            <div class="indice superior">4</div>
+                            <div class="marco-carta">
+                                <p class="texto-carta">Mentiroso</p>
+                            </div>
+                            <div class="indice inferior">4</div>
+                        </div>
+
+                        <div class="cara atras">
+                            <p class="texto-carta-atras">
+                                Cada 2 manos: al inicio, revelás 1 carta aleatoria del rival.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <div class="seccion-3">
-            <h2 class="titulo-landing">FORJÁ TU HÉROE</h2>
-            <br><br>
-            <p class="texto-landing">Seleccioná uno nuestros personajes y convertilo en un héroe seleccionando la
-                habilidad
-                que mejor se adapte a tu estilo de juego.</p>
-            <br><br>
-            <div class="personajes">
-                <div class="personaje">
-                    <img src="assets/personajes/personaje-1.png" alt="Personaje 1" class="imagen-personaje">
-                    <p class="texto-landing">Personaje 1</p>
+        <div class="seccion-3 seccion-fade">
+            <h2 class="titulo-landing titulo-desarrolladores">DESARROLLADORES</h2>
+
+            <div class="desarrolladores">
+                <div class="desarrollador">
+                    <img src="assets/avatares-desarrolladores/Melina-avatar.jpeg" alt="Foto de Melina"
+                        class="foto-desarrollador">
+                    <p class="texto-landing">Melina Abillera</p>
                 </div>
-                <div class="personaje">
-                    <img src="assets/personajes/personaje-2.png" alt="Personaje 2" class="imagen-personaje">
-                    <p class="texto-landing">Personaje 2</p>
+
+                <div class="desarrollador">
+                    <img src="assets/avatares-desarrolladores/Lucia-avatar.jpeg" alt="Foto de Lucia"
+                        class="foto-desarrollador">
+                    <p class="texto-landing">Lucía Alarcón</p>
                 </div>
-                <div class="personaje">
-                    <img src="assets/personajes/personaje-3.png" alt="Personaje 3" class="imagen-personaje">
-                    <p class="texto-landing">Personaje 3</p>
+
+                <div class="desarrollador">
+                    <img src="assets/avatares-desarrolladores/Agustin-avatar.jpeg" alt="Foto de Lucia"
+                        class="foto-desarrollador">
+                    <p class="texto-landing">Agustin Dominguez</p>
                 </div>
-                <div class="personaje">
-                    <img src="assets/personajes/personaje-4.png" alt="Personaje 4" class="imagen-personaje">
-                    <p class="texto-landing">Personaje 4</p>
+
+                <div class="desarrollador">
+                    <img src="assets/avatares-desarrolladores/Guido-avatar.jpeg" alt="Foto de Lucia"
+                        class="foto-desarrollador">
+                    <p class="texto-landing">Guido Fink</p>
+                </div>
+
+                <div class="desarrollador">
+                    <img src="assets/avatares-desarrolladores/Gabriel-avatar.jpeg" alt="Foto de Lucia"
+                        class="foto-desarrollador">
+                    <p class="texto-landing">Gabriel Forestiero</p>
+                </div>
+
+                <div class="desarrollador">
+                    <img src="assets/avatares-desarrolladores/Gonzalo-avatar.jpeg" alt="Foto de Lucia"
+                        class="foto-desarrollador">
+                    <p class="texto-landing">Gonzalo Jordán</p>
+                </div>
+
+                <div class="desarrollador">
+                    <img src="assets/avatares-desarrolladores/Gabriela-avatar.jpeg" alt="Foto de Gabriela"
+                        class="foto-desarrollador">
+                    <p class="texto-landing">Gabriela Leveratto</p>
+                </div>
+
+                <div class="desarrollador">
+                    <img src="assets/avatares-desarrolladores/Anahi-avatar.jpeg" alt="Foto de Lucia"
+                        class="foto-desarrollador">
+                    <p class="texto-landing">Anahí Quelca</p>
+                </div>
+
+                <div class="desarrollador">
+                    <img src="assets/avatares-desarrolladores/Pilar-avatar.jpeg" alt="Foto de Pilar"
+                        class="foto-desarrollador">
+                    <p class="texto-landing">Pilar Rodriguez</p>
                 </div>
             </div>
         </div>
-    </div>
+    <!-- </div> -->
 </main>

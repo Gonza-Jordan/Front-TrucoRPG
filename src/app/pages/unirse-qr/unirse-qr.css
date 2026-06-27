@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  font-family: 'Jersey 10', monospace;
+  background: url('/assets/home.png') center center / cover no-repeat;
+}
+
+.panel {
+  width: min(400px, 90vw);
+  padding: 40px 28px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background: rgba(14, 12, 8, 0.97);
+  border: 2px solid #5a4020;
+  outline: 1px solid rgba(200, 144, 48, 0.18);
+  outline-offset: 4px;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+}
+
+.titulo {
+  margin: 0;
+  font-size: 1.3rem;
+  letter-spacing: 3px;
+  color: #c89030;
+}
+
+.sep {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #5a4020, transparent);
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #5a4020;
+  border-top-color: #c89030;
+  border-radius: 50%;
+  animation: girar 0.9s linear infinite;
+}
+
+.mensaje {
+  margin: 0;
+  color: #c89030;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.error {
+  margin: 0;
+  color: #e05050;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.boton {
+  width: 100%;
+  height: 52px;
+  background: #1e1508;
+  border: 2px solid #5a4020;
+  color: #c89030;
+  font-family: 'Jersey 10', monospace;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+
+.boton:hover {
+  background: #2e1f0e;
+  border-color: #8a6030;
+  color: #f0b050;
+}
+
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}

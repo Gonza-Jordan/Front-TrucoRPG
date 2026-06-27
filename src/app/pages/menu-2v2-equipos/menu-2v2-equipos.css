@@ -1,0 +1,402 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
+:host {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    overflow: hidden;
+    font-family: 'Jersey 10', monospace;
+    background: url('/assets/home.png') center center / cover no-repeat;
+}
+
+.connection-container {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    z-index: 10;
+    max-width: 300px;
+}
+
+.menu-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(560px, 95vw);
+    animation: flotar 2.5s infinite ease-in-out;
+}
+
+.contenedor-menu {
+    width: 100%;
+    padding: 36px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    background: rgba(14, 12, 8, 0.96);
+    border: 2px solid #5a4020;
+    outline: 1px solid rgba(200, 144, 48, 0.18);
+    outline-offset: 4px;
+    box-shadow:
+        0 0 40px rgba(0, 0, 0, 0.8),
+        inset 0 0 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Título ──────────────────────────────────────────────────── */
+.titulo-equipos {
+    margin: 0;
+    font-family: 'Jersey 10', monospace;
+    font-size: 1.3rem;
+    letter-spacing: 4px;
+    color: #c89030;
+    text-transform: uppercase;
+}
+
+/* ── Separador ───────────────────────────────────────────────── */
+.menu-sep {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #5a4020, transparent);
+    margin: 2px 0;
+}
+
+/* ── Arena de equipos ────────────────────────────────────────── */
+.equipos-arena {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+}
+
+/* ── Panel de equipo ─────────────────────────────────────────── */
+.equipo-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 12px 16px;
+    border: 2px solid transparent;
+    transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+    background: rgba(255,255,255,0.02);
+}
+
+/* San Martín — rojo oscuro */
+.equipo-san-martin {
+    border-color: #5a1a1a;
+    background: rgba(80, 20, 20, 0.15);
+}
+.equipo-san-martin.seleccionado {
+    border-color: #cc3333;
+    background: rgba(120, 30, 30, 0.35);
+    box-shadow: 0 0 18px rgba(180, 40, 40, 0.3);
+}
+.equipo-san-martin.lleno:not(.seleccionado) {
+    opacity: 0.55;
+}
+
+/* Belgrano — azul oscuro */
+.equipo-belgrano {
+    border-color: #1a2a5a;
+    background: rgba(20, 40, 100, 0.15);
+}
+.equipo-belgrano.seleccionado {
+    border-color: #3366cc;
+    background: rgba(30, 60, 140, 0.35);
+    box-shadow: 0 0 18px rgba(50, 100, 200, 0.3);
+}
+.equipo-belgrano.lleno:not(.seleccionado) {
+    opacity: 0.55;
+}
+
+/* ── Header del equipo ───────────────────────────────────────── */
+.equipo-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.equipo-escudo {
+    font-size: 1.3rem;
+    line-height: 1;
+}
+
+.equipo-nombre-wrap {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.equipo-nombre {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: #8a7050;
+}
+
+.equipo-san-martin .equipo-apellido { color: #dd5555; font-size: 0.95rem; letter-spacing: 1px; }
+.equipo-belgrano .equipo-apellido   { color: #4488dd; font-size: 0.95rem; letter-spacing: 1px; }
+
+.equipo-badge-lleno {
+    margin-left: auto;
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
+    padding: 2px 6px;
+    border: 1px solid #5a4020;
+    color: #c89030;
+    background: rgba(90, 64, 32, 0.3);
+}
+
+/* ── Slots ───────────────────────────────────────────────────── */
+.equipo-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.slot {
+    height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.slot.ocupado {
+    border-color: rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+}
+
+.slot.es-yo {
+    background: rgba(200, 144, 48, 0.1);
+    border-color: rgba(200, 144, 48, 0.3);
+}
+
+.slot-av {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #5c4325 0%, #3f2c18 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: opacity 0.3s;
+}
+
+.slot-av::before {
+    content: '';
+    width: 55%;
+    height: 55%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 35%, #f4e1a4 35%, transparent 36%);
+}
+
+.slot-av.dim { opacity: 0.2; }
+
+.slot-txt {
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    color: #8a7050;
+    flex: 1;
+    text-align: center;
+}
+
+.slot.ocupado .slot-txt { color: #c0a060; }
+.slot.es-yo .slot-txt   { color: #f0d080; }
+
+/* ── Botón Unirme ────────────────────────────────────────────── */
+.btn-unirse {
+    width: 100%;
+    height: 44px;
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    border: 2px solid;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.btn-san-martin {
+    background: rgba(80, 20, 20, 0.4);
+    border-color: #7a2020;
+    color: #dd7070;
+}
+.btn-san-martin:hover:not(:disabled) {
+    background: rgba(120, 30, 30, 0.65);
+    border-color: #cc3333;
+    color: #ff9999;
+    box-shadow: 0 0 10px rgba(180, 40, 40, 0.3);
+}
+
+.btn-belgrano {
+    background: rgba(20, 40, 100, 0.4);
+    border-color: #1a3a7a;
+    color: #6699dd;
+}
+.btn-belgrano:hover:not(:disabled) {
+    background: rgba(30, 60, 140, 0.65);
+    border-color: #3366cc;
+    color: #88bbff;
+    box-shadow: 0 0 10px rgba(50, 100, 200, 0.3);
+}
+
+.btn-unirse:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+/* Cuando ya está en ese equipo */
+.equipo-san-martin.seleccionado .btn-san-martin:disabled {
+    opacity: 1;
+    background: rgba(120, 30, 30, 0.55);
+    border-color: #cc3333;
+    color: #ffaaaa;
+}
+.equipo-belgrano.seleccionado .btn-belgrano:disabled {
+    opacity: 1;
+    background: rgba(30, 60, 140, 0.55);
+    border-color: #3366cc;
+    color: #aaccff;
+}
+
+/* ── VS divider ──────────────────────────────────────────────── */
+.vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    min-width: 36px;
+}
+
+.vs-texto {
+    font-family: 'Jersey 10', monospace;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    color: #3a2a10;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+}
+
+/* ── Estado listos ───────────────────────────────────────────── */
+.listos-estado {
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    color: #7a6535;
+    text-align: center;
+}
+
+/* ── Botón Comenzar ──────────────────────────────────────────── */
+.boton-comenzar {
+    width: 100%;
+    height: 58px;
+    background: #1e1508;
+    border: 2px solid #5a4020;
+    color: #c89030;
+    font-family: 'Jersey 10', monospace;
+    font-size: 1.05rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.boton-comenzar:hover:not(:disabled):not(.listo) {
+    background: #2e1f0e;
+    color: #f0b050;
+    border-color: #8a6030;
+    box-shadow: 0 0 10px rgba(200, 144, 48, 0.25);
+}
+
+.boton-comenzar.listo {
+    background: #1a3d22;
+    border-color: #2a7a3a;
+    color: #4adc6a;
+    cursor: default;
+    box-shadow: 0 0 12px rgba(42, 122, 58, 0.35);
+}
+
+/* ── Esperando equipos ───────────────────────────────────────── */
+.esperando-equipos {
+    width: 100%;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4a3a20;
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 1.5px;
+    border: 2px dashed #2a1a08;
+    text-align: center;
+    padding: 0 12px;
+}
+
+/* ── Error ───────────────────────────────────────────────────── */
+.error-msg {
+    margin: 0;
+    color: #e05050;
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.88rem;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+/* ── Abandonar ───────────────────────────────────────────────── */
+.boton-abandonar {
+    display: inline-block;
+    color: #c87a3a;
+    font-family: 'Jersey 10', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1px solid #7a4a18;
+    background: rgba(80, 30, 10, 0.35);
+    padding: 6px 22px;
+    border-radius: 3px;
+    margin-top: 4px;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.boton-abandonar:hover {
+    color: #ffaa66;
+    border-color: #c87a3a;
+    background: rgba(120, 50, 15, 0.55);
+}
+
+/* ── Animación ───────────────────────────────────────────────── */
+@keyframes flotar {
+    0%   { transform: translateY(0px); }
+    50%  { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+}
+
+@media (max-width: 560px) {
+    main { padding: 0.8rem; }
+    .menu-wrapper { width: 98vw; animation: none; }
+    .contenedor-menu { padding: 24px 12px 24px; gap: 10px; }
+    .vs-texto { font-size: 1rem; }
+    .equipo-apellido { font-size: 0.8rem !important; }
+}
+
+@media (max-height: 640px) {
+    .menu-wrapper { animation: none; }
+    .contenedor-menu { padding: 18px 16px 18px; gap: 8px; }
+    .slot { height: 38px; }
+    .boton-comenzar { height: 46px; }
+}

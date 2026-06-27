@@ -1,6 +1,7 @@
-import { Component,inject,signal } from '@angular/core';
-import { RouterModule,ActivatedRoute,NavigationEnd,Router } from '@angular/router';
+import { Component, inject, signal, computed, HostListener } from '@angular/core';
+import { RouterModule, ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
+import { AuthService } from '../../auth/auth.service';
 import { Boton } from '../boton/boton';
 
 @Component({
@@ -10,19 +11,24 @@ import { Boton } from '../boton/boton';
   styleUrl: './header.css',
 })
 export class Header {
-  router = inject(Router);
-  activatedRoute = inject(ActivatedRoute);
+  router          = inject(Router);
+  activatedRoute  = inject(ActivatedRoute);
+  authService     = inject(AuthService);
 
-  headerType = signal('');
+  headerType      = signal('');
+  usuario         = computed(() => this.authService.obtenerUsuario());
+  inicial         = computed(() => this.usuario()?.nombre?.charAt(0).toUpperCase() ?? '?');
+  avatarUrl       = computed(() => this.authService.avatarUrl());
+  dropdownAbierto = signal(false);
 
   constructor() {
-    // Leer la ruta actual inmediatamente (cubre refresh y navegación directa)
     this.actualizarTipo();
-
-    // Escuchar navegaciones futuras
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => this.actualizarTipo());
+      .subscribe(() => {
+        this.actualizarTipo();
+        this.dropdownAbierto.set(false);
+      });
   }
 
   private actualizarTipo(): void {
@@ -34,4 +40,18 @@ export class Header {
     this.headerType.set(data['header'] || 'default');
   }
 
+  toggleDropdown(event: Event): void {
+    event.stopPropagation();
+    this.dropdownAbierto.update(v => !v);
+  }
+
+  @HostListener('document:click')
+  cerrarDropdown(): void {
+    this.dropdownAbierto.set(false);
+  }
+
+  cerrarSesion(): void {
+    this.authService.cerrarSesion();
+    this.router.navigate(['/']);
+  }
 }

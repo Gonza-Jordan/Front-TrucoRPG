@@ -1,0 +1,16 @@
+<main>
+  <div class="panel">
+    <h2 class="titulo">UNIRSE A SALA</h2>
+    <div class="sep"></div>
+
+    @if (estado === 'uniendo') {
+      <div class="spinner"></div>
+      <p class="mensaje">{{ mensaje }}</p>
+    }
+
+    @if (estado === 'error') {
+      <p class="error">{{ mensaje }}</p>
+      <button type="button" class="boton" (click)="irAlMenu()">IR AL MENÚ</button>
+    }
+  </div>
+</main>

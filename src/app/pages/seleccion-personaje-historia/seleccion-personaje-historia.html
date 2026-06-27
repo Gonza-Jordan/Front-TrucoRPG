@@ -1,0 +1,129 @@
+<main>
+  @if (!esTouch) {
+    <section class="pantalla-seleccion">
+      @if (pasoActual === 1) {
+        <div class="pantalla-paso-centrada fade-in">
+          <h2 class="titulo-flujo-pasos">ELEGÍ TU AVATAR</h2>
+
+          <div class="carrusel-carta-container">
+            <button class="btn-flecha" (click)="anteriorPersonaje()">◀</button>
+
+            <div class="tarjeta-vista">
+              <div class="cara-tarjeta">
+                <div class="indice superior">{{ heroeEnPantalla.id + 1 }}</div>
+                <div class="marco-personaje">
+                  <img
+                    class="personaje"
+                    src="{{ heroeEnPantalla.img }}"
+                    [alt]="heroeEnPantalla.nombrePersonaje"
+                  />
+                </div>
+                <button class="btn-continuar-paso" (click)="avanzarAlMazo()">
+                  CONFIRMAR AVATAR
+                </button>
+                <div class="indice inferior">{{ heroeEnPantalla.id + 1 }}</div>
+              </div>
+            </div>
+
+            <button class="btn-flecha" (click)="siguientePersonaje()">▶</button>
+          </div>
+        </div>
+      }
+
+      @if (pasoActual === 2) {
+        <div class="bloque-seleccion mazo-habilidades-container de-costado-a-costado fade-in">
+          <h2 class="titulo-seccion">ELEGÍ TU HABILIDAD</h2>
+
+          <div class="zona-mazo-interactiva">
+            <div class="mazo-deck" (click)="revelarSiguienteHabilidad()">
+              <div class="carta-en-mazo mazo-capa-3"></div>
+              <div class="carta-en-mazo mazo-capa-2"></div>
+              <div class="carta-en-mazo mazo-capa-1"></div>
+              <div class="carta-en-mazo mazo-tope">
+                <img class="dorso-mazo" src="/Imagenes/dorso.png" alt="Dorso Mazo" />
+              </div>
+            </div>
+
+            <div class="slot-carta-revelada">
+              @if (habilidadEnVista) {
+                <div
+                  class="tarjeta-habilidad-carta"
+                  [class.activa]="selectedAbilityId === habilidadEnVista.id"
+                >
+                  <div class="cara-habilidad-frente">
+                    <div class="indice-hab superior">★</div>
+                    <div class="info-habilidad-carta">
+                      <h3>{{ habilidadEnVista.nombre }}</h3>
+                      <p><strong>Pasiva:</strong> {{ habilidadEnVista.pasiva }}</p>
+                      <p><strong>Activa:</strong> {{ habilidadEnVista.activa }}</p>
+                    </div>
+                    <button
+                      class="btn-equipar-habilidad"
+                      [class.equipada]="selectedAbilityId === habilidadEnVista.id"
+                      (click)="seleccionarHabilidad(habilidadEnVista.id)"
+                    >
+                      {{ selectedAbilityId === habilidadEnVista.id ? 'EQUIPADA' : 'EQUIPAR' }}
+                    </button>
+                    <div class="indice-hab inferior">★</div>
+                  </div>
+                </div>
+              } @else {
+                <div class="placeholder-vacio">
+                  <p>Hacé click sobre el mazo para ver habilidades...</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </section>
+  } @else {
+    <div class="lista-heroes-mobile">
+      <h2 class="titulo-seccion-mobile">Personaje</h2>
+      <div class="carrusel-skins-mobile">
+        @for (heroe of heroes; track heroe.id) {
+          <button
+            class="item-skin-mobile"
+            [class.seleccionado]="selectedHeroId === heroe.id"
+            (click)="seleccionarHeroe(heroe.id)"
+          >
+            <img [src]="heroe.img" [alt]="heroe.nombrePersonaje" />
+          </button>
+        }
+      </div>
+
+      <h2 class="titulo-seccion-mobile">Habilidad</h2>
+      <div class="opciones-habilidad-mobile">
+        @for (hab of habilidadesOpciones; track hab.id) {
+          <div
+            class="item-habilidad-mobile"
+            [class.seleccionado]="selectedAbilityId === hab.id"
+            (click)="seleccionarHabilidad(hab.id)"
+          >
+            {{ hab.nombre }}
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="acciones-confirmar">
+    <button class="btn-volver" (click)="volver()">
+      {{ pasoActual === 2 && !esTouch ? '← VOLVER A AVATAR' : '← VOLVER' }}
+    </button>
+
+    @if (selectedHeroId !== null || selectedAbilityId !== null) {
+      <button class="btn-elegir-otro" (click)="elegirOtro()">↺ REINICIAR</button>
+    }
+
+    <button
+      class="confirmar-heroe"
+      [disabled]="
+        selectedHeroId === null || selectedAbilityId === null || (pasoActual === 1 && !esTouch)
+      "
+      (click)="enviarConfirmacion()"
+    >
+      Confirmar y Jugar
+    </button>
+  </div>
+</main>
