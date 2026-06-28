@@ -8,3 +8,7 @@ export const PERSONAJES = [
 export function personajePorId(id) {
     return PERSONAJES.find(p => p.id === id) ?? null;
 }
+
+export function personajePorSpriteKey(spriteKey){
+    return PERSONAJES.find(p => p.spriteKey === spriteKey) ?? null;
+}

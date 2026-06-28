@@ -15,50 +15,104 @@ import { Prologo } from '../../../pages/prologo/prologo';
 import { SalaService } from '../../../services/sala.service';
 import { PulperiaUiService } from '../../../services/pulperiaOverlay/pulperia-overlay-config';
 
-
 @Component({
   selector: 'app-historia',
   standalone: true,
-  imports: [CommonModule, SeleccionPersonajeHistoria, TrucoSoloComponent, TrucoSolo2v2Component, TrucoSolo3v3Component, TrucoMultiComponent, TrucoMulti2v2Component, Truco3v3Component, CasaManager, PulperiaManager, Prologo],
+  imports: [
+    CommonModule,
+    SeleccionPersonajeHistoria,
+    TrucoSoloComponent,
+    TrucoSolo2v2Component,
+    TrucoSolo3v3Component,
+    TrucoMultiComponent,
+    TrucoMulti2v2Component,
+    Truco3v3Component,
+    CasaManager,
+    PulperiaManager,
+    Prologo,
+  ],
   templateUrl: './historia.html',
   styleUrl: './historia.css',
 })
 export class Historia implements OnInit, OnDestroy {
+  cargandoEstado = true;
   vistaActual: 'seleccion-heroe' | 'prologo' | 'en-juego' = 'seleccion-heroe';
+
   mostrarTrucoSolo = false;
-  mostrarTruco2v2  = false;
-  mostrarTruco3v3  = false;
-  mostrarTrucoMulti     = false;
-  mostrarTruco2v2Multi  = false;
-  mostrarTruco3v3Multi  = false;
+  mostrarTruco2v2 = false;
+  mostrarTruco3v3 = false;
+  mostrarTrucoMulti = false;
+  mostrarTruco2v2Multi = false;
+  mostrarTruco3v3Multi = false;
 
   constructor(
     private historiaService: HistoriaService,
     private salaService: SalaService,
     private uiService: PulperiaUiService,
     @Inject(DOCUMENT) private document: Document,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
+    this.historiaService.verificarPersonajeBD().subscribe({
+      next: (res) => {
+        if (res.tienePersonaje) {
+          const vistaGuardada = localStorage.getItem('historia_vista_actual');
+          this.vistaActual = (vistaGuardada as any) || 'en-juego';
+
+          if (this.vistaActual === 'en-juego') {
+            this.alTerminarPrologo();
+          }
+        } else {
+          this.vistaActual = 'seleccion-heroe';
+        }
+        this.cargandoEstado = false;
+      },
+      error: (err) => {
+        console.error('Error al verificar personaje', err);
+        this.cargandoEstado = false;
+      },
+    });
+
     window.addEventListener('truco-solo:start', this.abrirMesaTruco);
-    window.addEventListener('truco-solo:end',   this.cerrarMesaTruco);
-    window.addEventListener('truco-2v2:start',  this.abrirMesa2v2);
-    window.addEventListener('truco-2v2:end',    this.cerrarMesa2v2);
-    window.addEventListener('truco-3v3:start',  this.abrirMesa3v3);
-    window.addEventListener('truco-3v3:end',    this.cerrarMesa3v3);
-    window.addEventListener('truco-multi:start',      this.abrirMesaMulti);
-    window.addEventListener('truco-multi:end',        this.cerrarMesaMulti);
-    window.addEventListener('truco-2v2-multi:start',  this.abrirMesa2v2Multi);
-    window.addEventListener('truco-2v2-multi:end',    this.cerrarMesa2v2Multi);
-    window.addEventListener('truco-3v3-multi:start',  this.abrirMesa3v3Multi);
-    window.addEventListener('truco-3v3-multi:end',    this.cerrarMesa3v3Multi);
+    window.addEventListener('truco-solo:end', this.cerrarMesaTruco);
+    window.addEventListener('truco-2v2:start', this.abrirMesa2v2);
+    window.addEventListener('truco-2v2:end', this.cerrarMesa2v2);
+    window.addEventListener('truco-3v3:start', this.abrirMesa3v3);
+    window.addEventListener('truco-3v3:end', this.cerrarMesa3v3);
+    window.addEventListener('truco-multi:start', this.abrirMesaMulti);
+    window.addEventListener('truco-multi:end', this.cerrarMesaMulti);
+    window.addEventListener('truco-2v2-multi:start', this.abrirMesa2v2Multi);
+    window.addEventListener('truco-2v2-multi:end', this.cerrarMesa2v2Multi);
+    window.addEventListener('truco-3v3-multi:start', this.abrirMesa3v3Multi);
+    window.addEventListener('truco-3v3-multi:end', this.cerrarMesa3v3Multi);
   }
 
   alConfirmarHeroe(evento: { heroeId: number; habilidad: string }): void {
     this.historiaService.setHeroeSeleccionado(evento.heroeId);
     this.historiaService.setHabilidadSeleccionada(evento.habilidad);
-    this.vistaActual = 'prologo';
+
+    const spriteKey = this.historiaService.obtenerSpriteKey();
+
+    this.historiaService.guardarPersonajeBD(evento.habilidad, spriteKey).subscribe({
+      next: () => {
+        this.vistaActual = 'prologo';
+        localStorage.setItem('historia_vista_actual', 'prologo');
+        this.document.body.classList.add('modo-phaser-mobile');
+      },
+      error: (err) => {
+        alert('Error al guardar personaje: ' + (err.error || err.message));
+      },
+    });
+  }
+
+  alTerminarPrologo(): void {
+    this.vistaActual = 'en-juego';
+    localStorage.setItem('historia_vista_actual', 'en-juego');
     this.document.body.classList.add('modo-phaser-mobile');
+    setTimeout(() => {
+      this.historiaService.iniciarJuego('historia-container', this.salaService, this.uiService);
+      window.dispatchEvent(new Event('resize'));
+    }, 50);
   }
 
   abrirMesaTruco = (): void => {
@@ -136,32 +190,25 @@ export class Historia implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     window.removeEventListener('truco-solo:start', this.abrirMesaTruco);
-    window.removeEventListener('truco-solo:end',   this.cerrarMesaTruco);
-    window.removeEventListener('truco-2v2:start',  this.abrirMesa2v2);
-    window.removeEventListener('truco-2v2:end',    this.cerrarMesa2v2);
-    window.removeEventListener('truco-3v3:start',  this.abrirMesa3v3);
-    window.removeEventListener('truco-3v3:end',    this.cerrarMesa3v3);
-    window.removeEventListener('truco-multi:start',      this.abrirMesaMulti);
-    window.removeEventListener('truco-multi:end',        this.cerrarMesaMulti);
-    window.removeEventListener('truco-2v2-multi:start',  this.abrirMesa2v2Multi);
-    window.removeEventListener('truco-2v2-multi:end',    this.cerrarMesa2v2Multi);
-    window.removeEventListener('truco-3v3-multi:start',  this.abrirMesa3v3Multi);
-    window.removeEventListener('truco-3v3-multi:end',    this.cerrarMesa3v3Multi);
+    window.removeEventListener('truco-solo:end', this.cerrarMesaTruco);
+    window.removeEventListener('truco-2v2:start', this.abrirMesa2v2);
+    window.removeEventListener('truco-2v2:end', this.cerrarMesa2v2);
+    window.removeEventListener('truco-3v3:start', this.abrirMesa3v3);
+    window.removeEventListener('truco-3v3:end', this.cerrarMesa3v3);
+    window.removeEventListener('truco-multi:start', this.abrirMesaMulti);
+    window.removeEventListener('truco-multi:end', this.cerrarMesaMulti);
+    window.removeEventListener('truco-2v2-multi:start', this.abrirMesa2v2Multi);
+    window.removeEventListener('truco-2v2-multi:end', this.cerrarMesa2v2Multi);
+    window.removeEventListener('truco-3v3-multi:start', this.abrirMesa3v3Multi);
+    window.removeEventListener('truco-3v3-multi:end', this.cerrarMesa3v3Multi);
+
     localStorage.removeItem('multiEnHistoria');
     localStorage.removeItem('historiaPartida');
     localStorage.removeItem('rivalNivel');
     localStorage.removeItem('origenPulperia');
+
     this.historiaService.destruirJuego();
     this.document.body.classList.remove('modo-phaser-mobile');
     this.document.body.classList.remove('combate-historia');
-  }
-
-  alTerminarPrologo(): void {
-    this.vistaActual = 'en-juego';
-    this.document.body.classList.add('modo-phaser-mobile');
-    setTimeout(() => {
-      this.historiaService.iniciarJuego('historia-container', this.salaService, this.uiService);
-      window.dispatchEvent(new Event('resize'));
-    }, 50);
   }
 }
