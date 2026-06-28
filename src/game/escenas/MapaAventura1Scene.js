@@ -5,6 +5,7 @@ import Portal from '../objetos/Portal.js';
 import Oponente from '../personajes/Oponente.js';
 import ZonaInteraccionNpc from '../objetos/ZonaInteraccionNpc.js';
 import NpcDialogo from '../personajes/NpcDialogo.js';
+import { environment } from '../../environments/environment';
 
 const RIVAL_NAHUELITO_NIVEL = 1;
 const RIVAL_POMBERITO_NIVEL = 2;
@@ -174,7 +175,7 @@ export default class MapaAventura1Scene extends BaseScene {
   async cargarPuedePelearPomberito() {
     try {
       const res = await fetch(
-        `/api/historia/rivales/${RIVAL_POMBERITO_NIVEL}/puede-pelear`,
+        `${environment.apiUrl}/api/historia/rivales/${RIVAL_POMBERITO_NIVEL}/puede-pelear`,
         { headers: authHeaders() },
       );
       if (!res.ok) return;

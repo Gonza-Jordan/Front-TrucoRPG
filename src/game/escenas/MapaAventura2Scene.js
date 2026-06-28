@@ -147,7 +147,7 @@ export default class MapaAventura2Scene extends BaseScene {
   async cargarPuedePelearLobizon() {
     try {
       const res = await fetch(
-        `/api/historia/rivales/${RIVAL_LOBIZON_NIVEL}/puede-pelear`,
+        `${environment.apiUrl}/api/historia/rivales/${RIVAL_LOBIZON_NIVEL}/puede-pelear`,
         { headers: authHeaders() },
       );
       if (!res.ok) return;
@@ -169,7 +169,7 @@ export default class MapaAventura2Scene extends BaseScene {
   async cargarPuedePelearLuzMala() {
     try {
       const res = await fetch(
-        `/api/historia/rivales/${RIVAL_LUZMALA_NIVEL}/puede-pelear`,
+        `${environment.apiUrl}/api/historia/rivales/${RIVAL_LUZMALA_NIVEL}/puede-pelear`,
         { headers: authHeaders() },
       );
       if (!res.ok) return;
