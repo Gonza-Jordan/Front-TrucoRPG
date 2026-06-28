@@ -150,8 +150,7 @@ const HEROES: Heroe[] = [
 // ── Constantes ───────────────────────────────────────────────────────────────
 
 const PALO_SYM: Record<Palo, string> = { Oro: '★', Espada: '†', Copa: '♦', Basto: '♣' };
-const API = `${environment.apiUrl}/api/Truco`;
-const API_HISTORIA = '/api/historia';
+const API_HISTORIA = '${environment.apiUrl}/api/Historia';
 const FAN_ANGLES = [-16, 0, 16];
 const FAN_X = [-84, 0, 84];
 const SALPICADURA_REVEAL_SEG = 5;
