@@ -5,6 +5,11 @@ import { initHistoria } from '../../../game/historiaConfig';
 import { personajePorId } from '../../../game/data/personaje';
 import { claseHeroePorHabilidadId } from '../../../game/data/habilidades';
 
+export interface Personaje {
+  heroeId: string;
+  spriteKey: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -19,10 +24,23 @@ export class HistoriaService {
   private cambiarSkinSource = new Subject<string>();
   cambiarSkin$ = this.cambiarSkinSource.asObservable();
 
+  private readonly escenasMapa = [
+    'MapaPrincipal',
+    'MapaAventura1',
+    'MapaAventura2',
+    'MapaAventura3',
+    'InteriorCasaScene',
+    'InteriorPulperiaScene',
+  ];
+
   constructor(private http: HttpClient) {}
 
   verificarPersonajeBD(): Observable<{ tienePersonaje: boolean }> {
     return this.http.get<{ tienePersonaje: boolean }>(`${this.apiUrl}/verificarPersonaje`);
+  }
+
+  obtenerPersonajeBD(): Observable<Personaje> {
+    return this.http.get<Personaje>(`${this.apiUrl}/obtenerPersonaje`);
   }
 
   guardarPersonajeBD(habilidadId: string, spriteKey: string): Observable<any> {
@@ -32,7 +50,6 @@ export class HistoriaService {
     };
 
     console.log('Enviando este objeto al backend:', body);
-
     return this.http.post(`${this.apiUrl}/crearPersonaje`, body);
   }
 
@@ -47,15 +64,6 @@ export class HistoriaService {
   cargarPersonajeExistente(habilidadId: string, spriteKey: string): void {
     this.habilidadSeleccionada = habilidadId;
     this.spriteKeyBD = spriteKey;
-  }
-
-  equiparSkinDesdeArmario(spriteKey: string): void {
-    if (this.juegoInstance) {
-      this.juegoInstance.registry.set('playerSprite', spriteKey);
-    }
-    const evento = new CustomEvent('phaser:cambiarSkin', { detail: spriteKey });
-    window.dispatchEvent(evento);
-    this.cambiarSkinSource.next(spriteKey);
   }
 
   obtenerSpriteKey(): string {
@@ -77,6 +85,19 @@ export class HistoriaService {
       this.destruirJuego();
     }
 
+    this.obtenerPersonajeBD().subscribe({
+      next: (personaje) => {
+        this.cargarPersonajeExistente(personaje.heroeId, personaje.spriteKey);
+        this.ejecutarInicioJuego(contenedorId, salaService, uiService);
+      },
+      error: (err) => {
+        console.warn('No se pudo recuperar el personaje desde el backend, usando valores por defecto:', err);
+        this.ejecutarInicioJuego(contenedorId, salaService, uiService);
+      }
+    });
+  }
+
+  private ejecutarInicioJuego(contenedorId: string, salaService: any, uiService: any): void {
     this.juegoInstance = initHistoria(contenedorId, salaService, uiService);
 
     const spriteKey = this.obtenerSpriteKey();
@@ -93,6 +114,22 @@ export class HistoriaService {
     return this.juegoInstance;
   }
 
+  destruirJuego(): void {
+    if (this.juegoInstance) {
+      this.juegoInstance.destroy(true);
+      this.juegoInstance = null;
+    }
+  }
+
+  equiparSkinDesdeArmario(spriteKey: string): void {
+    if (this.juegoInstance) {
+      this.juegoInstance.registry.set('playerSprite', spriteKey);
+    }
+    const evento = new CustomEvent('phaser:cambiarSkin', { detail: spriteKey });
+    window.dispatchEvent(evento);
+    this.cambiarSkinSource.next(spriteKey);
+  }
+
   pausarEscena(key: string): void {
     this.juegoInstance?.scene.pause(key);
   }
@@ -100,15 +137,6 @@ export class HistoriaService {
   reanudarEscena(key: string): void {
     this.juegoInstance?.scene.resume(key);
   }
-
-  private readonly escenasMapa = [
-    'MapaPrincipal',
-    'MapaAventura1',
-    'MapaAventura2',
-    'MapaAventura3',
-    'InteriorCasaScene',
-    'InteriorPulperiaScene',
-  ];
 
   obtenerEscenaMapaActiva(): string {
     if (this.juegoInstance) {
@@ -131,12 +159,5 @@ export class HistoriaService {
     localStorage.removeItem('historiaMapaEscena');
     this.reanudarEscena(key);
     setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
-  }
-
-  destruirJuego(): void {
-    if (this.juegoInstance) {
-      this.juegoInstance.destroy(true);
-      this.juegoInstance = null;
-    }
   }
 }
