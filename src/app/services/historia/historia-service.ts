@@ -4,6 +4,7 @@ import { Observable, Subject } from 'rxjs';
 import { initHistoria } from '../../../game/historiaConfig';
 import { personajePorId } from '../../../game/data/personaje';
 import { claseHeroePorHabilidadId } from '../../../game/data/habilidades';
+import { environment } from "../../../environments/environment";
 
 export interface Personaje {
   heroeId: string;
@@ -19,7 +20,7 @@ export class HistoriaService {
   private habilidadSeleccionada: string | null = null;
   private spriteKeyBD: string | null = null;
 
-  private apiUrl = 'http://localhost:5001/api/Historia';
+  private apiUrl = `${environment.apiUrl}/api/Historia`;
 
   private cambiarSkinSource = new Subject<string>();
   cambiarSkin$ = this.cambiarSkinSource.asObservable();
