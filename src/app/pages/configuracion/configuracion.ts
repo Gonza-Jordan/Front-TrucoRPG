@@ -18,6 +18,7 @@ export class ConfiguracionComponent {
   musica = localStorage.getItem('cfg_musica') !== 'false';
   pantallaCompleta = localStorage.getItem('cfg_pantalla') === 'true';
   delaySegundos = Number(localStorage.getItem('cfg_delay') ?? 1200) / 1000;
+  velocidad = Number(localStorage.getItem('cfg_velocidad') ?? 250);
 
   private audio = inject(AudioService);
 
@@ -34,6 +35,7 @@ export class ConfiguracionComponent {
   async guardar() {
     localStorage.setItem('cfg_pantalla', String(this.pantallaCompleta));
     localStorage.setItem('cfg_delay', String(Math.round(this.delaySegundos * 1000)));
+    localStorage.setItem('cfg_velocidad', String(Math.round(this.velocidad)));
 
     await this.aplicarPantallaCompleta(this.pantallaCompleta);
 
