@@ -841,6 +841,12 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameOverTimer = setTimeout(() => {
           this.gameOver = true;
           this.gameOverWon = m.ganadorPartida === 'Humano';
+          // La partida también puede definirse por el envido: hay que registrar la
+          // victoria de historia acá igual que en el cierre normal, si no el progreso
+          // (rival derrotado) no se guarda y el siguiente rival queda bloqueado.
+          if (this.gameOverWon && this.rivalNivel !== null) {
+            this.registrarVictoriaHistoria(m);
+          }
           this.cdr.markForCheck();
         }, this.duracionSecuenciaEnvido(m) + 800);
         this.cdr.markForCheck();

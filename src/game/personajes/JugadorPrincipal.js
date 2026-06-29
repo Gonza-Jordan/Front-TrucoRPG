@@ -80,7 +80,10 @@ export default class JugadorPrincipal extends Phaser.Physics.Arcade.Sprite {
   }
 
   update(keys) {
-    const velocidad = 250;
+    // Velocidad configurable desde Configuración ("Velocidad del personaje").
+    // Se lee de localStorage para que el cambio aplique sin recompilar; 250 por defecto.
+    const guardada = Number(localStorage.getItem('cfg_velocidad'));
+    const velocidad = Number.isFinite(guardada) && guardada > 0 ? guardada : 250;
 
     this.setVelocity(0);
 
