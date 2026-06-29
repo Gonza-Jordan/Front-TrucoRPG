@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ConnectionStatusComponent } from '../../components/connection-status/connection-status';
 import { SalaService } from '../../services/sala.service';
+import { ToastService } from '../../services/toast/toast.service';
 import { PulperiaUiService } from '../../services/pulperiaOverlay/pulperia-overlay-config';
 
 @Component({
@@ -42,6 +43,7 @@ export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     protected uiService: PulperiaUiService,
+    private toast: ToastService,
   ) {}
 
   async ngOnInit() {
@@ -146,6 +148,7 @@ export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
         await this.sala.crearSala(this.gameMode, this.publica);
       } catch {
         this.errorMsg = 'No se pudo conectar al servidor.';
+        this.toast.error(this.errorMsg);
       }
     }
 
@@ -198,6 +201,7 @@ export class MenuMultijugadorTradicionalSala implements OnInit, OnDestroy {
       await this.sala.listoParaJugar();
     } catch {
       this.errorMsg = 'Error al comunicarse con el servidor.';
+      this.toast.error(this.errorMsg);
     }
   }
 
