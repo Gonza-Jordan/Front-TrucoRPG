@@ -1,14 +1,18 @@
-@if (vistaActual === 'seleccion-heroe') {
-<app-seleccion-personaje-historia (heroeConfirmado)="alConfirmarHeroe($event)">
-</app-seleccion-personaje-historia>
-}
+@if (cargandoEstado) {
+  <div class="loading-screen">
+    <p>Cargando datos del modo historia...</p>
+  </div>
+} @else {
+  @if (vistaActual === 'seleccion-heroe') {
+    <app-seleccion-personaje-historia (heroeConfirmado)="alConfirmarHeroe($event)"></app-seleccion-personaje-historia>
+  }
 
-@if (vistaActual === 'prologo') {
-<app-prologo (prologoTerminado)="alTerminarPrologo()"></app-prologo>
-}
+  @if (vistaActual === 'prologo') {
+    <app-prologo (prologoTerminado)="alTerminarPrologo()"></app-prologo>
+  }
 
-@if (vistaActual === 'en-juego') {
-  <div class="contenedor-juego-wrapper">
+  @if (vistaActual === 'en-juego') {
+   <div class="contenedor-juego-wrapper">
     <div id="historia-container"
          [style.display]="(mostrarTrucoSolo || mostrarTruco2v2 || mostrarTruco3v3 || mostrarTrucoMulti || mostrarTruco2v2Multi || mostrarTruco3v3Multi) ? 'none' : 'block'">
     </div>
@@ -33,4 +37,5 @@
     <app-casa-manager></app-casa-manager>
     <app-pulperia-manager></app-pulperia-manager>
   </div>
+  }
 }
