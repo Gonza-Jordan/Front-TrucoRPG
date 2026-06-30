@@ -1,6 +1,13 @@
 @if (vistaActiva) {
   <div class="contenedor-overlay-principal">
-    <div class="contenedor-modal" [class.modal-ancho]="vistaActiva === 'multijugador'">
+    <div
+      class="contenedor-modal"
+      [class.modal-ancho]="vistaActiva === 'multijugador'"
+      [class.modal-sala]="
+        vistaActiva === 'multijugador' &&
+        (subVistaActiva === 'sala' || subVistaActiva === 'equipos')
+      "
+    >
       @if (vistaActiva === 'tienda') {
         <app-tienda-overlay></app-tienda-overlay>
       }

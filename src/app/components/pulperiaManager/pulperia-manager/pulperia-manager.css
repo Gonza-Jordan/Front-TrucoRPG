@@ -111,3 +111,29 @@
         font-size: 1.2rem;
     }
 }
+
+/* ── Sala / equipos en mobile ──────────────────────────────────────
+   Solo la sala y la selección de equipos usan el layout horizontal a
+   todo el ancho con la X al lado derecho. El resto de las sub-vistas
+   (menú tipo, crear, unirse, buscar) siguen centradas con ancho propio. */
+@media screen and (max-width: 768px),
+       screen and (orientation: landscape) and (max-height: 540px) {
+    .contenedor-modal.modal-sala {
+        width: 100%;
+        max-width: 100%;
+        padding: 14px 12px 44px 12px;
+        row-gap: 0;
+    }
+
+    /* X reposicionada al lado derecho (esquina inferior derecha) */
+    .modal-sala .botonCerrar {
+        top: auto;
+        bottom: 8px;
+        left: auto;
+        right: 10px;
+        transform: none;
+        width: 30px;
+        height: 30px;
+        font-size: 1rem;
+    }
+}
