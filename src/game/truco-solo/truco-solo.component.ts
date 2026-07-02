@@ -840,6 +840,12 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameOverTimer = setTimeout(() => {
           this.gameOver = true;
           this.gameOverWon = m.ganadorPartida === 'Humano';
+          // La partida también puede definirse por el envido: hay que registrar la
+          // victoria de historia acá igual que en el cierre normal, si no el progreso
+          // (rival derrotado) no se guarda y el siguiente rival queda bloqueado.
+          if (this.gameOverWon && this.rivalNivel !== null) {
+            this.registrarVictoriaHistoria(m);
+          }
           this.cdr.markForCheck();
         }, this.duracionSecuenciaEnvido(m) + 800);
         this.cdr.markForCheck();
@@ -1572,7 +1578,9 @@ export class TrucoSoloComponent implements OnInit, AfterViewInit, OnDestroy {
       if (tipoEnv === 'Envido' || tipoEnv === 'EnvidoEnvido')
         raw.push(['REAL ENVIDO', '#ffaa00',
           () => this.call('responder-envido', { manoId: m.id, aceptar: true, escalarA: 'Real Envido' })]);
-      if (tipoEnv !== 'Falta Envido')
+      // El backend normaliza el tipo como 'FaltaEnvido' (sin espacio): comparar contra
+      // ambos, si no el botón aparecía aunque la máquina ya hubiera cantado la falta.
+      if (tipoEnv !== 'FaltaEnvido' && tipoEnv !== 'Falta Envido')
         raw.push(['FALTA ENVIDO', '#ff8800',
           () => this.call('responder-envido', { manoId: m.id, aceptar: true, escalarA: 'Falta Envido' })]);
       raw.push(['NO QUIERO', '#ff4444',

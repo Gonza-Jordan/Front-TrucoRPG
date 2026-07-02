@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModul
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth.service';
+import { ToastService } from '../../services/toast/toast.service';
 import { Card } from '../../components/card/card';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 
@@ -69,7 +70,8 @@ export class RegistroComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toast: ToastService
   ) {
     this.form = this.fb.group({
       userName: ['', [Validators.required, Validators.minLength(3)]],
@@ -108,11 +110,13 @@ export class RegistroComponent {
         // para que el usuario ingrese con su usuario y contraseña.
         this.cargando = false;
         this.registroExitoso = true;
+        this.toast.success('¡Cuenta creada! Ya podés iniciar sesión.');
         setTimeout(() => this.router.navigate(['/login']), 2000);
       },
       error: (err) => {
         const raw = err.error?.error ?? err.error?.message ?? '';
         this.errorServidor = raw ? traducirErrorServidor(raw) : 'Error al registrarse. Intentá de nuevo.';
+        this.toast.error(this.errorServidor);
         this.cargando = false;
       }
     });

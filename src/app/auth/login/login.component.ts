@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth.service';
+import { ToastService } from '../../services/toast/toast.service';
 import { Card } from '../../components/card/card';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 
@@ -28,7 +29,8 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toast: ToastService
   ) {
     this.form = this.fb.group({
       email:    ['', [Validators.required, emailValido]],
@@ -56,6 +58,7 @@ export class LoginComponent {
       },
       error: (err) => {
         this.errorServidor = err.error?.error ?? 'Email o contraseña incorrectos.';
+        this.toast.error(this.errorServidor);
         this.cargando = false;
       }
     });

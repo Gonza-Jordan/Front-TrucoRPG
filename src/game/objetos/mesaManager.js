@@ -40,6 +40,10 @@ export default class MesaManager {
         this.salaService.listarSalasPublicas('3v3'),
       ]);
 
+      // La escena pudo cerrarse mientras esperábamos las salas: si el grupo ya fue
+      // destruido, getChildren() leería this.children (undefined) y rompería.
+      if (this._destroyed || !this.mesasPublicasGroup?.children) return;
+
       this.mesasPublicasGroup.getChildren().forEach((mesa) => {
         const texto = mesa.getData('textoAsociado');
         const zona = mesa.getData('zonaAsociada');

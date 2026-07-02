@@ -4,7 +4,7 @@
 
 .contenedor-baul {
     background-color: #1a130b;
-    width: 450px;
+    width: min(450px, 92vw); /* en pantallas angostas no desborda */
     height: fit-content;
     align-self: center;
     border: 6px solid #000;
@@ -145,7 +145,7 @@
     border: 6px solid #000;
     box-shadow: inset -4px -4px -4px #140d0c, 4px 4px 0px rgba(0,0,0,0.4);
     padding: 20px;
-    width: 300px;
+    width: min(300px, 82vw);
     text-align: center;
     display: flex;
     flex-direction: column;
