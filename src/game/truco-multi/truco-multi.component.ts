@@ -234,6 +234,7 @@ export class TrucoMultiComponent implements OnInit, OnDestroy {
         raw.push(['REAL ENVIDO', '#ffaa00', () => this.hub('EscalarEnvido', 'Real Envido')]);
       if (tipo !== 'FaltaEnvido' && tipo !== 'Falta Envido')
         raw.push(['FALTA ENVIDO', '#ff8800', () => this.hub('EscalarEnvido', 'Falta Envido')]);
+      raw.push(['SON BUENAS', '#ffaa00', () => this.hub('SonBuenas')]);
       raw.push(['NO QUIERO', '#ff4444', () => this.hub('ResponderEnvido', false)]);
 
     } else if (pendTru) {
