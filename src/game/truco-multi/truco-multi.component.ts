@@ -193,11 +193,19 @@ export class TrucoMultiComponent implements OnInit, OnDestroy {
     // Burbuja
     this.updateBubble(e, pendEnv, pendTru);
 
-    // Auto nueva mano con countdown
+    // Auto nueva mano con countdown: solo el jugador "mano" dispara el invoke
+    // (mismo patrón que 2v2/3v3), el otro recibe el broadcast. El botón manual
+    // y el guard del hub quedan como respaldo.
     const manoTermino = !!e.ganadorMano && !e.partidaTerminada;
     const esManoNueva = e.ganadorMano !== this.prevGanadorMano;
-    if (manoTermino && esManoNueva) {
-      this.iniciarCountdown(() => this.hub('NuevaMano'));
+    const soyElMano   = (e.manoIniciadaPor === 'Humano') === esJ1;
+    if (manoTermino && esManoNueva && soyElMano) {
+      this.iniciarCountdown(() => {
+        // Recheck: si mientras corría el countdown llegó otra mano o terminó la
+        // partida, no invocar.
+        const est = this.msg?.estado;
+        if (est?.ganadorMano && !est.partidaTerminada) this.hub('NuevaMano');
+      });
     } else if (!e.ganadorMano) {
       this.cancelarCountdown();
     }
